@@ -1,1 +1,730 @@
-# CTRLgroup-
+# CTRLgroup-<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTRL GROUP HQ ✿</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #121214;
+      --sidebar-bg: #1a1a1e;
+      --card-bg: #1e1e24;
+      --card-hover: #262630;
+      --text-main: #f4f4f6;
+      --text-muted: #a0a0b0;
+      --pink: #ff7bc0;
+      --pink-soft: rgba(255, 123, 192, 0.15);
+      --yellow: #ffdf6d;
+      --yellow-soft: rgba(255, 223, 109, 0.15);
+      --border: #2a2a35;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Layout */
+    aside {
+      width: 300px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.2rem;
+      color: var(--pink);
+      letter-spacing: 1px;
+    }
+
+    .sidebar-search {
+      padding: 12px 20px;
+      background: rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-search input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .sidebar-search input:focus {
+      border-color: var(--pink);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .nav-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--yellow);
+      margin: 20px 0 8px 0;
+      font-weight: 700;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+    }
+
+    .sidebar-nav li a {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-nav li a:hover {
+      background-color: var(--pink-soft);
+      color: var(--pink);
+      padding-left: 16px;
+    }
+
+    main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 40px;
+      max-width: calc(100vw - 300px);
+    }
+
+    header.main-header {
+      margin-bottom: 30px;
+    }
+
+    header.main-header span {
+      font-size: 0.8rem;
+      color: var(--yellow);
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    header.main-header h1 {
+      font-size: 2.2rem;
+      color: var(--pink);
+      margin: 4px 0;
+    }
+
+    header.main-header p {
+      color: var(--text-muted);
+    }
+
+    /* Stats Banner */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .stat-card .number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--yellow);
+      margin-bottom: 4px;
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Interactive Tools Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .tool-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .tool-card:hover {
+      border-color: var(--pink);
+      transform: translateY(-2px);
+    }
+
+    .tool-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tool-card h3 span {
+      font-size: 0.7rem;
+      background: var(--pink-soft);
+      color: var(--pink);
+      padding: 3px 8px;
+      border-radius: 12px;
+      letter-spacing: 1px;
+    }
+
+    .tool-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--pink), #ff52b0);
+      color: #121214;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: opacity 0.2s, transform 0.1s;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--card-hover);
+      color: var(--yellow);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--yellow-soft);
+    }
+
+    /* Modal Pop-up */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--pink);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transform: translateY(20px);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .modal h2 {
+      color: var(--pink);
+      font-size: 1.3rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      color: var(--text-main);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .modal-body ul {
+      margin-top: 12px;
+      padding-left: 20px;
+      color: var(--text-muted);
+    }
+
+    .data-actions {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      aside {
+        display: none;
+      }
+      main {
+        margin-left: 0;
+        max-width: 100vw;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside>
+    <div class="sidebar-header">
+      <h2>CTRL GROUP HQ ✿</h2>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="sidebarSearchInput" placeholder="🔍 Filter pages & hubs..." onkeyup="filterSidebar()">
+    </div>
+    <nav class="sidebar-nav" id="sidebarNavContent">
+      <div class="nav-section-title">My Cozy HQ</div>
+      <ul>
+        <li><a href="#hq">🏠 My Cozy HQ</a></li>
+        <li><a href="#scribbles">✏️ My Scribbles</a></li>
+        <li><a href="#big-block-city">🏙️ The Big Block City</a></li>
+        <li><a href="#pretty-worlds">🌐 My Pretty Worlds</a></li>
+      </ul>
+
+      <div class="nav-section-title">World Hubs (11)</div>
+      <ul>
+        <li><a href="#beaches">✨ Beaches</a></li>
+        <li><a href="#cozy-camp">✨ Cozy Camp</a></li>
+        <li><a href="#garden">✨ Garden</a></li>
+        <li><a href="#golf-course">✨ Golf Course</a></li>
+        <li><a href="#heart-house">✨ Heart House</a></li>
+        <li><a href="#lights">✨ Lights</a></li>
+        <li><a href="#lost-city">✨ Lost City</a></li>
+        <li><a href="#main">✨ Main</a></li>
+        <li><a href="#modern-x">✨ Modern X</a></li>
+        <li><a href="#resort">✨ Resort</a></li>
+        <li><a href="#things">✨ Things</a></li>
+      </ul>
+
+      <div class="nav-section-title">Cozy Tools & Pages</div>
+      <ul>
+        <li><a href="#snaps">📸 My Snaps</a></li>
+        <li><a href="#memory-lane">⏱️ My Memory Lane</a></li>
+        <li><a href="#wins">🏆 Wins & Whoopsies</a></li>
+        <li><a href="#secret-box">🔒 Secret Time Box</a></li>
+        <li><a href="#dream-list">🚀 Silly Dream List</a></li>
+        <li><a href="#tiktok-maker">✨ TikTok Maker</a></li>
+        <li><a href="#my-tiktoks">🎬 My TikToks</a></li>
+        <li><a href="#add-ons">🧩 My Add-Ons</a></li>
+      </ul>
+
+      <div class="nav-section-title">Maps & Roads</div>
+      <ul>
+        <li><a href="#p-6">Page 6: The Big Pretty Map</a></li>
+        <li><a href="#p-7">Page 7: All the Avenues</a></li>
+        <li><a href="#p-8">Page 8: All the Streets</a></li>
+        <li><a href="#p-21">Page 21: The Road Situation</a></li>
+        <li><a href="#p-22">Page 22: How I Build Roads</a></li>
+      </ul>
+
+      <div class="nav-section-title">Builds & IKEA Maze</div>
+      <ul>
+        <li><a href="#p-13">Page 13: Stuff I Actually Built</a></li>
+        <li><a href="#p-14">Page 14: Stuff I Wanna Build</a></li>
+        <li><a href="#p-18">Page 18: The IKEA Maze</a></li>
+        <li><a href="#p-19">Page 19: IKEA Display Numbers</a></li>
+      </ul>
+
+      <div class="nav-section-title">Films & Content</div>
+      <ul>
+        <li><a href="#p-37">Page 37: My Film Studio</a></li>
+        <li><a href="#p-38">Page 38: Video Ideas</a></li>
+        <li><a href="#p-39">Page 39: Look What I Made!</a></li>
+        <li><a href="#p-40">Page 40: My Filming Calendar</a></li>
+      </ul>
+
+      <div class="nav-section-title">Codes & Scraps</div>
+      <ul>
+        <li><a href="#p-41">Page 41: Weird Code Stuff</a></li>
+        <li><a href="#p-42">Page 42: Coords to Remember</a></li>
+        <li><a href="#p-43">Page 43: Google This Later</a></li>
+        <li><a href="#p-44">Page 44: Fix-It List</a></li>
+        <li><a href="#p-45">Page 45: Silly Thoughts</a></li>
+        <li><a href="#p-46">Page 46: Extra Stuff</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main>
+    <header class="main-header">
+      <span>EST. MY COZY NOTEBOOK</span>
+      <h1>CTRL GROUP HQ ✿</h1>
+      <p>My whole little Minecraft world, all snuggled up in one supercharged place.</p>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="number">11</div>
+        <div class="label">My Pretty Worlds</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="addonStatDisplay">0 / 130</div>
+        <div class="label">Loaded Add-ons</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">12</div>
+        <div class="label">TikToks Made</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">1</div>
+        <div class="label">Active Build Plot</div>
+      </div>
+    </div>
+
+    <!-- Interactive Generators & Tools Grid -->
+    <div class="tools-grid">
+      
+      <!-- Tool 1: TikTok Idea Roller -->
+      <div class="tool-card">
+        <div>
+          <h3>🎬 TikTok 100+ Idea & Lore Roller <span>100+ IDEAS</span></h3>
+          <p>Roll a fresh TikTok concept with a detailed briefing pop-up using your custom pink and yellow palette aesthetic.</p>
+        </div>
+        <button class="btn" onclick="openTikTokRoller()">Roll TikTok Idea ✨</button>
+      </div>
+
+      <!-- Tool 2: What should I build? -->
+      <div class="tool-card">
+        <div>
+          <h3>🔨 What should I build? <span>BUILD VIBES</span></h3>
+          <p>Bored? Pick a style and get a cute little job description in a detailed pop-up card.</p>
+        </div>
+        <button class="btn" onclick="openBuildPicker()">Pick a Build Job 🏡</button>
+      </div>
+
+      <!-- Tool 3: Challenge Mode -->
+      <div class="tool-card">
+        <div>
+          <h3>⚡ Challenge Mode <span>GO GO GO</span></h3>
+          <p>Roll a wild speed-build constraint and race the clock on your server grid.</p>
+        </div>
+        <button class="btn" onclick="openChallengeMode()">Roll Challenge ⏱️</button>
+      </div>
+
+      <!-- Tool 4: IKEA Display Generator -->
+      <div class="tool-card">
+        <div>
+          <h3>🛋️ What should I display? <span>IKEA MAZE</span></h3>
+          <p>Pick a room vignette and receive custom furniture layout details.</p>
+        </div>
+        <button class="btn" onclick="openIkeaDisplay()">Get Display Vignette 🛋️</button>
+      </div>
+
+      <!-- Tool 5: Random Palette Generator -->
+      <div class="tool-card">
+        <div>
+          <h3>🎨 Random Palette Generator <span>MICRO-PALETTE</span></h3>
+          <p>Roll a cozy 3-block micro-palette featuring bright pale pinks and sunny yellows.</p>
+        </div>
+        <button class="btn" onclick="openPaletteGenerator()">Roll Color Palette 🌸</button>
+      </div>
+
+      <!-- Tool 6: Quick Add-On Logger -->
+      <div class="tool-card">
+        <div>
+          <h3>🧩 Add-On Quick Logger <span>DATABASE</span></h3>
+          <p>Log a new add-on or texture pack right onto your active tracker list instantly.</p>
+        </div>
+        <button class="btn" onclick="openAddonLogger()">Manage Add-Ons 📦</button>
+      </div>
+
+    </div>
+
+    <!-- Data Backup & Migration Tools -->
+    <div class="data-actions">
+      <button class="btn btn-secondary" onclick="exportAppData()">💾 Export My App Data (JSON)</button>
+      <button class="btn btn-secondary" onclick="importAppData()">📂 Restore Data Backup</button>
+    </div>
+  </main>
+
+  <!-- Universal Modal Pop-Up -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackground(event)">
+    <div class="modal">
+      <header>
+        <h2 id="modalTitle">Generator Details</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </header>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic content goes here -->
+      </div>
+      <button class="btn" onclick="closeModal()">Got it, love this! ✨</button>
+    </div>
+  </div>
+
+  <script>
+    // Local Storage state initialization
+    let appData = JSON.parse(localStorage.getItem('ctrl_group_hq_data')) || {
+      addonsCount: 42,
+      savedRolls: []
+    };
+
+    document.getElementById('addonStatDisplay').innerText = `${appData.addonsCount} / 130`;
+
+    function saveAppData() {
+      localStorage.setItem('ctrl_group_hq_data', JSON.stringify(appData));
+    }
+
+    // Sidebar Live Filter
+    function filterSidebar() {
+      let query = document.getElementById('sidebarSearchInput').value.toLowerCase();
+      let navSections = document.querySelectorAll('.sidebar-nav .nav-section-title');
+      
+      navSections.forEach(section => {
+        let ul = section.nextElementSibling;
+        let items = ul.getElementsByTagName('li');
+        let visibleCount = 0;
+
+        for (let i = 0; i < items.length; i++) {
+          let text = items[i].innerText.toLowerCase();
+          if (text.includes(query)) {
+            items[i].style.display = "";
+            visibleCount++;
+          } else {
+            items[i].style.display = "none";
+          }
+        }
+        section.style.display = visibleCount === 0 ? "none" : "";
+      });
+    }
+
+    // Modal Control Functions
+    function showModal(title, htmlContent) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBody').innerHTML = htmlContent;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function closeModalOnBackground(event) {
+      if (event.target === document.getElementById('modalOverlay')) {
+        closeModal();
+      }
+    }
+
+    // Generator 1: TikTok Roller
+    function openTikTokRoller() {
+      const ideas = [
+        { title: "30-Second Bright Pink Bakery Build", hook: "Watch me build a cozy pastry shop using strict pale pink and sunny yellow blocks!", details: "Audio: Soft acoustic guitar instrumental. Pacing: Quick 0.5s cuts for each wall placement." },
+        { title: "Highway Grid Expansion Timelapse", hook: "Laying down custom coordinate axes for the CTRL GROUP DIGITAL HQ infrastructure.", details: "Audio: Lo-fi beat. Pacing: 4x speed sweep showing the highway grid alignment." },
+        { title: "IKEA Maze Room Showcase", hook: "Navigating the trickiest corner of the bright display rooms.", details: "Audio: Upbeat conversational voiceover. Pacing: Smooth panning shots with block spotlight close-ups." }
+      ];
+      let idea = ideas[Math.floor(Math.random() * ideas.length)];
+      showModal("🎬 TikTok Concept Briefing", `
+        <p><strong>Concept:</strong> ${idea.title}</p>
+        <p style="margin-top: 10px;"><strong>Hook Line:</strong> <em>"${idea.hook}"</em></p>
+        <p style="margin-top: 10px;"><strong>Production Notes:</strong> ${idea.details}</p>
+        <div style="margin-top: 15px; padding: 10px; background: rgba(255,123,192,0.1); border-radius: 8px;">
+          <label><input type="checkbox" checked> Concept reviewed & locked</label><br>
+          <label><input type="checkbox"> Screen recording captured</label>
+        </div>
+      `);
+    }
+
+    // Generator 2: Build Picker
+    function openBuildPicker() {
+      const builds = [
+        "Build a sunny yellow corner cafe with outdoor patio seating and miniature flower planters.",
+        "Construct a modern greenhouse featuring glass panes, hanging ferns, and warm interior lighting.",
+        "Design a custom equestrian stable entrance with detailed post-and-beam woodwork and decorative flower boxes."
+      ];
+      let build = builds[Math.floor(Math.random() * builds.length)];
+      showModal("🔨 Build Assignment", `
+        <p><strong>Your Task:</strong></p>
+        <p style="font-size: 1.1rem; color: var(--yellow); margin: 10px 0;">${build}</p>
+        <p><strong>Color Guidelines:</strong> Accent with bright pale pink trim and sunny yellow lighting elements.</p>
+      `);
+    }
+
+    // Generator 3: Challenge Mode
+    function openChallengeMode() {
+      const challenges = [
+        "⚡ 10-Minute Micro Build: Construct a complete bedroom vignette using only wool, quartz, and pink concrete blocks!",
+        "⚡ Monochrome Palette: Build a structure using strictly pink and white blocks with zero timber.",
+        "⚡ Vertical Slice: Build a 3-story facade in under 15 minutes focusing entirely on window framing."
+      ];
+      let challenge = challenges[Math.floor(Math.random() * challenges.length)];
+      showModal("⚡ Speed Challenge Active", `
+        <p style="font-size: 1.1rem; color: var(--pink);">${challenge}</p>
+        <p style="margin-top: 10px; color: var(--text-muted);">Set your timer and capture your screen recording highlights!</p>
+      `);
+    }
+
+    // Generator 4: IKEA Display
+    function openIkeaDisplay() {
+      const displays = [
+        "Vignette #402: Cozy Reading Nook with pastel pink shelving, layered rugs, and warm baseboard heater detailing.",
+        "Vignette #118: Modern Kitchen Display featuring minimalist island counters, hanging pendant lights, and bright yellow stools.",
+        "Vignette #905: Studio Apartment Corner featuring a compact loft bed and integrated workspace grid."
+      ];
+      let display = displays[Math.floor(Math.random() * displays.length)];
+      showModal("🛋️ IKEA Display Vignette", `
+        <p style="font-size: 1.05rem; color: var(--yellow);">${display}</p>
+        <p style="margin-top: 10px;">Arrangement includes custom item frames, textured blocks, and cozy aesthetic lighting.</p>
+      `);
+    }
+
+    // Generator 5: Palette Generator
+    function openPaletteGenerator() {
+      const palettes = [
+        { name: "Sunny Blossom", colors: ["#ff7bc0 (Bright Pale Pink)", "#ffdf6d (Sunny Yellow)", "#ffffff (Clean White Quartz)"] },
+        { name: "Cozy Hearth", colors: ["#ffb6c1 (Soft Pink)", "#fffacd (Lemon Chiffon)", "#d2b48c (Warm Wood)"] },
+        { name: "Digital HQ Sunset", colors: ["#ff69b4 (Hot Pink)", "#ffe4e1 (Misty Rose)", "#ffebcd (Blanched Almond)"] }
+      ];
+      let p = palettes[Math.floor(Math.random() * palettes.length)];
+      showModal(`🎨 Palette: ${p.name}`, `
+        <p>Recommended 3-block micro-palette for your current build:</p>
+        <ul style="list-style: none; padding: 0; margin-top: 10px;">
+          <li style="padding: 6px 0; border-bottom: 1px solid var(--border);">🌸 ${p.colors[0]}</li>
+          <li style="padding: 6px 0; border-bottom: 1px solid var(--border);">☀️ ${p.colors[1]}</li>
+          <li style="padding: 6px 0;">✨ ${p.colors[2]}</li>
+        </ul>
+      `);
+    }
+
+    // Generator 6: Add-On Logger
+    function openAddonLogger() {
+      appData.addonsCount = Math.min(130, appData.addonsCount + 1);
+      saveAppData();
+      document.getElementById('addonStatDisplay').innerText = `${appData.addonsCount} / 130`;
+      showModal("🧩 Add-On Logged Successfully", `
+        <p>A new add-on/texture pack has been successfully logged to your active tracker!</p>
+        <p style="margin-top: 10px; color: var(--yellow);">Total Loaded Add-ons: <strong>${appData.addonsCount} / 130</strong></p>
+      `);
+    }
+
+    // Export & Import Backup
+    function exportAppData() {
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+      let downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "ctrl_group_hq_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importAppData() {
+      let input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = readerEvent => {
+          try {
+            appData = JSON.parse(readerEvent.target.result);
+            saveAppData();
+            document.getElementById('addonStatDisplay').innerText = `${appData.addonsCount} / 130`;
+            alert("✨ App data successfully restored from backup!");
+          } catch (err) {
+            alert("❌ Invalid backup file.");
+          }
+        }
+      }
+      input.click();
+    }
+  </script>
+</body>
+</html>
