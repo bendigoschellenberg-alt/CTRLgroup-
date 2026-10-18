@@ -4034,8 +4034,29 @@ function observePrivateThumbs(){
  cards.forEach(card=>thumbObserver.observe(card));
 }
 
-async function signedMedia(r){const path=data(r).filePath;if(!path||S.mediaUrls.has(path))return S.mediaUrls.get(path)||'';
- try{const j=await api(`/storage/v1/object/sign/hq-media/${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expiresIn:3600})});let url=j.signedURL||j.signedUrl||'';if(url.startsWith('/'))url=SUPABASE_URL+'/storage/v1'+url;S.mediaUrls.set(path,url);if(!S.modal){clearTimeout(signedMedia.paintTimer);signedMedia.paintTimer=setTimeout(()=>{if(sessionValid())render()},180)}return url}catch{return ''}}
+const mediaLinkExpires=new Map();
+function mediaCachedUrl(path){
+ const exp=mediaLinkExpires.get(path);
+ if(exp&&exp<Date.now()){mediaLinkExpires.delete(path);S.mediaUrls.delete(path);}
+ return S.mediaUrls.get(path)||'';
+}
+async function signedMedia(r){
+ const path=data(r).filePath;if(!path)return '';
+ const cached=mediaCachedUrl(path);if(cached)return cached;
+ try{
+  const safe=path.split('/').map(encodeURIComponent).join('/');
+  const j=await api('/storage/v1/object/sign/hq-media/'+safe,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expiresIn:3600})});
+  let url=j.signedURL||j.signedUrl||'';
+  if(url.startsWith('/'))url=SUPABASE_URL+'/storage/v1'+url;
+  if(!url)throw Error('No signed video link received.');
+  S.mediaUrls.set(path,url);mediaLinkExpires.set(path,Date.now()+55*60*1000);
+  if(!S.modal){clearTimeout(signedMedia.paintTimer);signedMedia.paintTimer=setTimeout(()=>{
+   // Do not replace a playing video when another private preview finishes loading.
+   if(sessionValid()&&![...app.querySelectorAll('video')].some(v=>!v.paused&&!v.ended))render();
+  },180)}
+  return url;
+ }catch(err){console.warn('Private preview unavailable:',err.message);return ''}
+}
 function mediaMime(file){const ext=String(file.name||'').split('.').pop().toLowerCase();return file.type||({heic:'image/heic',heif:'image/heif',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',mp4:'video/mp4',mov:'video/quicktime',m4v:'video/x-m4v',webm:'video/webm'}[ext]||'')}
 async function uploadMedia(file){if(!/^(image|video)\//.test(mediaMime(file)))throw Error('Only supported photo and video files can be uploaded.');if(file.size>25*1024*1024)throw Error('Your private Supabase media bucket currently limits each file to 25 MiB. A Netlify update cannot increase that storage setting.');const uid=S.session?.user?.id;if(!uid)throw Error('Please sign in again.');const ext=(file.name.split('.').pop()||'file').replace(/[^a-z0-9]/ig,'').toLowerCase();const path=`${uid}/${crypto.randomUUID()}.${ext||'bin'}`;
  await api(`/storage/v1/object/hq-media/${path}`,{method:'POST',headers:{'Content-Type':mediaMime(file)||'application/octet-stream','x-upsert':'false'},body:file});return path}
@@ -4944,7 +4965,7 @@ function tkClips(r){
 function tkClipPreview(r){
  const clips=tkClips(r);if(!clips.length)return '<p class="tk29-note-empty">No video attached yet — you can upload yours directly to this TikTok record.</p>';
  return `<div class="tkplus-clips"><div class="tkplus-clip-label">${pinkIcon('TikTok')} ${clips.length} uploaded clip${clips.length===1?'':'s'}</div>${clips.map(clip=>{
-  const path=clip.filePath,url=S.mediaUrls.get(path);
+  const path=clip.filePath,url=mediaCachedUrl(path);
   if(!url)signedMedia({data:{filePath:path}}).catch(()=>{});
   return `<div class="tkplus-clip">${url?`<video controls playsinline preload="metadata" src="${e(url)}" aria-label="TikTok video"></video>`:`<div class="tkplus-clip-loading">Private video · preparing preview…</div>`}<small>${e(clip.fileName||'Uploaded video')}</small></div>`;
  }).join('')}</div>`;
@@ -5226,9 +5247,9 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  for(const pic of kitPhotos){if(!S.mediaUrls.has(data(pic).filePath))signedMedia(pic).catch(()=>{});}
  const kitGallery=kitPhotos.length?`<section class="panel lore-photos-panel"><div class="section-line"><div><div class="eyebrow">DAY ${e(d.day||'')} · YOUR VISUAL JOURNAL</div><h2>${pinkIcon('camera')} Pictures for this day</h2></div><span class="pill yellow">${kitPhotos.length} photo${kitPhotos.length===1?'':'s'}</span></div><div class="lore-gallery">${kitPhotos.map(pic=>`<button class="lore-gallery-item" data-detail="${e(pic.id)}">${S.mediaUrls.get(data(pic).filePath)?`<img src="${e(S.mediaUrls.get(data(pic).filePath))}" alt="${e(title(pic))}" loading="lazy">`:`<span class="lore-gallery-placeholder">${pinkIcon('Photo')} Loading private image…</span>`}<small>${e(title(pic))}</small></button>`).join('')}</div></section>`:'';
  const tiktokClips=r.kind==='TikTok'?tkClips(r):[];
- for(const clip of tiktokClips){if(!S.mediaUrls.has(clip.filePath))signedMedia({data:{filePath:clip.filePath}}).catch(()=>{});}
- const tiktokClipGallery=tiktokClips.length?`<section class="panel video-clip-gallery"><div class="section-line"><h2>${pinkIcon('TikTok')} Footage attached to this TikTok</h2><span class="pill yellow">${tiktokClips.length} private clip${tiktokClips.length===1?'':'s'}</span></div>${tiktokClips.map(clip=>`<div class="video-clip-tile"><strong>${e(clip.fileName||'Uploaded video')}</strong>${S.mediaUrls.get(clip.filePath)?`<video controls playsinline preload="metadata" src="${e(S.mediaUrls.get(clip.filePath))}"></video>`:`<p class="muted">Loading private clip…</p>`}</div>`).join('')}</section>`:'';
- const url=d.filePath?S.mediaUrls.get(d.filePath):'';
+ for(const clip of tiktokClips){if(!mediaCachedUrl(clip.filePath))signedMedia({data:{filePath:clip.filePath}}).catch(()=>{});}
+ const tiktokClipGallery=tiktokClips.length?`<section class="panel video-clip-gallery"><div class="section-line"><h2>${pinkIcon('TikTok')} Footage attached to this TikTok</h2><span class="pill yellow">${tiktokClips.length} private clip${tiktokClips.length===1?'':'s'}</span></div>${tiktokClips.map(clip=>`<div class="video-clip-tile"><strong>${e(clip.fileName||'Uploaded video')}</strong>${mediaCachedUrl(clip.filePath)?`<video controls playsinline preload="metadata" src="${e(mediaCachedUrl(clip.filePath))}"></video>`:`<p class="muted">Loading private clip…</p>`}</div>`).join('')}</section>`:'';
+ const url=d.filePath?mediaCachedUrl(d.filePath):'';
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
@@ -5281,13 +5302,26 @@ function vlQueueDOM(){const host=app.querySelector('#vl-queue-status');if(!host)
  host.querySelectorAll('[data-vl-remove]').forEach(b=>b.addEventListener('click',()=>{VL.queue.splice(Number(b.dataset.vlRemove),1);vlQueueDOM()}));
  const run=app.querySelector('#vl-upload-start');if(run)run.disabled=VL.uploading||!VL.queue.some(x=>x.status==='ready');
 }
-async function vlPrivateUrl(r){const path=data(r).filePath;if(!path||VL.signed.has(path))return VL.signed.get(path)?.url||'';
- if(VL.busySigning.has(path))return '';VL.busySigning.add(path);
- try{const j=await api('/storage/v1/object/sign/hq-media/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expiresIn:2700})});
- let url=j.signedURL||j.signedUrl||'';if(url.startsWith('/'))url=SUPABASE_URL+'/storage/v1'+url;
- if(url){VL.signed.set(path,{url,expires:Date.now()+2500*1000});const media=app.querySelectorAll('[data-vl-video-path]');media.forEach(el=>{if(el.dataset.vlVideoPath===path){el.src=url;el.closest('.vl-video-wrap')?.classList.add('ready')}});}
- return url;
- }catch(err){vlStatusLine('Cannot load a private video: '+err.message);return '';}finally{VL.busySigning.delete(path)}
+async function vlPrivateUrl(r){
+ const path=data(r).filePath;if(!path)return '';
+ const cached=VL.signed.get(path);
+ if(cached?.url&&cached.expires>Date.now()+30000)return cached.url;
+ VL.signed.delete(path);
+ if(!VL.pendingSigning)VL.pendingSigning=new Map();
+ if(VL.pendingSigning.has(path))return VL.pendingSigning.get(path);
+ const job=(async()=>{
+  const safe=path.split('/').map(encodeURIComponent).join('/');
+  const j=await api('/storage/v1/object/sign/hq-media/'+safe,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expiresIn:2700})});
+  let url=j.signedURL||j.signedUrl||'';
+  if(url.startsWith('/'))url=SUPABASE_URL+'/storage/v1'+url;
+  if(!url)throw Error('No private playback link received.');
+  VL.signed.set(path,{url,expires:Date.now()+2500*1000});
+  return url;
+ })();
+ VL.pendingSigning.set(path,job);
+ try{return await job}
+ catch(err){vlStatusLine('Cannot load private video: '+err.message);return ''}
+ finally{VL.pendingSigning.delete(path)}
 }
 function vlVideoMedia(r){const d=data(r),status=d.status||'Raw footage';
  return `<div class="vl-video-wrap" data-vl-player="${e(r.id)}">
@@ -5296,15 +5330,46 @@ function vlVideoMedia(r){const d=data(r),status=d.status||'Raw footage';
   <span class="vl-clip-tag">${e(status)}</span>
  </div>`;
 }
-async function vlPlayClip(button){const id=button.dataset.vlPlay,r=get(id),wrap=button.closest('.vl-video-wrap');if(!r||!wrap)return;
- button.disabled=true;button.textContent='…';
- try{const path=data(r).filePath;if(!path)throw Error('No video file is linked to this record.');
-  const old=VL.signed.get(path);if(old&&old.expires<Date.now())VL.signed.delete(path);
-  const src=await vlPrivateUrl(r);if(!src)throw Error('Private playback link unavailable. Please sign in and try again.');
+function vlPlaybackNotice(wrap,message,url){
+ let note=wrap.nextElementSibling;
+ if(!note?.classList?.contains('vl-playback-notice')){
+  note=document.createElement('div');note.className='vl-preview-error vl-playback-notice';note.setAttribute('role','status');wrap.after(note);
+ }
+ note.replaceChildren(document.createTextNode(message));
+ if(url){const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=' Open original video ↗';note.append(link);}
+}
+function vlStartVideo(wrap,r,src){
+ if(!wrap.isConnected)return;
+ if(wrap.nextElementSibling?.classList?.contains('vl-playback-notice'))wrap.nextElementSibling.remove();
+ const video=document.createElement('video');video.className='vl-active-player';
+ video.controls=true;video.playsInline=true;video.setAttribute('playsinline','');video.preload='metadata';
+ video.setAttribute('aria-label','Video: '+title(r));
+ video.addEventListener('error',()=>{
+  VL.signed.delete(data(r).filePath);
+  vlPlaybackNotice(wrap,'This video could not play here. Its format or private link may need refreshing.',src);
+ });
+ wrap.replaceChildren(video);video.src=src;
+ const playResult=video.play();
+ if(playResult?.catch)playResult.catch(err=>{
   if(!wrap.isConnected)return;
-  const player=document.createElement('video');player.className='vl-active-player';player.controls=true;player.playsInline=true;player.setAttribute('playsinline','');player.preload='metadata';player.src=src;player.setAttribute('aria-label','Video: '+title(r));
-  wrap.replaceChildren(player);player.play().catch(()=>{});
- }catch(err){if(wrap.isConnected){button.disabled=false;button.textContent='▶';const alert=document.createElement('div');alert.className='vl-preview-error';alert.setAttribute('role','alert');alert.textContent=err.message;wrap.append(alert)}}
+  if(err?.name==='NotAllowedError')vlPlaybackNotice(wrap,'Ready to watch. Tap Play in the video controls.',src);
+  else if(err?.name!=='AbortError')vlPlaybackNotice(wrap,'Tap Play in the player, or open the original video.',src);
+ });
+}
+async function vlPlayClip(button){
+ const r=get(button.dataset.vlPlay),wrap=button.closest('.vl-video-wrap');if(!r||!wrap)return;
+ const path=data(r).filePath;
+ if(!path){vlPlaybackNotice(wrap,'This record is missing its original video file.');return;}
+ button.disabled=true;button.textContent='…';
+ try{
+  const cached=VL.signed.get(path);
+  // Safari allows immediate play when the signed link was prefetched before the tap.
+  if(cached?.url&&cached.expires>Date.now()+30000){vlStartVideo(wrap,r,cached.url);return;}
+  const src=await vlPrivateUrl(r);
+  if(!src)throw Error('Private playback link unavailable. Sign in and try again.');
+  // Native playback controls remain usable if Safari blocks automatic play after loading.
+  vlStartVideo(wrap,r,src);
+ }catch(err){if(wrap.isConnected){button.disabled=false;button.textContent='▶';vlPlaybackNotice(wrap,err.message);}}
 }
 function vlLabels(r){const d=data(r),parts=[...vlLinked(r,'World','video_world').map(x=>'World: '+title(x)),...vlLinked(r,'TikTok','video_tiktok').map(x=>'TikTok: '+title(x)),...vlLinked(r,'Build','video_build').map(x=>'Build: '+title(x)),...vlLinked(r,'AddOn','video_addon').map(x=>'Add-on: '+title(x))];return parts.length?`<small class="vl-relations">${parts.map(x=>`<span>${e(x)}</span>`).join('')}</small>`:'<small class="vl-unlinked">Not linked yet</small>'}
 function vlEntry(r){const d=data(r);const dur=Number(d.durationSeconds)||0;const duration=dur?Math.floor(dur/60)+':'+String(Math.floor(dur%60)).padStart(2,'0'):'';
@@ -5398,6 +5463,16 @@ async function vlIndexLegacy(){const originals=vlClips();const known=new Map(S.r
  await loadAll();vlStatusLine(`Indexed ${created} existing clip(s), linked ${linked} TikTok relationship(s) · ${errors} need review.`);
  }finally{VL.legacyBusy=false;render()}}
 async function vlArchive(){const r=get(VL.editId);if(!r||r.kind!=='Video')return;if(!confirm(`Archive video “${title(r)}”? The uploaded file and all TikTok data will remain private and untouched.`))return;try{await removeRecord(r.id);VL.editId=null;await loadAll();vlStatusLine('Video record archived. Original file kept.')}catch(err){vlStatusLine(err.message)}}
+function vlPreloadVisiblePlayers(root){
+ if(VL.previewObserver){VL.previewObserver.disconnect();VL.previewObserver=null;}
+ const cards=[...root.querySelectorAll('[data-vl-player]')];if(!cards.length)return;
+ const prepare=el=>{const r=get(el.dataset.vlPlayer);if(r&&data(r).filePath)vlPrivateUrl(r).catch(()=>{});};
+ if(!('IntersectionObserver' in window)){cards.slice(0,5).forEach(prepare);return;}
+ VL.previewObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries)if(entry.isIntersecting){VL.previewObserver?.unobserve(entry.target);prepare(entry.target);}
+ },{rootMargin:'200px 0px'});
+ cards.forEach(card=>VL.previewObserver.observe(card));
+}
 function vlBind(root){root.querySelector('#vl-jump-upload')?.addEventListener('click',()=>{VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({behavior:'smooth',block:'center'})});
  root.querySelector('#vl-empty-upload')?.addEventListener('click',()=>{VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({behavior:'smooth',block:'center'})});
  root.querySelector('.vl-upload-details')?.addEventListener('toggle',ev=>{VL.uploadOpen=ev.target.open});
@@ -5414,7 +5489,7 @@ function vlBind(root){root.querySelector('#vl-jump-upload')?.addEventListener('c
  root.querySelector('#vl-close-edit')?.addEventListener('click',()=>{VL.editId=null;render()});
  root.querySelector('#vl-edit-form')?.addEventListener('submit',ev=>{ev.preventDefault();vlSaveEdit(ev.target)});
  root.querySelector('#vl-archive')?.addEventListener('click',vlArchive);
- vlQueueDOM();}
+ vlQueueDOM();vlPreloadVisiblePlayers(root);}
 
 function render(){if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video')body=videoLibraryPage();else if(S.page==='TikTok')body=videoHubPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
 function globalSearchPage(){
