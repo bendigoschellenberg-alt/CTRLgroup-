@@ -6748,7 +6748,8 @@ function wireApp(){
  app.querySelector('#field-edit-form')?.addEventListener('submit',ev=>{ev.preventDefault();saveFieldChange(ev.target)});
 
  app.querySelectorAll('[data-video-tab]').forEach(b=>b.addEventListener('click',()=>{S.videoTab=b.dataset.videoTab;S.tkAdd=false;S.tkEdit=null;S.tkPage=0;render()}));
- app.querySelectorAll('[data-video-filter]').forEach(b=>b.addEventListener('click',()=>{S.videoFilter=b.dataset.videoFilter;S.tkPage=0;S.tkEdit=null;render()}));
+ app.querySelectorAll('[data-video-upload-close]').forEach(b=>b.addEventListener('click',()=>{if(VL.uploading)return;VL.uploadOpen=false;VL.queue=[];render()}));
+  app.querySelectorAll('[data-video-filter]').forEach(b=>b.addEventListener('click',()=>{S.videoFilter=b.dataset.videoFilter;S.tkPage=0;S.tkEdit=null;render()}));
  app.querySelectorAll('[data-video-expand]').forEach(b=>b.addEventListener('click',()=>{S.videoExpanded=S.videoExpanded===b.dataset.videoExpand?'':b.dataset.videoExpand;S.tkEdit=null;render()}));
  app.querySelector('[data-video-new]')?.addEventListener('click',()=>{S.videoTab='tiktoks';S.tkAdd=true;S.tkEdit=null;render();app.querySelector('.v4-new-panel')?.scrollIntoView({block:'start',behavior:'smooth'})});
  app.querySelector('[data-video-upload]')?.addEventListener('click',()=>{S.tkAdd=false;S.tkEdit=null;VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({block:'center',behavior:'smooth'});});
@@ -7837,6 +7838,89 @@ boot();
  #app .video-v7 .v7-upload-copy>strong{font-size:13px}
 }
 @media(prefers-reduced-motion:reduce){#app .video-v7 *{transition:none!important}}
+
+
+/* Videos v8 — one clean library. Pink accents, lots of white space, no collage or split galleries. */
+#app .video-desk{--vd-pink:#ff5b9a;--vd-pale:#ffe4ed;--vd-cream:#fff8ef;--vd-ink:#3c3138;--vd-line:#f0e1e7;width:100%;max-width:880px;min-width:0;margin:0 auto 48px;color:var(--vd-ink);font-family:var(--scrap-body,system-ui)}
+#app .video-desk *{box-sizing:border-box}
+#app .vd-head{display:flex;gap:20px;align-items:flex-end;justify-content:space-between;padding:4px 2px 25px;border-bottom:1px solid var(--vd-line);margin:0 0 23px}
+#app .vd-overline{font:800 10px/1.35 var(--scrap-body,system-ui);color:#b0557f;letter-spacing:.11em}
+#app .vd-head h1{margin:7px 0 6px!important;padding:0!important;color:#3b333a!important;background:none!important;font:750 clamp(42px,7vw,58px)/1 var(--scrap-hand,'Patrick Hand',cursive)!important}
+#app .vd-head h1 span{color:var(--vd-pink)}
+#app .vd-head p{font:470 13px/1.5 var(--scrap-body,system-ui)!important;color:#796c74;margin:0 0 8px!important;max-width:460px}
+#app .vd-head small{font:650 11px/1.35 var(--scrap-body,system-ui);color:#af8196}
+#app .vd-head-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+#app .vd-head-actions button{border:1px solid #e8bacd!important;background:white!important;color:#92506d!important;min-height:45px;padding:10px 14px;border-radius:10px;font:740 12px/1.25 var(--scrap-body,system-ui)!important;cursor:pointer;white-space:normal}
+#app .vd-head-actions button:first-child{background:var(--vd-pink)!important;border-color:#e7508d!important;color:#fff!important}
+#app .vd-library{min-width:0}
+#app .vd-library-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 15px}
+#app .vd-library-heading h2{color:#483d43!important;margin:0!important;font:730 30px/1.1 var(--scrap-hand,'Patrick Hand',cursive)!important}
+#app .vd-library-heading span{color:#a08594;font:650 11px var(--scrap-body,system-ui)}
+#app .vd-search{display:flex;align-items:center;gap:10px;border:1px solid #ebd9e2;border-radius:11px;background:#fff;min-height:48px;padding:0 13px}
+#app .vd-search span{font:28px/1 var(--scrap-hand,cursive);color:#b55f87}
+#app .vd-search input{display:block;width:100%;min-width:0;min-height:46px;font:480 16px var(--scrap-body,system-ui)!important;color:#3c3438!important;background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;padding:9px 0!important}
+#app .vd-filters{display:flex;gap:8px;overflow-x:auto;margin:12px 0 14px;padding:1px 0 5px;scrollbar-width:thin}
+#app .vd-filters button{flex:none;min-height:37px;border:1px solid transparent!important;background:transparent!important;color:#806f79!important;border-radius:22px;padding:7px 12px;font:700 12px var(--scrap-body,system-ui)!important;cursor:pointer;white-space:nowrap}
+#app .vd-filters button.active{background:#ffe4ed!important;border-color:#ffbdd5!important;color:#89415e!important}
+#app .vd-list{background:white;border:1px solid var(--vd-line);border-radius:14px;overflow:hidden}
+#app .vd-entry{background:white;border-bottom:1px solid #f3e7ed;min-width:0}
+#app .vd-entry:last-child{border-bottom:0}
+#app .vd-entry.vd-open{background:#fffbfd}
+#app .vd-entry-title{width:100%;display:grid;grid-template-columns:39px minmax(0,1fr) 18px;gap:12px;align-items:center;padding:16px!important;border:0!important;background:transparent!important;text-align:left!important;cursor:pointer;min-height:91px}
+#app .vd-file-symbol{width:39px;height:43px;border-radius:11px;background:#ffe4ed;color:#ad547d;display:grid;place-items:center;font:800 25px var(--scrap-hand,cursive)}
+#app .vd-file-symbol.vd-file-upload{background:#fff0d5;color:#947247}
+#app .vd-entry-text{min-width:0;display:grid;gap:4px}
+#app .vd-entry-text small{font:780 10px/1.25 var(--scrap-body,system-ui);color:#b16388;letter-spacing:.02em}
+#app .vd-entry-text strong{color:#3d3339!important;font:760 15px/1.3 var(--scrap-body,system-ui)!important;overflow-wrap:anywhere}
+#app .vd-entry-text>span{color:#83747e;font:450 12px/1.4 var(--scrap-body,system-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+#app .vd-entry-arrow{color:#bd7a9b;font:500 24px/1 var(--scrap-body,system-ui);text-align:center}
+#app .vd-entry-detail{padding:17px 20px 21px 67px;border-top:1px solid #f0e5ea;min-width:0}
+#app .vd-detail-fields{display:grid;gap:13px;max-width:650px}
+#app .vd-detail-field strong{display:block;color:#a15a79;font:760 11px/1.4 var(--scrap-body,system-ui)}
+#app .vd-detail-field p{font:480 13px/1.6 var(--scrap-body,system-ui);margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#564a52}
+#app .vd-entry-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}
+#app .vd-entry-actions button,#app .vd-entry-actions a{min-height:42px;border-radius:9px;padding:9px 13px;border:1px solid #f1cadd!important;background:#ffe4ed!important;color:#8c4865!important;font:720 12px var(--scrap-body,system-ui)!important;text-decoration:none!important;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+#app .vd-entry-actions a{background:white!important}
+#app .vd-entry-detail .tkplus-link-badges{margin-top:13px;display:flex;flex-wrap:wrap;gap:5px}
+#app .vd-entry-detail .tkplus-link-badges span{font-size:11px}
+#app .vd-player{width:100%;max-width:500px;min-width:0}
+#app .vd-player .vl-video-wrap{aspect-ratio:16/10}
+#app .vd-editor{border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important;margin:15px 0 0!important;display:grid;gap:13px}
+#app .vd-editor input,#app .vd-editor textarea,#app .vd-editor select{font-size:16px!important;max-width:100%;min-width:0;width:100%}
+#app .vd-editor .video-v3-save{background:#ff5b9a!important;color:white!important;border:1px solid #f05890!important}
+#app .vd-editor .video-v3-cancel{background:white!important;color:#935570!important;border:1px solid #ecd0dd!important}
+#app .vd-form-shell{margin:2px 0 25px;background:#fffaf7;border:1px solid #efdae4;border-radius:14px;padding:19px;min-width:0}
+#app .vd-compose-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#app .vd-compose-heading h2{font:740 26px var(--scrap-hand,'Patrick Hand',cursive)!important;margin:0!important;color:#504049!important}
+#app .vd-compose-heading>button{font-size:24px!important;color:#9f6481!important;background:transparent!important;border:0!important;min-height:39px;min-width:39px;cursor:pointer}
+#app .vd-form-shell>p{font-size:12px;color:#8a7681;line-height:1.5}
+#app .vd-upload-shell .vl-page{padding:0!important;display:block!important}
+#app .vd-upload-shell .vl-upload-panel{background:transparent!important;border:0!important;box-shadow:none!important}
+#app .vd-upload-shell .vl-upload-details>summary{display:none!important}
+#app .vd-upload-shell .vl-upload-content{padding:0!important}
+#app .vd-upload-shell .vl-file-pick{min-height:120px!important;background:#fff!important;border:1.5px dashed #e9b0c8!important;margin:10px 0 8px!important}
+#app .vd-upload-shell .vl-file-pick:before{display:none!important}
+#app .vd-upload-shell .vl-primary{background:#ff5b9a!important;border-color:#ee5994!important;color:white!important}
+#app .vd-empty{margin:0;padding:24px 16px;color:#8e7883;text-align:center;font-size:13px}
+#app .vd-pager{display:flex;gap:11px;align-items:center;justify-content:center;padding-top:16px}
+#app .vd-pager button{border:1px solid #efd1de;background:white;color:#995676;padding:9px 13px;border-radius:8px;cursor:pointer;min-height:42px}
+#app .vd-pager button:disabled{opacity:.38;cursor:default}
+#app .vd-pager span{font:700 11px var(--scrap-body,system-ui);color:#9d8292}
+#app .vd-footnote{color:#b19ba7;font:450 11px/1.5 var(--scrap-body,system-ui);margin:16px 3px}
+#app .video-desk :is(button,a,input,textarea,select,summary):focus-visible{outline:3px solid #ff5b9a!important;outline-offset:2px}
+@media(max-width:650px){
+ #app .vd-head{display:block;padding:3px 0 18px;margin-bottom:20px}
+ #app .vd-head h1{font-size:48px!important}
+ #app .vd-head p{font-size:12px!important}
+ #app .vd-head-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:19px}
+ #app .vd-head-actions button{width:100%;min-width:0;padding:11px 5px;font-size:11px!important}
+ #app .vd-entry-title{grid-template-columns:32px minmax(0,1fr) 18px;gap:10px;min-height:83px;padding:13px 10px!important}
+ #app .vd-file-symbol{width:32px;height:38px;font-size:21px;border-radius:8px}
+ #app .vd-entry-text strong{font-size:14px!important}
+ #app .vd-entry-detail{padding:15px 12px}
+ #app .vd-form-shell{padding:13px}
+}
+@media(prefers-reduced-motion:reduce){#app .video-desk *{transition:none!important}}
 
 </style>
 </body>
