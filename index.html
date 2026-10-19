@@ -5243,6 +5243,73 @@ function worldHubDefinitions(){
 function worldHubReverseDef(def){
  return relationDefs(def[4]).find(back=>back[4]==='World'&&back[2]===def[2]&&back[3]!==def[3]);
 }
+
+/* Each World has an independent private dated add-on combination ledger. */
+const WORLD_LOADOUT_HISTORY_KIND='WorldAddonSnapshot';
+function worldLoadoutHistory(worldId){return all(WORLD_LOADOUT_HISTORY_KIND).filter(r=>data(r).worldId===worldId);}
+function worldLoadoutEntries(ids){
+ const seen=new Set();
+ return ids.map(id=>get(id)).filter(r=>r&&r.kind==='AddOn'&&!r.archived_at&&!seen.has(r.id)&&(seen.add(r.id),true))
+ .map(r=>({id:r.id,name:title(r),creator:creatorName(r)||''}))
+ .sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base',numeric:true}));
+}
+function worldLoadoutNow(worldId){
+ const r=get(worldId);return r&&r.kind==='World'?worldLoadoutEntries(worldOverviewLinkList(r,'addons').map(a=>a.id)):[];
+}
+function worldLoadoutSignature(items){return items.map(r=>r.id?'id:'+r.id:'name:'+String(r.name||'').toLowerCase()).sort().join('||');}
+async function worldLoadoutSave(worldId,entries,options={}){
+ const w=get(worldId);if(!w||w.kind!=='World'||w.archived_at)throw Error('World not found.');
+ const date=options.date||dateOnly(),source=options.source||'automatic',signature=worldLoadoutSignature(entries);
+ const prior=worldLoadoutHistory(worldId).filter(r=>data(r).source!=='manual').sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')))[0];
+ if(!options.force&&prior&&data(prior).signature===signature)return null;
+ const saved=await saveRecord(WORLD_LOADOUT_HISTORY_KIND,{
+  name:title(w)+' add-ons '+date,worldId,worldName:title(w),date,recordedAt:new Date().toISOString(),
+  source,note:String(options.note||''),signature,addons:entries.map(a=>({id:a.id||'',name:String(a.name||''),creator:String(a.creator||'')}))
+ });
+ S.records.push(saved);return saved;
+}
+async function worldLoadoutBefore(worldIds){
+ for(const id of unique(worldIds).filter(Boolean)){
+  if(!worldLoadoutHistory(id).some(r=>data(r).source!=='manual'))
+   await worldLoadoutSave(id,worldLoadoutNow(id),{source:'baseline',force:true});
+ }
+}
+async function worldLoadoutAfter(worldIds){
+ const problems=[];
+ for(const id of unique(worldIds).filter(Boolean)){
+  try{await worldLoadoutSave(id,worldLoadoutNow(id),{source:'automatic'});}
+  catch(err){problems.push(err.message);}
+ }
+ if(problems.length)showToast('Add-ons saved, but a history snapshot failed: '+problems[0]);
+}
+function worldLoadoutDate(ymd){
+ const s=String(ymd||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return 'Undated';
+ return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+}
+async function worldLoadoutSaveCurrent(id){
+ if(S.worldLoadoutBusy)return;
+ S.worldLoadoutBusy=true;
+ try{await worldLoadoutSave(id,worldLoadoutNow(id),{source:'current',force:true});showToast('Current add-on combination saved with today’s date ♡');}
+ catch(err){showToast('Could not save combination: '+err.message);}
+ finally{S.worldLoadoutBusy=false;render();}
+}
+async function worldLoadoutSavePast(form){
+ if(S.worldLoadoutBusy)return;
+ const id=form.dataset.worldLoadout,world=get(id),fd=new FormData(form),date=String(fd.get('date')||'');
+ if(!world||world.kind!=='World')return showToast('World not available.');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateOnly())return showToast('Choose a real past date.');
+ const picked=fd.getAll('addon').map(String),entries=worldLoadoutEntries(picked);
+ if(entries.length!==new Set(picked).size)return showToast('An add-on is unavailable. Review the selected packs.');
+ for(const name of String(fd.get('other')||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,40)){
+  if(!entries.some(x=>x.name.toLowerCase()===name.toLowerCase()))entries.push({id:'',name,creator:''});
+ }
+ if(!confirm('Save '+entries.length+' add-ons for '+title(world)+' on '+worldLoadoutDate(date)+'? This will not change your current add-ons.'))return;
+ S.worldLoadoutBusy=true;
+ try{await worldLoadoutSave(id,entries,{source:'manual',date,note:String(fd.get('note')||''),force:true});S.worldLoadoutPast=null;showToast('Past add-on combination saved ♡');}
+ catch(err){showToast('History not saved: '+err.message);}
+ finally{S.worldLoadoutBusy=false;render();}
+}
+
 /* WORLD OVERVIEW LOADOUT — read only until the user chooses Edit Links. Uses existing hq_links. */
 function worldOverviewLinkList(world, key){
  const def=relationDefs('World').find(d=>d[0]===key);
