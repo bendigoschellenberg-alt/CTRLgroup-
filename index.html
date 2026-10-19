@@ -5052,12 +5052,12 @@ function tkClips(r){
  return clips.filter(c=>c&&typeof c.filePath==='string'&&c.filePath);
 }
 function tkClipPreview(r){
- const clips=tkClips(r).filter(c=>c.manualVideoHub===true);if(!clips.length)return '<p class="tk29-note-empty">No new video attached yet. Upload your own footage whenever you are ready.</p>';
- return `<div class="tkplus-clips"><div class="tkplus-clip-label">${pinkIcon('TikTok')} ${clips.length} uploaded clip${clips.length===1?'':'s'}</div>${clips.map(clip=>{
-  const path=clip.filePath,url=mediaCachedUrl(path);
-  if(!url)signedMedia({data:{filePath:path}}).catch(()=>{});
-  return `<div class="tkplus-clip">${url?`<video controls playsinline preload="metadata" src="${e(url)}" aria-label="TikTok video"></video>`:`<div class="tkplus-clip-loading">Private video · preparing preview…</div>`}<small>${e(clip.fileName||'Uploaded video')}</small></div>`;
- }).join('')}</div>`;
+ const clips=tkClips(r).filter(c=>c.manualVideoHub===true);
+ if(!clips.length)return '';
+ return `<details class="tk-new-footage"><summary>${clips.length} new clip${clips.length===1?'':'s'} attached ⌄</summary><div class="tk-new-footage-inner">${clips.map(c=>{
+  const url=mediaCachedUrl(c.filePath);if(!url)signedMedia({data:{filePath:c.filePath}}).catch(()=>{});
+  return `<div class="tk-new-footage-clip">${url?`<video controls playsinline preload="none" src="${e(url)}" aria-label="My attached clip"></video>`:'<span>Preparing private preview…</span>'}</div>`;
+ }).join('')}</div></details>`;
 }
 function tkSelectionPicker(kind,linkType,recId){const opts=all(kind).slice().sort((a,b)=>title(a).localeCompare(title(b))),selected=new Set(recId?tkRelatedIds(recId,linkType,kind):[]),word=kind==='World'?'Worlds':kind==='Build'?'Builds':'Add-Ons',input=kind==='World'?'worldIds':kind==='Build'?'buildIds':'addonIds';
  return `<details class="tkplus-picker"><summary>${pinkIcon(kind)} Link ${word} <small>(${selected.size} selected)</small></summary><label class="tkplus-finder">Find ${word}<input type="search" data-tkplus-filter placeholder="Search ${word}…" autocomplete="off"></label><div class="tkplus-options" data-tkplus-options>${opts.length?opts.map((r,i)=>`<label class="tkplus-option" data-tkplus-option data-name="${e(title(r).toLowerCase())}" ${i>=18&&!selected.has(r.id)?'hidden':''}><input type="checkbox" name="${input}" value="${e(r.id)}" ${selected.has(r.id)?'checked':''}> <span>${e(title(r))}</span></label>`).join(''):'<p>None saved yet — add a record in your library first.</p>'}</div><small class="tkplus-tip">Choose as many as you like. Selected links only change when you save.</small></details>`;
@@ -5080,13 +5080,32 @@ function tkMetadataFields(r){const d=r?data(r):{},field=(key,label,area=false)=>
 }
 function tkMiniLinks(r){const worlds=tkLinkedNames(r,'World','tiktok_world'),addons=tkLinkedNames(r,'AddOn','tiktok_addon'),builds=tkLinkedNames(r,'Build','tiktok_build');
  return worlds.length||addons.length||builds.length?`<div class="tkplus-link-badges">${worlds.map(w=>`<span>${pinkIcon('World')} ${e(w)}</span>`).join('')}${addons.map(a=>`<span>${pinkIcon('AddOn')} ${e(a)}</span>`).join('')}${builds.map(a=>`<span>${pinkIcon('Build')} ${e(a)}</span>`).join('')}</div>`:''}
-function tkCard(r,i){const ed=S.tkEdit===r.id,notes=tkNote(r),name=tkTitle(r),url=tkPostUrl(r),date=String(data(r).postDate||data(r).date||''),needsTitle=tkNeedsTitle(r);
- return `<article class="tk29-card" aria-label="${e(name)}">
-  <div class="tk29-top"><div class="tk29-number">${String(i+1).padStart(2,'0')}</div><div class="tk29-card-main"><h3>${e(name)}</h3><div class="tk29-titleline">${needsTitle?'<span class="tk29-reviewflag">♡ Watch + name this one</span>':''}<button type="button" class="tk29-rename" data-tk29-rename="${e(r.id)}" aria-label="Rename ${e(name)}">✎ Rename</button></div>${date?`<small>${e(date)}</small>`:''}<p>${notes?e(notes):'<span class="tk29-note-empty">Your notes go here ♡</span>'}</p></div></div>
-  ${tkMiniLinks(r)}${!ed?tkClipPreview(r)+vlTikTokLinkedClips(r):''}
-  ${ed?`<form class="tk29-edit" data-tk29-form="${e(r.id)}"><label>Title<input name="title" value="${e(name)}" required maxlength="200"></label><label>TikTok link<input type="url" name="url" value="${e(url)}" inputmode="url"></label><label>Notes<textarea name="note" rows="4" placeholder="Notes for this TikTok…">${e(notes)}</textarea></label>${tkMetadataFields(r)}${tkExtraFields(r.id)}<div class="tk29-actions"><button type="submit" class="tk29-primary" ${S.tkSaving?'disabled':''}>${S.tkSaving?'Saving…':'Save TikTok + links'}</button><button type="button" class="tk29-secondary" data-tk29-cancel ${S.tkSaving?'disabled':''}>Cancel</button></div></form>`:''}
-  <div class="tk29-actions">${url?`<a class="tk29-primary" href="${e(url)}" target="_blank" rel="noopener noreferrer">Watch on TikTok ↗</a>`:`<span class="tk29-note-empty">Draft — no published link yet</span>`}<button class="tk29-secondary" type="button" data-tk29-edit="${e(r.id)}" ${S.tkSaving?'disabled':''}>${ed?'Edit open':'✎ Edit + link'}</button></div>
- </article>`
+function tkCard(r,i){
+ const d=data(r),editing=S.tkEdit===r.id,name=tkTitle(r),url=tkPostUrl(r),date=String(d.postDate||d.date||'');
+ const notes=tkNote(r),caption=String(d.caption||'').trim(),concept=String(d.description||'').trim(),body=caption||notes||concept;
+ const song=String(d.song||'').trim(),hashtags=String(d.hashtags||'').trim();
+ return `<article class="tk29-card tk-video-entry" aria-label="${e(name)}">
+  <div class="tk29-top"><span class="tk29-number">${String(i+1).padStart(2,'0')}</span><div class="tk29-card-main">
+   <div class="tk-video-head"><h3>${e(name)}</h3>${date?`<small class="tk-video-date">${e(date)}</small>`:''}</div>
+   ${tkNeedsTitle(r)?'<small class="tk29-reviewflag">Review title</small>':''}
+   ${body?`<p class="tk-video-snippet">${e(body)}</p>`:''}
+   ${notes&&notes!==body?`<p class="tk-video-notes"><strong>Notes:</strong> ${e(notes)}</p>`:''}
+   ${song||hashtags?`<div class="tk-video-metadata">${song?`<span>♫ ${e(song)}</span>`:''}${hashtags?`<span>${e(hashtags)}</span>`:''}</div>`:''}
+  </div></div>
+  ${tkMiniLinks(r)}${!editing?tkClipPreview(r):''}
+  ${editing?`<form class="tk29-edit" data-tk29-form="${e(r.id)}">
+   <label>Title<input name="title" value="${e(name)}" required maxlength="200"></label>
+   <label>TikTok link<input type="url" name="url" value="${e(url)}" inputmode="url"></label>
+   <label>Notes<textarea name="note" rows="4" placeholder="Notes for this TikTok…">${e(notes)}</textarea></label>
+   ${tkMetadataFields(r)}${tkExtraFields(r.id)}
+   <div class="tk29-actions"><button type="submit" class="tk29-primary" ${S.tkSaving?'disabled':''}>${S.tkSaving?'Saving…':'Save changes'}</button><button type="button" class="tk29-secondary" data-tk29-cancel ${S.tkSaving?'disabled':''}>Cancel</button></div>
+  </form>`:''}
+  <div class="tk29-actions tk-video-actions">
+   ${url?`<a class="tk29-primary" href="${e(url)}" target="_blank" rel="noopener noreferrer">View on TikTok ↗</a>`:''}
+   <button type="button" class="tk29-secondary" data-tk29-edit="${e(r.id)}" ${S.tkSaving?'disabled':''}>${editing?'Editing':'Edit details'}</button>
+   <button type="button" class="tk29-secondary tk-video-rename" data-tk29-rename="${e(r.id)}" ${S.tkSaving?'disabled':''}>Rename</button>
+  </div>
+ </article>`;
 }
 function videoHubPage(){
  const curated=all('TikTok').slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))),q=String(S.tkSearch||'').trim().toLowerCase(),hiddenCount=0;
@@ -5094,12 +5113,12 @@ function videoHubPage(){
  const pageSize=10,nPages=Math.max(1,Math.ceil(filtered.length/pageSize)),page=Math.max(0,Math.min(nPages-1,Number(S.tkPage)||0));S.tkPage=page;
  const chunk=filtered.slice(page*pageSize,(page+1)*pageSize);
  return `<div class="tk29-book">
-  <header class="tk29-header"><span class="tk29-tape">♡ MY VIDEOS ♡</span><div class="tk29-headrow"><span class="tk29-sketch">${pinkIcon('TikTok')}</span><div><div class="tk29-eyebrow">CTRL + CRFT · by Control Group</div><h1>Videos</h1><p>All your TikTok notes, links, captions, and new uploads together. Older mismatched clips are hidden safely.</p></div></div><a href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer" class="tk29-profile">@missistephi ↗</a></header>
-  <div class="tk29-counter"><span><strong>${curated.length}</strong> TikTok records — posted and drafts</span><span class="tk29-underline">${curated.filter(tkNeedsTitle).length} need your help identifying the footage</span></div>
+  <header class="tk29-header"><span class="tk29-tape">MY CREATIVE LIBRARY</span><div class="tk29-headrow"><span class="tk29-sketch">${pinkIcon('TikTok')}</span><div><div class="tk29-eyebrow">CTRL + CRFT · by Control Group</div><h1>Videos</h1><p>All your TikTok notes, links, captions, and new uploads together. Older mismatched clips are hidden safely.</p></div></div><a href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer" class="tk29-profile">@missistephi ↗</a></header>
+  <div class="tk29-counter"><span><strong>${curated.length}</strong> TikTok entries</span><span class="tk29-underline">${curated.filter(tkNeedsTitle).length} titles to review</span></div>
   <div class="tk29-controls"><label class="tk29-search"><span aria-hidden="true">⌕</span><input id="tk29-search" type="search" autocomplete="off" value="${e(S.tkSearch||'')}" placeholder="Search by build, sound, or title…" aria-label="Search TikToks"></label><button class="tk29-review-toggle ${S.tkReviewTitles?'is-on':''}" data-tk29-review type="button" aria-pressed="${!!S.tkReviewTitles}">${S.tkReviewTitles?'← All TikToks':`✎ Help name ${curated.filter(tkNeedsTitle).length}`}</button><button class="tk29-new" id="vl-missing-tiktok" type="button" aria-pressed="${!!VL.tkMissingOnly}">${VL.tkMissingOnly?'Show all TikToks':'♡ Missing Video'}</button><button class="tk29-new" data-tk29-add type="button" ${S.tkSaving?'disabled':''}>${S.tkAdd?'Close form':'＋ Add TikTok'}</button></div>
   ${S.tkAdd?`<section class="tk29-add-sheet"><h2>Paste a TikTok link ♡</h2><p>Create a draft or add a posted TikTok link. Add your footage whenever you are ready.</p><form id="tk29-add-form"><label>Title<input name="title" placeholder="Give this TikTok a name" maxlength="200" required></label><label>Link to my posted TikTok<input type="url" inputmode="url" name="url" placeholder="https://www.tiktok.com/@missistephi/video/… (optional)"></label><label>Notes<textarea name="note" placeholder="Notes for this TikTok…" rows="4"></textarea></label>${tkMetadataFields(null)}${tkExtraFields(null)}<div class="tk29-actions"><button class="tk29-primary" type="submit" ${S.tkSaving?'disabled':''}>${S.tkSaving?'Saving…':'Save my TikTok + links'}</button><button class="tk29-secondary" type="button" data-tk29-add ${S.tkSaving?'disabled':''}>Cancel</button></div></form></section>`:''}
   ${vlUnifiedUploads()}
-  <section class="tk29-library" aria-label="My posted TikToks"><div class="tk29-library-head"><h2>TikTok information</h2><span>${filtered.length} of ${curated.length}</span></div>
+  <section class="tk29-library" aria-label="My posted TikToks"><div class="tk29-library-head"><h2>TikTok details</h2><span>${filtered.length} of ${curated.length}</span></div>
   ${chunk.length?`<div class="tk29-grid">${chunk.map((r,i)=>tkCard(r,page*pageSize+i)).join('')}</div>`:`<div class="tk29-empty">No TikToks found. Try another search or paste a new post link.</div>`}
   ${nPages>1?`<div class="tk29-pagination"><button data-tk29-page="-1" type="button" ${page===0?'disabled':''}>← Previous</button><span>${page+1} / ${nPages}</span><button data-tk29-page="1" type="button" ${page===nPages-1?'disabled':''}>Next →</button></div>`:''}</section>
   <p class="tk29-note-empty">All your TikTok information is kept. Add footage whenever you want.</p>
@@ -5478,18 +5497,20 @@ function vlEditor(r){const d=data(r);return `<section class="panel vl-editor" id
 function vlTikTokLinkedClips(post){return '';}
 function vlTikTokBridge(){return ''}
 function vlManualRecords(){return all('Video').filter(r=>data(r).manualVideoHub===true);}
+function vlCompactEntry(r){
+ const d=data(r),raw=String(title(r)||''),friendly=/^[a-z0-9_-]{24,}$/i.test(raw)?'New uploaded video':raw||'New uploaded video',added=String(d.date||d.uploadedAt||'').slice(0,10);
+ return `<article class="vl-upload-item"><div class="vl-upload-item-top"><div class="vl-upload-item-title"><strong>${e(friendly)}</strong><small>${e([added,d.status||'Raw footage'].filter(Boolean).join(' · '))}</small></div><button type="button" class="btn btn-small btn-soft" data-vl-edit="${e(r.id)}">Edit + link</button></div>
+ ${vlLabels(r)}<details class="vl-preview-toggle"><summary>Preview video ⌄</summary><div class="vl-preview-inline">${vlVideoMedia(r)}</div></details></article>`;
+}
 function vlUnifiedUploads(){
  const mine=vlManualRecords();
  return `<section class="vl-page vl-unified-upload" aria-label="Upload new videos">
- <section class="vl-upload-panel" id="vl-upload-panel"><details class="vl-upload-details" ${VL.uploadOpen?'open':''}>
- <summary><span class="vl-upload-symbol">✧</span><span class="vl-upload-heading"><strong>Upload a new video</strong><small>Choose clips yourself. No automatic matching.</small></span><span class="vl-upload-chevron">⌄</span></summary>
- <div class="vl-upload-content"><label class="vl-file-pick"><strong>Select videos from my iPhone</strong><small>MP4 / MOV · multiple clips supported</small><input type="file" id="vl-video-file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple></label>
- <p class="vl-upload-hint">Files stay private. The current per-file storage limit is 25 MiB.</p><div id="vl-queue-status" aria-live="polite"></div>
- <div class="vl-upload-action"><button type="button" id="vl-upload-start" class="vl-primary" ${VL.uploading||!VL.queue.some(x=>x.status==='ready')?'disabled':''}>${VL.uploading?'Uploading…':'Upload selected videos'}</button><p id="vl-live-message" role="status">${e(VL.info||'Videos you choose to upload will show below.')}</p></div></div></details></section>
- ${mine.length?`<section class="vl-catalog"><div class="vl-catalog-head"><h2>My new uploads <span class="vl-catalog-count">${mine.length}</span></h2></div>${VL.editId&&get(VL.editId)&&data(get(VL.editId)).manualVideoHub?vlEditor(get(VL.editId)):''}<div class="vl-grid">${mine.map(vlEntry).join('')}</div></section>`:`<p class="vl-upload-hint">Your fresh video library is empty. Earlier clips are hidden but have not been deleted.</p>`}
+ <section class="vl-upload-panel" id="vl-upload-panel"><details class="vl-upload-details" ${VL.uploadOpen?'open':''}><summary><span class="vl-upload-symbol">✧</span><span class="vl-upload-heading"><strong>Add my own videos</strong><small>Choose clips yourself. No automatic matching.</small></span><span class="vl-upload-chevron">⌄</span></summary>
+ <div class="vl-upload-content"><label class="vl-file-pick"><strong>Select clips from my iPhone</strong><small>MP4 / MOV · multiple clips supported</small><input type="file" id="vl-video-file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple></label>
+ <p class="vl-upload-hint">Files stay private. Current limit: 25 MiB per clip.</p><div id="vl-queue-status" aria-live="polite"></div><div class="vl-upload-action"><button type="button" id="vl-upload-start" class="vl-primary" ${VL.uploading||!VL.queue.some(x=>x.status==='ready')?'disabled':''}>${VL.uploading?'Uploading…':'Upload selected videos'}</button><p id="vl-live-message" role="status">${e(VL.info||'New clips will appear below.')}</p></div></div></details></section>
+ ${mine.length?`<section class="vl-catalog vl-new-library"><div class="vl-catalog-head"><h2>My uploads <span class="vl-catalog-count">${mine.length}</span></h2></div>${VL.editId&&get(VL.editId)&&data(get(VL.editId)).manualVideoHub?vlEditor(get(VL.editId)):''}<div class="vl-compact-list">${mine.map(vlCompactEntry).join('')}</div></section>`:''}
  </section>`;
 }
-
 function videoLibraryPage(){const items=all('Video'),q=VL.search.trim().toLowerCase();let visible=items.filter(r=>[title(r),data(r).fileName,data(r).description,data(r).notes,data(r).tagsText].some(x=>String(x||'').toLowerCase().includes(q)));
  const liveLinked=items.filter(r=>S.links.some(l=>l.from_record_id===r.id&&/^video_(tiktok|world|build|addon)$/.test(l.link_type))).length;
  const favorites=items.filter(r=>data(r).favorite).length;
