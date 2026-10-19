@@ -3797,6 +3797,14 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .vl-tiktok-grid .vl-video-wrap{aspect-ratio:16/10}
 #app .vl-tiktok-grid small{display:block;font-size:12px}
 
+#app .capture-note-shortcuts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 15px}
+#app .capture-note-shortcuts .btn{font-size:13px!important;min-height:38px}
+#app .vl-unified-upload{padding:0;margin:10px 0 22px}
+#app .vl-unified-upload .vl-catalog{margin-top:14px}
+#app .tk29-book .tk29-grid{align-items:start}
+#app .tk29-book .tk29-card{transform:none!important;min-width:0}
+@media(max-width:700px){#app .capture-note-shortcuts .btn{flex:1 1 120px}#app .vl-unified-upload .vl-grid{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -3856,7 +3864,7 @@ const GROUPS = [
  ['CTRL GROUP GARDEN', [ ['GardenTheme','Garden Themes',''],['GardenFeature','Garden Features',''] ]],
  ['ASSETS', [ ['AddOn','Add-Ons',''],['Texture','Textures',''],['Craftable','Craftables',''],['CraftableItem','Craftable Items',''],['Creator','Creators',''],['Material','Materials',''],['Block','Blocks',''],['Palette','Palettes',''],['Skin','Skins',''],['shop','Shop Organizer',''],['WishlistItem','Wishlist',''] ]],
  ['GENERATORS', [ ['generator','All Generators',''],['GeneratorPrompt','Prompt Library',''] ]],
- ['MEDIA & STORY', [ ['Photo','Photos',''],['Video','My Videos',''],['TikTok','TikTok Studio',''],['Lore','Lore',''] ]],
+ ['MEDIA & STORY', [ ['Photo','Photos',''],['Video','Videos',''],['Lore','Lore',''] ]],
  ['EXTRAS', [ ['WorldTemplate','World Templates',''],['StructureBlock','Structure Blocks',''],['CraftablePlacement','Craftable Locations',''],['CoordinatePin','Coordinates',''],['Tag','Tags & Master Lists',''],['fields','Custom Fields',''],['RecoveryReview','Recovery Review',''],['trash','Archived & Trash',''],['reconcile','Safe Recovery',''],['settings','Settings & Imports',''] ]]
 ];
 
@@ -4093,7 +4101,7 @@ async function saveLinks(recordId,kind){
   S.links=S.links.filter(row=>row.id!==link.id);
  }
 }
-function nav(page){S.sidebarQuery='';S.page=page;S.sort=S.viewSort[page]||'name';S.query='';S.filter='all';S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.detail=null;S.sidebar=false;S.modal=null;const selected=GROUPS.find(([,items])=>items.some(([key])=>key===page));if(selected){S.navClosed.delete(selected[0]);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}}history.replaceState(null,'','#'+page);render()}
+function nav(page){if(page==='TikTok')page='Video';S.sidebarQuery='';S.page=page;S.sort=S.viewSort[page]||'name';S.query='';S.filter='all';S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.detail=null;S.sidebar=false;S.modal=null;const selected=GROUPS.find(([,items])=>items.some(([key])=>key===page));if(selected){S.navClosed.delete(selected[0]);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}}history.replaceState(null,'','#'+page);render()}
 const PINK_KIND_ICONS = {"WorldGroup": "bow", "World": "globe", "BuildIdea": "idea", "Build": "castle", "Subproject": "bow", "Task": "checklist", "AddOn": "puzzle", "Creator": "paint", "Texture": "texture", "Craftable": "bear", "CraftableItem": "strawberry", "Material": "thread", "Block": "cube", "Palette": "palette", "Avenue": "road", "Street": "road", "CityBlock": "city", "WishlistItem": "bag", "GardenTheme": "flower", "GardenFeature": "flower", "GeneratorPrompt": "wand", "Skin": "dress", "CraftablePlacement": "pin", "CoordinatePin": "pin", "RecoveryReview": "search", "WorldTemplate": "mountain", "StructureBlock": "columns", "Location": "map", "Photo": "camera", "Video": "film", "TikTok": "film", "Lore": "book", "Journal": "journal", "Event": "calendar", "Tag": "tag", "PageNote": "note", "home": "home", "today": "sun", "generator": "wand", "fields": "sliders", "trash": "trash", "settings": "settings", "shop": "bag", "search": "search", "photos": "camera", "quick": "star", "lock": "lock"};
 function pinkIcon(kind, extra=''){const shape=PINK_KIND_ICONS[kind]||kind;const id=/^[a-z]+$/.test(shape)?shape:'star';return `<svg class="pink-icon ${extra}" viewBox="0 0 48 48" focusable="false" aria-hidden="true"><use href="#pink-${id}"></use></svg>`;}
 function emoji(kind){return pinkIcon(kind)}
@@ -4104,7 +4112,7 @@ function label(kind){return KINDS[kind]?.label||cap(kind)}
 const SIDEBAR_FAVOURITES=[['home','Dashboard'],['Event','Calendar'],['World','My Worlds'],['Build','Builds'],['Palette','Palettes'],['generator','Generators']];
 const SIDEBAR_FAV_KEYS=new Set(SIDEBAR_FAVOURITES.map(([key])=>key));
 function sidebarLink(key,txt,extra=''){
- return `<button class="nav-item ${extra} ${S.page===key?'active':''}" data-nav="${key}" data-side-label="${e(txt.toLowerCase())}" ${S.page===key?'aria-current="page"':''}><span class="nav-emoji" aria-hidden="true">${pinkIcon(key)}</span><span class="nav-label">${e(txt)}</span>${KINDS[key]&&!extra.includes('nav-fav')?`<span class="nav-badge">${count(key)}</span>`:''}</button>`;
+ return `<button class="nav-item ${extra} ${S.page===key?'active':''}" data-nav="${key}" data-side-label="${e(txt.toLowerCase())}" ${S.page===key?'aria-current="page"':''}><span class="nav-emoji" aria-hidden="true">${pinkIcon(key)}</span><span class="nav-label">${e(txt)}</span>${KINDS[key]&&!extra.includes('nav-fav')?`<span class="nav-badge">${key==='Video'?count('TikTok'):count(key)}</span>`:''}</button>`;
 }
 function sidebar(){return `<aside class="sidebar sidebar-v4" aria-label="Main navigation"><div class="brand"><div class="brand-mark" aria-hidden="true">${pinkIcon('bow')}</div><div><strong class="brand-wordmark"><span class="brand-ctrl">CTRL</span><span class="brand-plus"> + </span><span class="brand-crft">CRFT</span></strong><small class="brand-byline">by Control Group</small></div><button class="sidebar-close-v4" type="button" id="sidebar-close-v4" aria-label="Close navigation">×</button></div>
  <div class="sidebar-v4-intro"><span class="sidebar-v4-doodle" aria-hidden="true">${pinkIcon('star')}</span> My handmade HQ <span class="sidebar-v4-swash" aria-hidden="true"></span></div>
@@ -4113,7 +4121,7 @@ function sidebar(){return `<aside class="sidebar sidebar-v4" aria-label="Main na
  ${GROUPS.map(([name,items],index)=>{const closed=S.navClosed.has(name);const remaining=items.filter(([key])=>!SIDEBAR_FAV_KEYS.has(key));return remaining.length?`<section class="side-group sidebar-v4-group" data-side-group><button class="group-heading group-toggle" data-toggle-group="${e(name)}" aria-expanded="${!closed}"><span>${e(name)}</span><span class="sidebar-v4-group-count">${remaining.length}</span><span class="group-chevron" aria-hidden="true">${closed?'＋':'−'}</span></button><div class="group-items ${closed?'is-collapsed':''}">${remaining.map(([key,txt])=>sidebarLink(key,txt)).join('')}</div></section>`:''}).join('')}
  </nav><div class="sidebar-v4-footer"><span aria-hidden="true">${pinkIcon('heart')}</span> all your little ideas, safely in one place </div></aside>`}
 function filterSidebarV4(){const term=String(S.sidebarQuery||'').trim().toLocaleLowerCase();const side=app.querySelector('.sidebar-v4');if(!side)return;let total=0;for(const group of side.querySelectorAll('[data-side-group]')){let hits=0;for(const b of group.querySelectorAll('[data-side-label]')){const hit=!term||b.dataset.sideLabel.includes(term);b.hidden=!hit;if(hit)hits++;}group.hidden=hits===0;total+=hits;const items=group.querySelector('.group-items');const toggle=group.querySelector('[data-toggle-group]');if(items&&toggle){if(term){items.classList.remove('is-collapsed');toggle.setAttribute('aria-expanded','true');}else{const isClosed=S.navClosed.has(toggle.dataset.toggleGroup);items.classList.toggle('is-collapsed',isClosed);toggle.setAttribute('aria-expanded',String(!isClosed))}}}const status=side.querySelector('#sidebar-search-status-v4');if(status)status.textContent=term?total+' page'+(total===1?'':'s')+' found':'';const clear=side.querySelector('#sidebar-clear-v4');if(clear)clear.hidden=!term;}
-function topbar(){return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs"><span class="crumb-heart">${pinkIcon("star")}</span> CTRL + CRFT <span class="crumb-divider">/</span> ${e(S.page==='home'?'My HQ':S.page==='today'?'Today':label(S.page))}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${((S.page==='TikTok'||S.page==='home')&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
+function topbar(){return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs"><span class="crumb-heart">${pinkIcon("star")}</span> CTRL + CRFT <span class="crumb-divider">/</span> ${e(S.page==='home'?'My HQ':S.page==='today'?'Today':label(S.page))}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${(S.page==='home'&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
 
 function pageNoteKey(){return S.detail?`record:${S.detail}`:`page:${S.page}`}
 function existingPageNote(page){return S.records.find(r=>r.kind==='PageNote'&&!r.archived_at&&data(r).pageKey===page)}
@@ -4146,20 +4154,20 @@ async function savePageNote(key){
  }catch(err){showToast('Note not saved: '+err.message)}
  finally{S.pageNoteSaving.delete(key);render()}
 }
-function shell(contents){app.innerHTML=`<div class="app-layout ${S.sidebar?'menu-open':''}">${sidebar()}<div class="mobile-shade" data-close-menu></div><div class="main">${topbar()}<main class="content">${S.loading?'<div class="statusbar">Refreshing your library — saved records remain visible</div>':''}${contents}${((S.page==='TikTok'||S.page==='home')&&!S.detail)?'':pageNotesPanel()}</main></div></div><nav class="scrap-mobile-tabs" aria-label="Quick navigation">
-${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn'],['TikTok','TikToks','TikTok']].map(([key,label,iconName])=>`<button type="button" class="scrap-mobile-tab ${S.page===key&&!S.detail?'is-active':''}" data-nav="${key}" ${S.page===key&&!S.detail?'aria-current="page"':''}><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon(iconName)}</span><span>${label}</span></button>`).join('')}
+function shell(contents){app.innerHTML=`<div class="app-layout ${S.sidebar?'menu-open':''}">${sidebar()}<div class="mobile-shade" data-close-menu></div><div class="main">${topbar()}<main class="content">${S.loading?'<div class="statusbar">Refreshing your library — saved records remain visible</div>':''}${contents}${(S.page==='home'&&!S.detail)?'':pageNotesPanel()}</main></div></div><nav class="scrap-mobile-tabs" aria-label="Quick navigation">
+${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn'],['Video','Videos','Video']].map(([key,label,iconName])=>`<button type="button" class="scrap-mobile-tab ${S.page===key&&!S.detail?'is-active':''}" data-nav="${key}" ${S.page===key&&!S.detail?'aria-current="page"':''}><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon(iconName)}</span><span>${label}</span></button>`).join('')}
 <button type="button" class="scrap-mobile-tab" data-open-scrap-menu aria-label="More pages"><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon('note')}</span><span>More</span></button>
 </nav>${S.modal?modalView():''}`;pinkifyDecorations(app);wireApp();app.querySelector('[data-open-scrap-menu]')?.addEventListener('click',()=>{S.sidebar=true;render()});filterSidebarV4();observePrivateThumbs()}
 function header(title,description,buttons=''){return `<div class="page-head"><div><div class="eyebrow">THE LITTLE BIG HQ ✦</div><h1>${title==='Today in My World'?pinkIcon('today'):Object.keys(KINDS).some(k=>KINDS[k].label===title)?pinkIcon(Object.keys(KINDS).find(k=>KINDS[k].label===title)):''}${e(title)}</h1><div class="subcopy">${e(description)}</div></div><div class="actions">${buttons}</div></div>`}
 // ---- HOME QUICK CAPTURE: REVIEW FIRST, THEN FILE / LINK ----------------------
 const CAPTURE_DESTINATIONS=[
- ['DailyNote','Daily note (one scratchpad per day)'],['AddOn','Add-On'],['Build','Build'],
+ ['DailyNote','Daily note (one scratchpad per day)'],['World','New World'],['AddOn','Add-On'],['Build','Build'],
  ['BuildIdea','Build Idea'],['Craftable','Craftable'],['Texture','Texture'],
  ['Task','Task'],['Journal','Journal'],['Lore','Lore'],['Location','Location'],
  ['Event','Calendar event'],['TikTok','TikTok note'],['WorldTemplate','World Template']
 ];
 const CAPTURE_ALIASES={
- note:'DailyNote',notes:'DailyNote',daily:'DailyNote',scratch:'DailyNote',
+ note:'DailyNote',notes:'DailyNote',daily:'DailyNote',scratch:'DailyNote',world:'World',worlds:'World',
  addon:'AddOn',addons:'AddOn',add_on:'AddOn',pack:'AddOn',packs:'AddOn',
  build:'Build',builds:'Build',idea:'BuildIdea',ideas:'BuildIdea',buildidea:'BuildIdea',
  craftable:'Craftable',craftables:'Craftable',texture:'Texture',textures:'Texture',
@@ -4194,7 +4202,7 @@ function captureRestore(){
   S.captureText=info.text.slice(0,30000);
   if(CAPTURE_DESTINATIONS.some(([kind])=>kind===info.kind))S.captureDefaultKind=info.kind;
   S.captureDefaultWorld=typeof info.worldId==='string'?info.worldId:'';
-  S.captureRows=info.rows.filter(row=>row&&typeof row.name==='string'&&['action',undefined].includes(row.mode)).slice(0,30).map(row=>({...row,status:'ready',error:''}));
+  S.captureRows=info.rows.filter(row=>row&&typeof row.name==='string'&&['action','targetNote',undefined].includes(row.mode)).slice(0,30).map(row=>({...row,status:'ready',error:''}));
   S.captureRestored=!!(S.captureText||S.captureRows.length);
   if(S.captureRestored)S.captureSummary='Recovered an unfinished draft from this device. Review before applying.';
  }catch(_err){/* If older storage is corrupted, ignore it. */}
@@ -4378,7 +4386,53 @@ async function captureExecuteAction(row){
   }
  }
 }
+
+function noteTargetPages(){return [{key:'home',name:'Home'},...GROUPS.flatMap(([,entries])=>entries.map(([key,name])=>({key,name})))].filter((p,i,a)=>a.findIndex(v=>v.key===p.key)===i);}
+function noteTargetPage(text){
+ const key=captureNorm(text);
+ if(['tiktok','tiktoks','video','videos'].includes(key))return 'Video';
+ if(['builds','build'].includes(key))return 'Build';
+ const choices=noteTargetPages().filter(p=>[p.name,p.key,p.name.split('&')[0].trim(),p.name.replace(/^my\s+/i,'')].some(n=>captureNorm(n)===key));
+ return choices.length===1?choices[0].key:'';
+}
+function captureSpecificNote(raw,index){
+ const m=raw.match(/^(?:(?:add|save|write|put|make)\s+)?(?:a\s+)?note\s+(?:to|on|for|in)\s+(.+?)\s*(?::|\s+-\s+|\s+that\s+|\s+saying\s+)(.+)$/i);
+ if(!m)return null;
+ let target=m[1].trim().replace(/^the\s+/i,''),type=/^(?:page|section)\s+/i.test(target)?'Page':'World';
+ let worldId='',pageKey='',recordId='';
+ if(/^this world$/i.test(target)){
+  const r=get(S.detail);worldId=r?.kind==='World'?r.id:S.captureDefaultWorld||'';
+ }else if(/^this page$/i.test(target)){
+  type='Page';const r=get(S.detail);if(r)recordId=r.id;else pageKey=S.page==='TikTok'?'Video':S.page;
+ }else{
+  target=target.replace(/^(?:my\s+)?(?:world|page|section)\s+/i,'').trim();
+  if(type==='World')worldId=captureWorld(target)||'';
+  if(!worldId){const page=noteTargetPage(target);if(page){type='Page';pageKey=page;}}
+ }
+ return {mode:'targetNote',index,raw,name:m[2].trim(),kind:'DailyNote',targetType:type,worldId,pageKey,targetRecordId:recordId,targetName:target,status:'ready',error:''};
+}
+async function captureSaveSpecificNote(row){
+ const message=String(row.name||'').trim();
+ if(!message)throw Error('Write the note first.');
+ if(row.targetType==='World'){
+  let id=row.worldId||captureWorld(row.targetName);
+  const r=id?get(id):null;if(!r||r.kind!=='World'||r.archived_at)throw Error('Choose an existing World.');
+  const saved=await saveRecord('World',{...data(r),notes:[String(data(r).notes||'').trim(),message].filter(Boolean).join('\n')},r.id);
+  S.records=S.records.map(x=>x.id===saved.id?saved:x);return;
+ }
+ const k=row.targetRecordId?'record:'+row.targetRecordId:'page:'+row.pageKey,old=row.targetRecordId?get(row.targetRecordId):existingPageNote(k);
+ if(row.targetRecordId&&!old)throw Error('The selected record is unavailable.');
+ const next={...data(old),notes:[String(data(old).notes||'').trim(),message].filter(Boolean).join('\n')};
+ if(!row.targetRecordId)Object.assign(next,{name:'Notes for '+row.pageKey,pageKey:k});
+ const saved=await saveRecord(row.targetRecordId?old.kind:'PageNote',next,old?.id);
+ S.records=[...S.records.filter(x=>x.id!==saved.id),saved];
+}
+
 function captureParseOne(line,index){
+ 
+ const routed=captureSpecificNote(line.trim(),index);if(routed)return routed;
+ const create=line.trim().match(/^(?:create|make|start|add)\s+(?:a\s+)?(?:new\s+)?(?:minecraft\s+)?world(?:\s+(?:called|named|:))?\s+(.+)$/i);
+ if(create)return {index,raw:line.trim(),kind:'World',name:create[1].trim().replace(/[.!]+$/,''),notes:'',worldId:'',createWorld:true,recordId:'',forceNew:false,status:'ready',error:''};
  const action=captureActionParse(line,index);if(action)return action;
  let raw=line.trim(),name=raw,kind=S.captureDefaultKind,worldId=S.captureDefaultWorld||'',invalidKind='',invalidWorld='',notes='';
  const parts=raw.split(/\s*\|\s*/);
@@ -4423,6 +4477,14 @@ function captureReview(){
 }
 function captureRowError(row){
  if(row.mode==='action')return captureActionError(row);
+ if(row.mode==='targetNote'){
+  if(!row.name.trim())return 'Write your note first.';
+  if(row.targetType==='Page'&&!row.pageKey&&!row.targetRecordId)return 'Choose the page to receive this note.';
+  if(row.targetType==='World'&&!row.worldId&&!captureWorld(row.targetName)&&!S.captureRows.some(r=>r.kind==='World'&&r.createWorld&&r.index<row.index&&captureNorm(r.name)===captureNorm(row.targetName)))return 'Choose the World for this note.';
+  if(row.worldId&&!get(row.worldId))return 'World not available.';
+  return '';
+ }
+ if(row.createWorld&&captureExisting(row).length)return 'That World already exists. Choose another name instead of duplicating it.';
  if(!row.name)return 'Add a name or note.';
  if(row.kind==='DailyNote'&&/^(?:add|remove|link|unlink|detach|attach|mark|set)\s+.+\s+(?:to|from|in|into|on|as)\s+.+$/i.test(row.raw||''))return 'This looks like an action, but could not be recognized. Try the tap-to-select shortcut below, or reword the instruction.';
  if(row.invalidKind)return 'Unrecognized type: '+row.invalidKind+'. Choose a destination below.';
@@ -4438,6 +4500,7 @@ function captureRowError(row){
 }
 function captureTargetPreview(row){
  if(row.mode==='action')return captureActionPreview(row);
+ if(row.mode==='targetNote')return 'Append note to '+(row.targetType==='World'?'world: '+(get(row.worldId)?title(get(row.worldId)):row.targetName):'page: '+(row.pageKey||'choose a page'));
  if(row.kind==='DailyNote')return `Append to one daily note for ${e(dateOnly())}`;
  const found=captureExisting(row);
  if(row.forceNew)return 'Create a separate new '+e(KINDS[row.kind]?.singular||row.kind);
@@ -4456,14 +4519,14 @@ function capturePanel(){
  const builderPacks=all(S.captureBuilderKind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
  const packTypes=[['AddOn','Add-Ons'],['Craftable','Craftable Packs'],['Texture','Textures']];
  return `<section class="panel capture-panel" aria-label="Quick Capture"><div class="capture-panel-top"><div><div class="eyebrow">WRITE IT ONCE. KEEP IT ALL.</div><h2>Scribble &amp; sort <span class="capture-star">${pinkIcon('star')}</span></h2><p>One thought, one spot. Review it, then send it where it belongs.</p></div><span class="hq-capture-marker" aria-hidden="true">01 / YOUR SCRIBBLES</span></div>
- <label class="capture-main-label" for="capture-text">What are we adding to the story?</label><textarea id="capture-text" rows="3" placeholder="Add Furniture Builder to Pink Wink Main\nOr write a note for today…" ${S.captureBusy?'disabled':''}>${e(S.captureText)}</textarea>
- <details class="hq-capture-settings" id="hq-capture-settings" ${S.hqCaptureSettingsOpen?'open':''}><summary>Give this scribble a home <span>(optional)</span></summary>
+ <label class="capture-main-label" for="capture-text">What are we adding to the story?</label><textarea id="capture-text" rows="3" placeholder="Create a new world called Strawberry Valley\nAdd note to world Pink Wink: Plan a new pool\nAdd note to page Builds: Try a greenhouse" ${S.captureBusy?'disabled':''}>${e(S.captureText)}</textarea>
+ <div class="capture-note-shortcuts"><button type="button" data-capture-example="Create a new world called " class="btn btn-soft btn-small">＋ New World</button><button type="button" data-capture-example="Add note to world : " class="btn btn-soft btn-small">✎ World note</button><button type="button" data-capture-example="Add note to page : " class="btn btn-soft btn-small">✎ Page note</button></div><details class="hq-capture-settings" id="hq-capture-settings" ${S.hqCaptureSettingsOpen?'open':''}><summary>Give this scribble a home <span>(optional)</span></summary>
  <div class="capture-controls"><label>Default category<select id="capture-default-kind" ${S.captureBusy?'disabled':''}>${kinds.map(([id,label])=>`<option value="${id}" ${S.captureDefaultKind===id?'selected':''}>${e(label)}</option>`).join('')}</select></label><label>Default World<select id="capture-default-world" ${S.captureBusy?'disabled':''}><option value="">No World selected</option>${worlds.map(r=>`<option value="${r.id}" ${S.captureDefaultWorld===r.id?'selected':''}>${e(title(r))}</option>`).join('')}</select></label></div></details>
 
  <details class="capture-quick-builder" id="capture-quick-builder" ${S.captureBuilderOpen?'open':''}><summary>Add or remove a pack from a world</summary>
  <div class="capture-builder-grid"><label>Action<select id="capture-builder-operation"><option value="link" ${S.captureBuilderOperation==='link'?'selected':''}>Add to World</option><option value="unlink" ${S.captureBuilderOperation==='unlink'?'selected':''}>Remove from World</option></select></label><label>Pack type<select id="capture-builder-kind">${packTypes.map(([kind,txt])=>`<option value="${kind}" ${S.captureBuilderKind===kind?'selected':''}>${e(txt)}</option>`).join('')}</select></label><label>Existing pack<select id="capture-builder-record"><option value="">Choose existing pack…</option>${builderPacks.map(r=>`<option value="${e(r.id)}" ${S.captureBuilderRecord===r.id?'selected':''}>${e(title(r))}</option>`).join('')}</select></label><label>World<select id="capture-builder-world"><option value="">Choose World…</option>${worlds.map(w=>`<option value="${e(w.id)}" ${S.captureBuilderWorld===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label></div>
  <button class="btn btn-soft capture-builder-btn" id="capture-builder-review" ${S.captureBusy?'disabled':''}>✓ Review this change</button><small>Uses your existing saved records. You'll confirm before anything changes.</small></details>
- <details class="scrap-tips"><summary>Need a few ideas?</summary><p class="capture-hint">Try: <b>Add Furniture Builder to Barbie</b> · <b>Remove Decocraft from Pink Wink Main</b> · <b>Mark Motel build as completed</b> · <b>Link TikTok: Motel Tour to Pink Wink Main</b> · Notes still support <b>World | Type | Note</b>.</p></details>
+ <details class="scrap-tips"><summary>Need a few ideas?</summary><p class="capture-hint">Try: <b>Create a new world called Strawberry Valley</b> · <b>Add note to world Pink Wink: Fix the pool</b> · <b>Add note to page Builds: Try a cottage</b> · <b>Add Furniture Builder to Barbie</b> · <b>Remove Decocraft from Pink Wink Main</b> · <b>Mark Motel build as completed</b> · <b>Link TikTok: Motel Tour to Pink Wink Main</b> · Notes still support <b>World | Type | Note</b>.</p></details>
  ${S.captureRestored?`<p class="capture-recovered" role="status">♡ Unfinished draft recovered on this iPhone. Only Apply writes to your database.</p>`:''}
  <div class="capture-actions"><button class="btn btn-primary" id="capture-review-button" ${S.captureBusy||allDone?'disabled':''}>Preview my changes</button>${draftRows.length?`<button class="btn btn-soft" id="capture-clear-button" ${S.captureBusy?'disabled':''}>New scribble</button>`:''}<small>Your world, your call · Nothing saves without you</small></div>
  ${daily?.data?.notes?`<details class="capture-daily"><summary>Today's little notes</summary><div class="capture-daily-text">${e(data(daily).notes)}</div></details>`:''}
@@ -4471,7 +4534,15 @@ function capturePanel(){
  ${draftRows.map((row,i)=>{
  const error=row.status==='saved'?'':captureRowError(row),matches=row.mode==='action'?captureActionCandidates(row):captureExisting(row);
  const isSaved=row.status==='saved',disabled=S.captureBusy||isSaved;
- if(row.mode==='action'){
+ if(row.mode==='targetNote'){
+  return `<article class="capture-row ${error?'capture-row-error':''} ${isSaved?'capture-row-saved':''}"><div class="capture-row-head"><strong>${isSaved?'✓ ':''}${e(row.name)}</strong><small>${e(captureTargetPreview(row))}</small></div>
+  <label class="capture-row-name-label">Note<textarea rows="2" data-note-message="${i}" ${disabled?'disabled':''}>${e(row.name)}</textarea></label>
+  <div class="capture-row-selectors"><label>Destination<select data-note-type="${i}" ${disabled?'disabled':''}><option value="World" ${row.targetType==='World'?'selected':''}>World</option><option value="Page" ${row.targetType==='Page'?'selected':''}>Page</option></select></label>
+  ${row.targetType==='World'?`<label>World<select data-note-world="${i}" ${disabled?'disabled':''}><option value="">Choose World…</option>${worlds.map(w=>`<option value="${e(w.id)}" ${row.worldId===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label>`:`<label>Page<select data-note-page="${i}" ${disabled?'disabled':''}><option value="">Choose page…</option>${noteTargetPages().map(p=>`<option value="${e(p.key)}" ${row.pageKey===p.key?'selected':''}>${e(p.name)}</option>`).join('')}</select></label>`}</div>
+  ${error?`<p class="capture-error" role="alert">${e(error)}</p>`:''}${row.status==='error'?`<p class="capture-error">${e(row.error)}</p>`:''}<p class="capture-hint">Adds to existing notes; nothing is removed.</p></article>`;
+ }
+ 
+if(row.mode==='action'){
   const item=captureActionPickItem(row),choices=captureActionStatusChoices(row.kind),targetKinds=captureActionKindsForLink(row.kind);
   const available=all(row.kind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
   const targets=all(row.targetKind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
@@ -4516,13 +4587,14 @@ async function captureSave(){
  for(const row of rows){
   try{
    if(row.mode==='action'){await captureExecuteAction(row);}
+    else if(row.mode==='targetNote'){await captureSaveSpecificNote(row);}
    else if(row.kind==='DailyNote'){
     const date=dateOnly(),pageKey='quick-capture:'+date,old=existingPageNote(pageKey);
     const next={...data(old),name:'Daily Drop Box — '+date,pageKey,notes:[String(data(old).notes||'').trim(),row.name].filter(Boolean).join('\n')};
     const saved=await saveRecord('PageNote',next,old?.id);S.records=[...S.records.filter(x=>x.id!==saved.id),saved];
    }else{
     let record=row.recordId?get(row.recordId):null;
-    if(!record&&!row.forceNew){const existing=captureExisting(row);if(existing.length===1)record=existing[0]}
+    if(!record&&!row.forceNew&&!row.createWorld){const existing=captureExisting(row);if(existing.length===1)record=existing[0]}
     if(!record){
      const init={name:row.name};
      if(row.notes)init.description=row.notes;
@@ -4546,6 +4618,23 @@ async function captureSave(){
  if(!pending.length)showToast('Daily Drop Box: everything filed successfully ♡');
 }
 function wireCapture(){
+ app.querySelectorAll('[data-capture-example]').forEach(b=>b.addEventListener('click',()=>{
+ S.captureText=b.dataset.captureExample;S.captureRows=[];S.captureSummary='';captureRemember();render();
+ const input=app.querySelector('#capture-text');input?.focus();input?.setSelectionRange(input.value.length,input.value.length);
+ }));
+ app.querySelectorAll('[data-note-message]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteMessage)];if(row){row.name=el.value;row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-type]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteType)];if(row){row.targetType=el.value;row.worldId='';row.pageKey='';row.targetRecordId='';row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-world]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteWorld)];if(row){row.worldId=el.value;row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-page]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.notePage)];if(row){row.pageKey=el.value;row.targetRecordId='';row.status='ready';row.error='';captureRemember();render()}
+ }));
+
  const settings=app.querySelector('#hq-capture-settings');settings?.addEventListener('toggle',()=>{S.hqCaptureSettingsOpen=settings.open});
  const input=app.querySelector('#capture-text');
  input?.addEventListener('input',ev=>{S.captureText=ev.target.value;S.captureRows=[];S.captureRestored=false;S.captureSummary='';captureRemember();app.querySelector('#capture-review')?.remove();});
@@ -4963,7 +5052,7 @@ function tkClips(r){
  return clips.filter(c=>c&&typeof c.filePath==='string'&&c.filePath);
 }
 function tkClipPreview(r){
- const clips=tkClips(r);if(!clips.length)return '<p class="tk29-note-empty">No video attached yet — you can upload yours directly to this TikTok record.</p>';
+ const clips=tkClips(r).filter(c=>c.manualVideoHub===true);if(!clips.length)return '<p class="tk29-note-empty">No new video attached yet. Upload your own footage whenever you are ready.</p>';
  return `<div class="tkplus-clips"><div class="tkplus-clip-label">${pinkIcon('TikTok')} ${clips.length} uploaded clip${clips.length===1?'':'s'}</div>${clips.map(clip=>{
   const path=clip.filePath,url=mediaCachedUrl(path);
   if(!url)signedMedia({data:{filePath:path}}).catch(()=>{});
@@ -4975,7 +5064,7 @@ function tkSelectionPicker(kind,linkType,recId){const opts=all(kind).slice().sor
 }
 function tkExtraFields(id){
  return `<div class="tkplus-extras"><h4>♡ Everything for this TikTok</h4>
- <label class="tkplus-file">${pinkIcon('TikTok')} Add footage to THIS record <input name="tikClipFile" type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/webm,.mp4,.mov,.m4v,.webm" /><small>Optional · MP4 or MOV · private storage limit 25 MiB. Existing clips stay connected; use Video Library for new footage.</small></label>
+ <label class="tkplus-file">${pinkIcon('TikTok')} Add footage to THIS record <input name="tikClipFile" type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/webm,.mp4,.mov,.m4v,.webm" /><small>Optional · MP4 or MOV · private storage limit 25 MiB. Earlier clips stay stored but are hidden. Add fresh footage here when ready.</small></label>
  ${tkSelectionPicker('World','tiktok_world',id)}
  ${tkSelectionPicker('AddOn','tiktok_addon',id)}
  ${tkSelectionPicker('Build','tiktok_build',id)}
@@ -5001,19 +5090,19 @@ function tkCard(r,i){const ed=S.tkEdit===r.id,notes=tkNote(r),name=tkTitle(r),ur
 }
 function videoHubPage(){
  const curated=all('TikTok').slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))),q=String(S.tkSearch||'').trim().toLowerCase(),hiddenCount=0;
- const filtered=curated.filter(r=>(!S.tkReviewTitles||tkNeedsTitle(r))&&(!VL.tkMissingOnly||(!tkClips(r).length&&!S.links.some(l=>l.to_record_id===r.id&&l.link_type==='video_tiktok'&&get(l.from_record_id)?.kind==='Video'&&!get(l.from_record_id)?.archived_at)))&&(!q||[tkTitle(r),tkNote(r),data(r).name,data(r).description,data(r).hashtags,data(r).song,tkPostUrl(r),...tkLinkedNames(r,'World','tiktok_world'),...tkLinkedNames(r,'AddOn','tiktok_addon')].some(v=>String(v||'').toLowerCase().includes(q))));
+ const filtered=curated.filter(r=>(!S.tkReviewTitles||tkNeedsTitle(r))&&(!VL.tkMissingOnly||(!tkClips(r).some(c=>c.manualVideoHub===true)&&!S.links.some(l=>l.to_record_id===r.id&&l.link_type==='video_tiktok'&&data(get(l.from_record_id)).manualVideoHub===true)))&&(!q||[tkTitle(r),tkNote(r),data(r).name,data(r).description,data(r).hashtags,data(r).song,tkPostUrl(r),...tkLinkedNames(r,'World','tiktok_world'),...tkLinkedNames(r,'AddOn','tiktok_addon')].some(v=>String(v||'').toLowerCase().includes(q))));
  const pageSize=10,nPages=Math.max(1,Math.ceil(filtered.length/pageSize)),page=Math.max(0,Math.min(nPages-1,Number(S.tkPage)||0));S.tkPage=page;
  const chunk=filtered.slice(page*pageSize,(page+1)*pageSize);
  return `<div class="tk29-book">
-  <header class="tk29-header"><span class="tk29-tape">♡ MY VIDEO SCRAPBOOK ♡</span><div class="tk29-headrow"><span class="tk29-sketch">${pinkIcon('TikTok')}</span><div><div class="tk29-eyebrow">CTRL + CRFT · by Control Group</div><h1>My TikToks</h1><p><button type="button" class="btn btn-soft btn-small" data-nav="Video">♡ Open Video Library</button></p><p>One record per TikTok, including drafts, captions, hashtags, linked worlds, add-ons and your own uploaded footage.</p></div></div><a href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer" class="tk29-profile">@missistephi ↗</a></header>
+  <header class="tk29-header"><span class="tk29-tape">♡ MY VIDEOS ♡</span><div class="tk29-headrow"><span class="tk29-sketch">${pinkIcon('TikTok')}</span><div><div class="tk29-eyebrow">CTRL + CRFT · by Control Group</div><h1>Videos</h1><p>All your TikTok notes, links, captions, and new uploads together. Older mismatched clips are hidden safely.</p></div></div><a href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer" class="tk29-profile">@missistephi ↗</a></header>
   <div class="tk29-counter"><span><strong>${curated.length}</strong> TikTok records — posted and drafts</span><span class="tk29-underline">${curated.filter(tkNeedsTitle).length} need your help identifying the footage</span></div>
   <div class="tk29-controls"><label class="tk29-search"><span aria-hidden="true">⌕</span><input id="tk29-search" type="search" autocomplete="off" value="${e(S.tkSearch||'')}" placeholder="Search by build, sound, or title…" aria-label="Search TikToks"></label><button class="tk29-review-toggle ${S.tkReviewTitles?'is-on':''}" data-tk29-review type="button" aria-pressed="${!!S.tkReviewTitles}">${S.tkReviewTitles?'← All TikToks':`✎ Help name ${curated.filter(tkNeedsTitle).length}`}</button><button class="tk29-new" id="vl-missing-tiktok" type="button" aria-pressed="${!!VL.tkMissingOnly}">${VL.tkMissingOnly?'Show all TikToks':'♡ Missing Video'}</button><button class="tk29-new" data-tk29-add type="button" ${S.tkSaving?'disabled':''}>${S.tkAdd?'Close form':'＋ Add TikTok'}</button></div>
   ${S.tkAdd?`<section class="tk29-add-sheet"><h2>Paste a TikTok link ♡</h2><p>Create a draft or add a posted TikTok link. Add your footage whenever you are ready.</p><form id="tk29-add-form"><label>Title<input name="title" placeholder="Give this TikTok a name" maxlength="200" required></label><label>Link to my posted TikTok<input type="url" inputmode="url" name="url" placeholder="https://www.tiktok.com/@missistephi/video/… (optional)"></label><label>Notes<textarea name="note" placeholder="Notes for this TikTok…" rows="4"></textarea></label>${tkMetadataFields(null)}${tkExtraFields(null)}<div class="tk29-actions"><button class="tk29-primary" type="submit" ${S.tkSaving?'disabled':''}>${S.tkSaving?'Saving…':'Save my TikTok + links'}</button><button class="tk29-secondary" type="button" data-tk29-add ${S.tkSaving?'disabled':''}>Cancel</button></div></form></section>`:''}
-  ${vlTikTokBridge()}${bulkVideoPageMarkup()}
-  <section class="tk29-library" aria-label="My posted TikToks"><div class="tk29-library-head"><h2>All TikTok records</h2><span>${filtered.length} of ${curated.length}</span></div>
+  ${vlUnifiedUploads()}
+  <section class="tk29-library" aria-label="My posted TikToks"><div class="tk29-library-head"><h2>TikTok information</h2><span>${filtered.length} of ${curated.length}</span></div>
   ${chunk.length?`<div class="tk29-grid">${chunk.map((r,i)=>tkCard(r,page*pageSize+i)).join('')}</div>`:`<div class="tk29-empty">No TikToks found. Try another search or paste a new post link.</div>`}
   ${nPages>1?`<div class="tk29-pagination"><button data-tk29-page="-1" type="button" ${page===0?'disabled':''}>← Previous</button><span>${page+1} / ${nPages}</span><button data-tk29-page="1" type="button" ${page===nPages-1?'disabled':''}>Next →</button></div>`:''}</section>
-  <p class="tk29-note-empty">All TikTok records are together here. Add your own footage to a TikTok record whenever you are ready.</p>
+  <p class="tk29-note-empty">All your TikTok information is kept. Add footage whenever you want.</p>
  </div>`;
 }
 function tkCheckIds(ids,kind){const verified=unique(ids.filter(Boolean));for(const id of verified){const rec=get(id);if(!rec||rec.kind!==kind||rec.archived_at)throw Error(`A selected ${kind} is no longer available. Refresh and choose it again.`)}return verified}
@@ -5035,7 +5124,7 @@ async function tkAttachVideo(postId,file){
  if(hash&&old.some(c=>c.sha256===hash)){tkStatus('That clip is already attached.');return;}
  tkStatus('Uploading privately to your TikTok record…');
  const path=await uploadMedia(file);
- const clips=[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:hash,uploadedAt:new Date().toISOString()}];
+ const clips=[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:hash,uploadedAt:new Date().toISOString(),manualVideoHub:true}];
  const saved=await saveRecord('TikTok',{...data(post),clips},postId);
  S.records=[...S.records.filter(r=>r.id!==postId),saved];
  tkStatus('Clip attached directly to your TikTok. No separate Video created.');
@@ -5246,10 +5335,10 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  const kitPhotos=r.kind==='Lore'?relatedRecords(r.id,relationDefs('Lore').find(def=>def[0]==='photos')).filter(p=>p.kind==='Photo'&&data(p).filePath):[];
  for(const pic of kitPhotos){if(!S.mediaUrls.has(data(pic).filePath))signedMedia(pic).catch(()=>{});}
  const kitGallery=kitPhotos.length?`<section class="panel lore-photos-panel"><div class="section-line"><div><div class="eyebrow">DAY ${e(d.day||'')} · YOUR VISUAL JOURNAL</div><h2>${pinkIcon('camera')} Pictures for this day</h2></div><span class="pill yellow">${kitPhotos.length} photo${kitPhotos.length===1?'':'s'}</span></div><div class="lore-gallery">${kitPhotos.map(pic=>`<button class="lore-gallery-item" data-detail="${e(pic.id)}">${S.mediaUrls.get(data(pic).filePath)?`<img src="${e(S.mediaUrls.get(data(pic).filePath))}" alt="${e(title(pic))}" loading="lazy">`:`<span class="lore-gallery-placeholder">${pinkIcon('Photo')} Loading private image…</span>`}<small>${e(title(pic))}</small></button>`).join('')}</div></section>`:'';
- const tiktokClips=r.kind==='TikTok'?tkClips(r):[];
+ const tiktokClips=r.kind==='TikTok'?tkClips(r).filter(c=>c.manualVideoHub===true):[];
  for(const clip of tiktokClips){if(!mediaCachedUrl(clip.filePath))signedMedia({data:{filePath:clip.filePath}}).catch(()=>{});}
  const tiktokClipGallery=tiktokClips.length?`<section class="panel video-clip-gallery"><div class="section-line"><h2>${pinkIcon('TikTok')} Footage attached to this TikTok</h2><span class="pill yellow">${tiktokClips.length} private clip${tiktokClips.length===1?'':'s'}</span></div>${tiktokClips.map(clip=>`<div class="video-clip-tile"><strong>${e(clip.fileName||'Uploaded video')}</strong>${mediaCachedUrl(clip.filePath)?`<video controls playsinline preload="metadata" src="${e(mediaCachedUrl(clip.filePath))}"></video>`:`<p class="muted">Loading private clip…</p>`}</div>`).join('')}</section>`:'';
- const url=d.filePath?mediaCachedUrl(d.filePath):'';
+ const url=d.filePath&&(r.kind!=='Video'||d.manualVideoHub===true)?mediaCachedUrl(d.filePath):'';
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
@@ -5280,7 +5369,7 @@ function guestHomePage(){
 }
 function guestShell(){
  S.page='home';S.detail=null;S.modal=null;S.sidebar=false;
- app.innerHTML=`<div class="guest-hq-page"><header class="guest-hq-top"><div class="brand"><div class="brand-mark">${pinkIcon('bow')}</div><div><strong class="brand-wordmark"><span class="brand-ctrl">CTRL</span><span class="brand-plus"> + </span><span class="brand-crft">CRFT</span></strong><small class="brand-byline">by Control Group</small></div></div><span class="guest-hq-top-title">My HQ</span></header><main class="content">${guestHomePage()}</main></div><nav class="scrap-mobile-tabs guest-bottom-tabs" aria-label="Quick navigation">${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn'],['TikTok','TikToks','TikTok']].map(([key,txt,icon])=>`<button type="button" class="scrap-mobile-tab ${key==='home'?'is-active':''}" ${key==='home'?'data-guest-home':'data-guest-connect'}><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon(icon)}</span><span>${txt}</span></button>`).join('')}<button type="button" class="scrap-mobile-tab" data-guest-connect><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon('note')}</span><span>More</span></button></nav>${S.authOpen?`<div class="guest-auth-overlay"><button class="guest-auth-close" type="button" data-guest-close aria-label="Close">×</button>${privateAccountPanel()}</div>`:''}`;
+ app.innerHTML=`<div class="guest-hq-page"><header class="guest-hq-top"><div class="brand"><div class="brand-mark">${pinkIcon('bow')}</div><div><strong class="brand-wordmark"><span class="brand-ctrl">CTRL</span><span class="brand-plus"> + </span><span class="brand-crft">CRFT</span></strong><small class="brand-byline">by Control Group</small></div></div><span class="guest-hq-top-title">My HQ</span></header><main class="content">${guestHomePage()}</main></div><nav class="scrap-mobile-tabs guest-bottom-tabs" aria-label="Quick navigation">${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn'],['Video','Videos','Video']].map(([key,txt,icon])=>`<button type="button" class="scrap-mobile-tab ${key==='home'?'is-active':''}" ${key==='home'?'data-guest-home':'data-guest-connect'}><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon(icon)}</span><span>${txt}</span></button>`).join('')}<button type="button" class="scrap-mobile-tab" data-guest-connect><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon('note')}</span><span>More</span></button></nav>${S.authOpen?`<div class="guest-auth-overlay"><button class="guest-auth-close" type="button" data-guest-close aria-label="Close">×</button>${privateAccountPanel()}</div>`:''}`;
  app.querySelectorAll('[data-guest-connect]').forEach(el=>el.addEventListener('click',()=>{S.authOpen=true;S.authMode='login';S.authMessage='';render()}));
  app.querySelectorAll('[data-guest-close]').forEach(el=>el.addEventListener('click',()=>{S.authOpen=false;S.authMessage='';render()}));
  if(S.authOpen){wireAuth();app.querySelector('#auth-email')?.focus();}
@@ -5386,10 +5475,21 @@ function vlEditor(r){const d=data(r);return `<section class="panel vl-editor" id
  <label>Notes<textarea name="notes" rows="2">${e(d.notes||'')}</textarea></label>
  ${[['TikTok','video_tiktok','TikToks'],['World','video_world','Worlds'],['Build','video_build','Builds'],['AddOn','video_addon','Add-ons']].map(([kind,type,txt])=>`<details class="vl-link-details"><summary>${e(txt)} (${vlLinkIds(r.id,type).length} linked)</summary><div class="vl-picks">${vlOptions(kind,vlLinkIds(r.id,type))}</div></details>`).join('')}
  <div class="vl-actions"><button class="btn btn-primary" type="submit" ${VL.saving?'disabled':''}>Save details + links</button><button type="button" class="btn btn-soft" id="vl-archive">Archive video record</button></div><p class="vl-helper">Archiving does not delete the original file or unlink any TikTok media.</p></form></section>`;}
-function vlTikTokLinkedClips(post){const vids=S.links.filter(l=>l.link_type==='video_tiktok'&&l.to_record_id===post.id).map(l=>get(l.from_record_id)).filter(r=>r&&r.kind==='Video'&&!r.archived_at);
- return vids.length?`<div class="vl-tiktok-connected"><strong>Linked original videos</strong><div class="vl-tiktok-grid">${vids.map(v=>`<div>${vlVideoMedia(v)}<small>${e(title(v))}</small></div>`).join('')}</div><button type="button" class="btn btn-small btn-soft" data-nav="Video">Manage in Video Library</button></div>`:'';}
-function vlTikTokBridge(){const n=vlClips().length,saved=new Set(S.records.filter(r=>r.kind==='Video').map(r=>data(r).filePath)),notIndexed=vlClips().filter(({clip})=>!saved.has(clip.filePath)).length;
- return `<section class="panel vl-bridge"><h3>♡ Video Library</h3><p>${all('Video').length} saved video records · ${n} original TikTok clip references · ${notIndexed} clips ready to index safely.</p><div class="vl-actions"><button type="button" class="btn btn-soft" data-nav="Video">Open My Videos</button>${notIndexed?'<button type="button" class="btn btn-small" id="vl-index-from-tiktok">Add existing clips to Video Library</button>':''}</div><small>The original TikTok files remain in place. No automatic reupload or deletion.</small></section>`;}
+function vlTikTokLinkedClips(post){return '';}
+function vlTikTokBridge(){return ''}
+function vlManualRecords(){return all('Video').filter(r=>data(r).manualVideoHub===true);}
+function vlUnifiedUploads(){
+ const mine=vlManualRecords();
+ return `<section class="vl-page vl-unified-upload" aria-label="Upload new videos">
+ <section class="vl-upload-panel" id="vl-upload-panel"><details class="vl-upload-details" ${VL.uploadOpen?'open':''}>
+ <summary><span class="vl-upload-symbol">✧</span><span class="vl-upload-heading"><strong>Upload a new video</strong><small>Choose clips yourself. No automatic matching.</small></span><span class="vl-upload-chevron">⌄</span></summary>
+ <div class="vl-upload-content"><label class="vl-file-pick"><strong>Select videos from my iPhone</strong><small>MP4 / MOV · multiple clips supported</small><input type="file" id="vl-video-file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple></label>
+ <p class="vl-upload-hint">Files stay private. The current per-file storage limit is 25 MiB.</p><div id="vl-queue-status" aria-live="polite"></div>
+ <div class="vl-upload-action"><button type="button" id="vl-upload-start" class="vl-primary" ${VL.uploading||!VL.queue.some(x=>x.status==='ready')?'disabled':''}>${VL.uploading?'Uploading…':'Upload selected videos'}</button><p id="vl-live-message" role="status">${e(VL.info||'Videos you choose to upload will show below.')}</p></div></div></details></section>
+ ${mine.length?`<section class="vl-catalog"><div class="vl-catalog-head"><h2>My new uploads <span class="vl-catalog-count">${mine.length}</span></h2></div>${VL.editId&&get(VL.editId)&&data(get(VL.editId)).manualVideoHub?vlEditor(get(VL.editId)):''}<div class="vl-grid">${mine.map(vlEntry).join('')}</div></section>`:`<p class="vl-upload-hint">Your fresh video library is empty. Earlier clips are hidden but have not been deleted.</p>`}
+ </section>`;
+}
+
 function videoLibraryPage(){const items=all('Video'),q=VL.search.trim().toLowerCase();let visible=items.filter(r=>[title(r),data(r).fileName,data(r).description,data(r).notes,data(r).tagsText].some(x=>String(x||'').toLowerCase().includes(q)));
  const liveLinked=items.filter(r=>S.links.some(l=>l.from_record_id===r.id&&/^video_(tiktok|world|build|addon)$/.test(l.link_type))).length;
  const favorites=items.filter(r=>data(r).favorite).length;
@@ -5440,7 +5540,7 @@ async function vlRunUploads(){if(VL.uploading)return;VL.uploading=true;vlQueueDO
  entry.status='saving';vlQueueDOM();const has=S.records.find(r=>r.kind==='Video'&&data(r).filePath===entry.path);
  const duration=await vlMeta(file);
  const name=file.name.replace(/\.[a-z0-9]{2,6}$/i,'').trim()||'New video';
- const record=has||await saveRecord('Video',{name,fileName:file.name,filePath:entry.path,fileSize:file.size,mimeType:vlMime(file),durationSeconds:duration,date:file.lastModified?new Date(file.lastModified).toISOString().slice(0,10):'',uploadedAt:new Date().toISOString(),status:'Raw footage',description:'',notes:''});
+ const record=has||await saveRecord('Video',{name,fileName:file.name,filePath:entry.path,fileSize:file.size,mimeType:vlMime(file),durationSeconds:duration,date:file.lastModified?new Date(file.lastModified).toISOString().slice(0,10):'',uploadedAt:new Date().toISOString(),status:'Raw footage',description:'',notes:'',manualVideoHub:true});
  S.records=[...S.records.filter(r=>r.id!==record.id),record];entry.recordId=record.id;entry.status='done';entry.error='';success++;vlStatusLine(`Saved ${success} video(s) in your private library.`);
  }catch(err){entry.status='error';entry.error=String(err.message||err);vlStatusLine(`Upload paused for ${file.name}: ${entry.error}`)}vlQueueDOM();}
  VL.uploading=false;await loadAll().catch(()=>render());vlQueueDOM();vlStatusLine(`Done. ${success} saved · ${VL.queue.filter(x=>x.status==='error').length} need attention. Already saved files are kept.`);
@@ -5491,7 +5591,7 @@ function vlBind(root){root.querySelector('#vl-jump-upload')?.addEventListener('c
  root.querySelector('#vl-archive')?.addEventListener('click',vlArchive);
  vlQueueDOM();vlPreloadVisiblePlayers(root);}
 
-function render(){if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video')body=videoLibraryPage();else if(S.page==='TikTok')body=videoHubPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
+function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=videoHubPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
 function globalSearchPage(){
  const query=S.query.trim().toLowerCase();
  const matches=query?S.records.filter(r=>!r.archived_at && r.kind!=='PageNote' && r.kind!=='FieldConfig' && ([r.kind,title(r),...Object.values(data(r)).filter(v=>typeof v==='string'||typeof v==='number')].join(' ').toLowerCase().includes(query)||relationDefs(r.kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(query))))).sort(defaultSort):[];
@@ -6325,6 +6425,7 @@ async function submitRecord(form,saveMode='view'){
     const videos=[];
     if(images.length>10||videos.length>10)throw Error('Select at most 10 photos and 10 videos per Lore save.');
    }
+   if(kind==='Video'&&!id)value.manualVideoHub=true;
    const saved=await saveRecord(kind,value,id);savedId=saved.id;S.records=[...S.records.filter(r=>r.id!==saved.id),saved];completed++;
    await saveLinks(saved.id,kind);
    if(kind==='TikTok'){
@@ -6335,7 +6436,7 @@ async function submitRecord(form,saveMode='view'){
      if(sha&&old.some(c=>c.sha256===sha))continue;
      const progress=document.getElementById('upload-status');if(progress)progress.textContent=`Uploading clip ${ix+1} of ${clips.length} to this TikTok…`;
      const path=await uploadMedia(file);uploaded++;
-     current=await saveRecord('TikTok',{...data(current),clips:[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:sha,uploadedAt:new Date().toISOString()}]},saved.id);
+     current=await saveRecord('TikTok',{...data(current),clips:[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:sha,uploadedAt:new Date().toISOString(),manualVideoHub:true}]},saved.id);
      S.records=[...S.records.filter(r=>r.id!==saved.id),current];
     }
    }
