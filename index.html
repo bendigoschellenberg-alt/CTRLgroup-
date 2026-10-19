@@ -3797,6 +3797,14 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .vl-tiktok-grid .vl-video-wrap{aspect-ratio:16/10}
 #app .vl-tiktok-grid small{display:block;font-size:12px}
 
+#app .capture-note-shortcuts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 15px}
+#app .capture-note-shortcuts .btn{font-size:13px!important;min-height:38px}
+#app .vl-unified-upload{padding:0;margin:10px 0 22px}
+#app .vl-unified-upload .vl-catalog{margin-top:14px}
+#app .tk29-book .tk29-grid{align-items:start}
+#app .tk29-book .tk29-card{transform:none!important;min-width:0}
+@media(max-width:700px){#app .capture-note-shortcuts .btn{flex:1 1 120px}#app .vl-unified-upload .vl-grid{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -4153,13 +4161,13 @@ ${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn']
 function header(title,description,buttons=''){return `<div class="page-head"><div><div class="eyebrow">THE LITTLE BIG HQ ✦</div><h1>${title==='Today in My World'?pinkIcon('today'):Object.keys(KINDS).some(k=>KINDS[k].label===title)?pinkIcon(Object.keys(KINDS).find(k=>KINDS[k].label===title)):''}${e(title)}</h1><div class="subcopy">${e(description)}</div></div><div class="actions">${buttons}</div></div>`}
 // ---- HOME QUICK CAPTURE: REVIEW FIRST, THEN FILE / LINK ----------------------
 const CAPTURE_DESTINATIONS=[
- ['DailyNote','Daily note (one scratchpad per day)'],['AddOn','Add-On'],['Build','Build'],
+ ['DailyNote','Daily note (one scratchpad per day)'],['World','New World'],['AddOn','Add-On'],['Build','Build'],
  ['BuildIdea','Build Idea'],['Craftable','Craftable'],['Texture','Texture'],
  ['Task','Task'],['Journal','Journal'],['Lore','Lore'],['Location','Location'],
  ['Event','Calendar event'],['TikTok','TikTok note'],['WorldTemplate','World Template']
 ];
 const CAPTURE_ALIASES={
- note:'DailyNote',notes:'DailyNote',daily:'DailyNote',scratch:'DailyNote',
+ note:'DailyNote',notes:'DailyNote',daily:'DailyNote',scratch:'DailyNote',world:'World',worlds:'World',
  addon:'AddOn',addons:'AddOn',add_on:'AddOn',pack:'AddOn',packs:'AddOn',
  build:'Build',builds:'Build',idea:'BuildIdea',ideas:'BuildIdea',buildidea:'BuildIdea',
  craftable:'Craftable',craftables:'Craftable',texture:'Texture',textures:'Texture',
@@ -4194,7 +4202,7 @@ function captureRestore(){
   S.captureText=info.text.slice(0,30000);
   if(CAPTURE_DESTINATIONS.some(([kind])=>kind===info.kind))S.captureDefaultKind=info.kind;
   S.captureDefaultWorld=typeof info.worldId==='string'?info.worldId:'';
-  S.captureRows=info.rows.filter(row=>row&&typeof row.name==='string'&&['action',undefined].includes(row.mode)).slice(0,30).map(row=>({...row,status:'ready',error:''}));
+  S.captureRows=info.rows.filter(row=>row&&typeof row.name==='string'&&['action','targetNote',undefined].includes(row.mode)).slice(0,30).map(row=>({...row,status:'ready',error:''}));
   S.captureRestored=!!(S.captureText||S.captureRows.length);
   if(S.captureRestored)S.captureSummary='Recovered an unfinished draft from this device. Review before applying.';
  }catch(_err){/* If older storage is corrupted, ignore it. */}
@@ -4378,7 +4386,53 @@ async function captureExecuteAction(row){
   }
  }
 }
+
+function noteTargetPages(){return [{key:'home',name:'Home'},...GROUPS.flatMap(([,entries])=>entries.map(([key,name])=>({key,name})))].filter((p,i,a)=>a.findIndex(v=>v.key===p.key)===i);}
+function noteTargetPage(text){
+ const key=captureNorm(text);
+ if(['tiktok','tiktoks','video','videos'].includes(key))return 'Video';
+ if(['builds','build'].includes(key))return 'Build';
+ const choices=noteTargetPages().filter(p=>[p.name,p.key,p.name.split('&')[0].trim(),p.name.replace(/^my\s+/i,'')].some(n=>captureNorm(n)===key));
+ return choices.length===1?choices[0].key:'';
+}
+function captureSpecificNote(raw,index){
+ const m=raw.match(/^(?:(?:add|save|write|put|make)\s+)?(?:a\s+)?note\s+(?:to|on|for|in)\s+(.+?)\s*(?::|\s+-\s+|\s+that\s+|\s+saying\s+)(.+)$/i);
+ if(!m)return null;
+ let target=m[1].trim().replace(/^the\s+/i,''),type=/^(?:page|section)\s+/i.test(target)?'Page':'World';
+ let worldId='',pageKey='',recordId='';
+ if(/^this world$/i.test(target)){
+  const r=get(S.detail);worldId=r?.kind==='World'?r.id:S.captureDefaultWorld||'';
+ }else if(/^this page$/i.test(target)){
+  type='Page';const r=get(S.detail);if(r)recordId=r.id;else pageKey=S.page==='TikTok'?'Video':S.page;
+ }else{
+  target=target.replace(/^(?:my\s+)?(?:world|page|section)\s+/i,'').trim();
+  if(type==='World')worldId=captureWorld(target)||'';
+  if(!worldId){const page=noteTargetPage(target);if(page){type='Page';pageKey=page;}}
+ }
+ return {mode:'targetNote',index,raw,name:m[2].trim(),kind:'DailyNote',targetType:type,worldId,pageKey,targetRecordId:recordId,targetName:target,status:'ready',error:''};
+}
+async function captureSaveSpecificNote(row){
+ const message=String(row.name||'').trim();
+ if(!message)throw Error('Write the note first.');
+ if(row.targetType==='World'){
+  let id=row.worldId||captureWorld(row.targetName);
+  const r=id?get(id):null;if(!r||r.kind!=='World'||r.archived_at)throw Error('Choose an existing World.');
+  const saved=await saveRecord('World',{...data(r),notes:[String(data(r).notes||'').trim(),message].filter(Boolean).join('\n')},r.id);
+  S.records=S.records.map(x=>x.id===saved.id?saved:x);return;
+ }
+ const k=row.targetRecordId?'record:'+row.targetRecordId:'page:'+row.pageKey,old=row.targetRecordId?get(row.targetRecordId):existingPageNote(k);
+ if(row.targetRecordId&&!old)throw Error('The selected record is unavailable.');
+ const next={...data(old),notes:[String(data(old).notes||'').trim(),message].filter(Boolean).join('\n')};
+ if(!row.targetRecordId)Object.assign(next,{name:'Notes for '+row.pageKey,pageKey:k});
+ const saved=await saveRecord(row.targetRecordId?old.kind:'PageNote',next,old?.id);
+ S.records=[...S.records.filter(x=>x.id!==saved.id),saved];
+}
+
 function captureParseOne(line,index){
+ 
+ const routed=captureSpecificNote(line.trim(),index);if(routed)return routed;
+ const create=line.trim().match(/^(?:create|make|start|add)\s+(?:a\s+)?(?:new\s+)?(?:minecraft\s+)?world(?:\s+(?:called|named|:))?\s+(.+)$/i);
+ if(create)return {index,raw:line.trim(),kind:'World',name:create[1].trim().replace(/[.!]+$/,''),notes:'',worldId:'',createWorld:true,recordId:'',forceNew:false,status:'ready',error:''};
  const action=captureActionParse(line,index);if(action)return action;
  let raw=line.trim(),name=raw,kind=S.captureDefaultKind,worldId=S.captureDefaultWorld||'',invalidKind='',invalidWorld='',notes='';
  const parts=raw.split(/\s*\|\s*/);
@@ -4423,6 +4477,14 @@ function captureReview(){
 }
 function captureRowError(row){
  if(row.mode==='action')return captureActionError(row);
+ if(row.mode==='targetNote'){
+  if(!row.name.trim())return 'Write your note first.';
+  if(row.targetType==='Page'&&!row.pageKey&&!row.targetRecordId)return 'Choose the page to receive this note.';
+  if(row.targetType==='World'&&!row.worldId&&!captureWorld(row.targetName)&&!S.captureRows.some(r=>r.kind==='World'&&r.createWorld&&r.index<row.index&&captureNorm(r.name)===captureNorm(row.targetName)))return 'Choose the World for this note.';
+  if(row.worldId&&!get(row.worldId))return 'World not available.';
+  return '';
+ }
+ if(row.createWorld&&captureExisting(row).length)return 'That World already exists. Choose another name instead of duplicating it.';
  if(!row.name)return 'Add a name or note.';
  if(row.kind==='DailyNote'&&/^(?:add|remove|link|unlink|detach|attach|mark|set)\s+.+\s+(?:to|from|in|into|on|as)\s+.+$/i.test(row.raw||''))return 'This looks like an action, but could not be recognized. Try the tap-to-select shortcut below, or reword the instruction.';
  if(row.invalidKind)return 'Unrecognized type: '+row.invalidKind+'. Choose a destination below.';
@@ -4438,6 +4500,7 @@ function captureRowError(row){
 }
 function captureTargetPreview(row){
  if(row.mode==='action')return captureActionPreview(row);
+ if(row.mode==='targetNote')return 'Append note to '+(row.targetType==='World'?'world: '+(get(row.worldId)?title(get(row.worldId)):row.targetName):'page: '+(row.pageKey||'choose a page'));
  if(row.kind==='DailyNote')return `Append to one daily note for ${e(dateOnly())}`;
  const found=captureExisting(row);
  if(row.forceNew)return 'Create a separate new '+e(KINDS[row.kind]?.singular||row.kind);
@@ -4456,14 +4519,14 @@ function capturePanel(){
  const builderPacks=all(S.captureBuilderKind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
  const packTypes=[['AddOn','Add-Ons'],['Craftable','Craftable Packs'],['Texture','Textures']];
  return `<section class="panel capture-panel" aria-label="Quick Capture"><div class="capture-panel-top"><div><div class="eyebrow">WRITE IT ONCE. KEEP IT ALL.</div><h2>Scribble &amp; sort <span class="capture-star">${pinkIcon('star')}</span></h2><p>One thought, one spot. Review it, then send it where it belongs.</p></div><span class="hq-capture-marker" aria-hidden="true">01 / YOUR SCRIBBLES</span></div>
- <label class="capture-main-label" for="capture-text">What are we adding to the story?</label><textarea id="capture-text" rows="3" placeholder="Add Furniture Builder to Pink Wink Main\nOr write a note for today…" ${S.captureBusy?'disabled':''}>${e(S.captureText)}</textarea>
- <details class="hq-capture-settings" id="hq-capture-settings" ${S.hqCaptureSettingsOpen?'open':''}><summary>Give this scribble a home <span>(optional)</span></summary>
+ <label class="capture-main-label" for="capture-text">What are we adding to the story?</label><textarea id="capture-text" rows="3" placeholder="Create a new world called Strawberry Valley\nAdd note to world Pink Wink: Plan a new pool\nAdd note to page Builds: Try a greenhouse" ${S.captureBusy?'disabled':''}>${e(S.captureText)}</textarea>
+ <div class="capture-note-shortcuts"><button type="button" data-capture-example="Create a new world called " class="btn btn-soft btn-small">＋ New World</button><button type="button" data-capture-example="Add note to world : " class="btn btn-soft btn-small">✎ World note</button><button type="button" data-capture-example="Add note to page : " class="btn btn-soft btn-small">✎ Page note</button></div><details class="hq-capture-settings" id="hq-capture-settings" ${S.hqCaptureSettingsOpen?'open':''}><summary>Give this scribble a home <span>(optional)</span></summary>
  <div class="capture-controls"><label>Default category<select id="capture-default-kind" ${S.captureBusy?'disabled':''}>${kinds.map(([id,label])=>`<option value="${id}" ${S.captureDefaultKind===id?'selected':''}>${e(label)}</option>`).join('')}</select></label><label>Default World<select id="capture-default-world" ${S.captureBusy?'disabled':''}><option value="">No World selected</option>${worlds.map(r=>`<option value="${r.id}" ${S.captureDefaultWorld===r.id?'selected':''}>${e(title(r))}</option>`).join('')}</select></label></div></details>
 
  <details class="capture-quick-builder" id="capture-quick-builder" ${S.captureBuilderOpen?'open':''}><summary>Add or remove a pack from a world</summary>
  <div class="capture-builder-grid"><label>Action<select id="capture-builder-operation"><option value="link" ${S.captureBuilderOperation==='link'?'selected':''}>Add to World</option><option value="unlink" ${S.captureBuilderOperation==='unlink'?'selected':''}>Remove from World</option></select></label><label>Pack type<select id="capture-builder-kind">${packTypes.map(([kind,txt])=>`<option value="${kind}" ${S.captureBuilderKind===kind?'selected':''}>${e(txt)}</option>`).join('')}</select></label><label>Existing pack<select id="capture-builder-record"><option value="">Choose existing pack…</option>${builderPacks.map(r=>`<option value="${e(r.id)}" ${S.captureBuilderRecord===r.id?'selected':''}>${e(title(r))}</option>`).join('')}</select></label><label>World<select id="capture-builder-world"><option value="">Choose World…</option>${worlds.map(w=>`<option value="${e(w.id)}" ${S.captureBuilderWorld===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label></div>
  <button class="btn btn-soft capture-builder-btn" id="capture-builder-review" ${S.captureBusy?'disabled':''}>✓ Review this change</button><small>Uses your existing saved records. You'll confirm before anything changes.</small></details>
- <details class="scrap-tips"><summary>Need a few ideas?</summary><p class="capture-hint">Try: <b>Add Furniture Builder to Barbie</b> · <b>Remove Decocraft from Pink Wink Main</b> · <b>Mark Motel build as completed</b> · <b>Link TikTok: Motel Tour to Pink Wink Main</b> · Notes still support <b>World | Type | Note</b>.</p></details>
+ <details class="scrap-tips"><summary>Need a few ideas?</summary><p class="capture-hint">Try: <b>Create a new world called Strawberry Valley</b> · <b>Add note to world Pink Wink: Fix the pool</b> · <b>Add note to page Builds: Try a cottage</b> · <b>Add Furniture Builder to Barbie</b> · <b>Remove Decocraft from Pink Wink Main</b> · <b>Mark Motel build as completed</b> · <b>Link TikTok: Motel Tour to Pink Wink Main</b> · Notes still support <b>World | Type | Note</b>.</p></details>
  ${S.captureRestored?`<p class="capture-recovered" role="status">♡ Unfinished draft recovered on this iPhone. Only Apply writes to your database.</p>`:''}
  <div class="capture-actions"><button class="btn btn-primary" id="capture-review-button" ${S.captureBusy||allDone?'disabled':''}>Preview my changes</button>${draftRows.length?`<button class="btn btn-soft" id="capture-clear-button" ${S.captureBusy?'disabled':''}>New scribble</button>`:''}<small>Your world, your call · Nothing saves without you</small></div>
  ${daily?.data?.notes?`<details class="capture-daily"><summary>Today's little notes</summary><div class="capture-daily-text">${e(data(daily).notes)}</div></details>`:''}
@@ -4471,7 +4534,15 @@ function capturePanel(){
  ${draftRows.map((row,i)=>{
  const error=row.status==='saved'?'':captureRowError(row),matches=row.mode==='action'?captureActionCandidates(row):captureExisting(row);
  const isSaved=row.status==='saved',disabled=S.captureBusy||isSaved;
- if(row.mode==='action'){
+ if(row.mode==='targetNote'){
+  return `<article class="capture-row ${error?'capture-row-error':''} ${isSaved?'capture-row-saved':''}"><div class="capture-row-head"><strong>${isSaved?'✓ ':''}${e(row.name)}</strong><small>${e(captureTargetPreview(row))}</small></div>
+  <label class="capture-row-name-label">Note<textarea rows="2" data-note-message="${i}" ${disabled?'disabled':''}>${e(row.name)}</textarea></label>
+  <div class="capture-row-selectors"><label>Destination<select data-note-type="${i}" ${disabled?'disabled':''}><option value="World" ${row.targetType==='World'?'selected':''}>World</option><option value="Page" ${row.targetType==='Page'?'selected':''}>Page</option></select></label>
+  ${row.targetType==='World'?`<label>World<select data-note-world="${i}" ${disabled?'disabled':''}><option value="">Choose World…</option>${worlds.map(w=>`<option value="${e(w.id)}" ${row.worldId===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label>`:`<label>Page<select data-note-page="${i}" ${disabled?'disabled':''}><option value="">Choose page…</option>${noteTargetPages().map(p=>`<option value="${e(p.key)}" ${row.pageKey===p.key?'selected':''}>${e(p.name)}</option>`).join('')}</select></label>`}</div>
+  ${error?`<p class="capture-error" role="alert">${e(error)}</p>`:''}${row.status==='error'?`<p class="capture-error">${e(row.error)}</p>`:''}<p class="capture-hint">Adds to existing notes; nothing is removed.</p></article>`;
+ }
+ 
+if(row.mode==='action'){
   const item=captureActionPickItem(row),choices=captureActionStatusChoices(row.kind),targetKinds=captureActionKindsForLink(row.kind);
   const available=all(row.kind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
   const targets=all(row.targetKind).slice().sort((a,b)=>title(a).localeCompare(title(b)));
@@ -4516,13 +4587,14 @@ async function captureSave(){
  for(const row of rows){
   try{
    if(row.mode==='action'){await captureExecuteAction(row);}
+    else if(row.mode==='targetNote'){await captureSaveSpecificNote(row);}
    else if(row.kind==='DailyNote'){
     const date=dateOnly(),pageKey='quick-capture:'+date,old=existingPageNote(pageKey);
     const next={...data(old),name:'Daily Drop Box — '+date,pageKey,notes:[String(data(old).notes||'').trim(),row.name].filter(Boolean).join('\n')};
     const saved=await saveRecord('PageNote',next,old?.id);S.records=[...S.records.filter(x=>x.id!==saved.id),saved];
    }else{
     let record=row.recordId?get(row.recordId):null;
-    if(!record&&!row.forceNew){const existing=captureExisting(row);if(existing.length===1)record=existing[0]}
+    if(!record&&!row.forceNew&&!row.createWorld){const existing=captureExisting(row);if(existing.length===1)record=existing[0]}
     if(!record){
      const init={name:row.name};
      if(row.notes)init.description=row.notes;
@@ -4546,6 +4618,23 @@ async function captureSave(){
  if(!pending.length)showToast('Daily Drop Box: everything filed successfully ♡');
 }
 function wireCapture(){
+ app.querySelectorAll('[data-capture-example]').forEach(b=>b.addEventListener('click',()=>{
+ S.captureText=b.dataset.captureExample;S.captureRows=[];S.captureSummary='';captureRemember();render();
+ const input=app.querySelector('#capture-text');input?.focus();input?.setSelectionRange(input.value.length,input.value.length);
+ }));
+ app.querySelectorAll('[data-note-message]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteMessage)];if(row){row.name=el.value;row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-type]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteType)];if(row){row.targetType=el.value;row.worldId='';row.pageKey='';row.targetRecordId='';row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-world]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.noteWorld)];if(row){row.worldId=el.value;row.status='ready';row.error='';captureRemember();render()}
+ }));
+ app.querySelectorAll('[data-note-page]').forEach(el=>el.addEventListener('change',()=>{
+ const row=S.captureRows[Number(el.dataset.notePage)];if(row){row.pageKey=el.value;row.targetRecordId='';row.status='ready';row.error='';captureRemember();render()}
+ }));
+
  const settings=app.querySelector('#hq-capture-settings');settings?.addEventListener('toggle',()=>{S.hqCaptureSettingsOpen=settings.open});
  const input=app.querySelector('#capture-text');
  input?.addEventListener('input',ev=>{S.captureText=ev.target.value;S.captureRows=[];S.captureRestored=false;S.captureSummary='';captureRemember();app.querySelector('#capture-review')?.remove();});
