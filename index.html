@@ -5129,6 +5129,7 @@ function tkCard(r,i){
   </article>`;
 }
 function videoHubPage(){
+ const tab=S.videoTab==='uploads'?'uploads':'tiktoks';
  const items=all('TikTok').slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
  const filter=S.videoFilter||'all',q=String(S.tkSearch||'').trim().toLowerCase();
  const posted=r=>!!tkPostUrl(r)||String(data(r).status||'').toLowerCase()==='posted';
@@ -5141,11 +5142,15 @@ function videoHubPage(){
  const options=[['all','All'],['posted','Posted'],['drafts','Drafts'],['review','Needs title']];
  return `<div class="video-v3 video-v5 video-v6">
   <header class="v5-hero">
-   <div class="v5-hero-text"><span class="v5-eyebrow">CTRL + CRFT / MY CREATIVE LIBRARY</span><h1>Videos<span class="v5-hero-star" aria-hidden="true">✳</span></h1>
-    <p>Your TikTok ideas, details and footage — organized your way.</p></div>
-   <div class="v5-hero-actions"><button type="button" class="v5-button-new" data-video-new>＋ New entry</button>
-    <button type="button" class="v5-button-upload" data-video-upload>↑ Upload video</button></div>
+   <div class="v5-hero-text"><h1>Videos</h1><p>Your videos and TikTok notes, together.</p></div>
+   <div class="v5-hero-actions"><button type="button" class="v5-button-new" data-video-new>＋ New</button>
+    <button type="button" class="v5-button-upload" data-video-upload>↑ Upload</button></div>
   </header>
+  <nav class="v6-tabs" aria-label="Video sections">
+   <button type="button" data-video-tab="tiktoks" aria-pressed="${tab==='tiktoks'}" class="${tab==='tiktoks'?'active':''}">TikTok notes <span>${items.length}</span></button>
+   <button type="button" data-video-tab="uploads" aria-pressed="${tab==='uploads'}" class="${tab==='uploads'?'active':''}">My uploads <span>${vlManualRecords().length}</span></button>
+  </nav>
+  ${tab==='uploads'?vlUnifiedUploads():`
   <section class="v5-notes-section" aria-label="TikTok information">
    <div class="v5-section-head"><div><span class="v5-section-kicker">01 / CONTENT NOTES</span><h2>TikTok library</h2><p>Titles, captions, scripts and links — without the old mismatched videos.</p></div>
     <span class="v5-count">${items.length} saved</span></div>
@@ -5164,7 +5169,7 @@ function videoHubPage(){
    <div class="v5-entries">${posts.slice(page*pageSize,(page+1)*pageSize).map((r,i)=>tkCard(r,page*pageSize+i)).join('')||'<p class="v5-empty">No entries found. Try a different search or add a new one.</p>'}</div>
    ${pages>1?`<nav class="v5-paging" aria-label="Video library pages"><button type="button" data-tk29-page="-1" ${page===0?'disabled':''}>← Previous</button><span>Page ${page+1} of ${pages}</span><button type="button" data-tk29-page="1" ${page>=pages-1?'disabled':''}>Next →</button></nav>`:''}
   </section>
-  ${vlUnifiedUploads()}
+  `}
  </div>`;
 }
 function tkCheckIds(ids,kind){const verified=unique(ids.filter(Boolean));for(const id of verified){const rec=get(id);if(!rec||rec.kind!==kind||rec.archived_at)throw Error(`A selected ${kind} is no longer available. Refresh and choose it again.`)}return verified}
@@ -7601,6 +7606,11 @@ boot();
 #app .video-v6 .v5-uploads-empty{background:transparent!important;border:0!important;text-align:left!important;padding:18px 0!important}
 @media(max-width:600px){#app .video-v6 .v5-hero-actions{width:auto!important;display:flex!important}#app .video-v6 .v5-entry-toggle{padding:13px 0!important}#app .video-v6 .v5-entry-detail{margin:0!important}}
 
+
+#app .video-v6 .v6-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #e9e0e5;margin:0 0 15px}
+#app .video-v6 .v6-tabs button{cursor:pointer;background:transparent;border:0;border-bottom:3px solid transparent;min-height:49px;color:#82787d;font:680 14px var(--scrap-body,system-ui);padding:10px 4px}
+#app .video-v6 .v6-tabs button.active{color:#563849;border-bottom-color:#ff5b9a}
+#app .video-v6 .v6-tabs span{font-size:11px;color:#a38d99;margin-left:4px}
 </style>
 </body>
 </html>
