@@ -5421,14 +5421,14 @@ function worldLoadoutRow(r){
 }
 function worldLoadoutPanel(world){
  const rows=worldLoadoutHistory(world.id).sort((a,b)=>String(data(b).date||'').localeCompare(String(data(a).date||''))||String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')));
- const open=S.worldLoadoutPast===world.id,addons=all('AddOn').slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'}));
+ const open=S.worldLoadoutPast===world.id,showAll=S.worldLoadoutShowAll===world.id,addons=all('AddOn').slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'}));
  const picker=addons.map(a=>'<label data-loadout-name="'+e(title(a).toLowerCase())+'"><input type="checkbox" name="addon" value="'+e(a.id)+'"><span>'+e(title(a))+(creatorName(a)?'<small>by '+e(creatorName(a))+'</small>':'')+'</span></label>').join('');
  const form=open?'<form class="world-loadout-past-form" id="world-loadout-past-form" data-world-loadout="'+e(world.id)+'"><h3>Record an older combination</h3><p class="hint">Use the date it was actually in use. Your active World will not be changed.</p>'+
   '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label><label>Optional note<input type="text" name="note" maxlength="240" placeholder="e.g. Before adding furniture"></label></div>'+
   '<label>Find saved add-ons<input type="search" id="world-loadout-search" placeholder="Search by name…"></label><div class="world-loadout-picks">'+picker+'</div>'+
   '<label>Other old add-ons (one name per line)<textarea name="other" rows="2" placeholder="Add any missing old packs"></textarea></label>'+
   '<div class="world-loadout-history-actions"><button type="submit" class="btn btn-primary btn-small">Save dated combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-cancel>Cancel</button></div></form>':'';
- const timeline=rows.length?'<div class="world-loadout-timeline">'+rows.slice(0,60).map(worldLoadoutRow).join('')+'</div>':'<p class="hint">No combinations saved yet. Save the current one, or change your linked add-ons to start a history.</p>';
+ const timeline=rows.length?'<div class="world-loadout-timeline">'+(showAll?rows:rows.slice(0,40)).map(worldLoadoutRow).join('')+(rows.length>40?'<button type="button" class="btn btn-soft btn-small" data-loadout-show-all="'+e(world.id)+'">'+(showAll?'Show newest 40':'Show all '+rows.length+' saved combinations')+'</button>':'')+'</div>':'<p class="hint">No combinations saved yet. Save the current one, or change your linked add-ons to start a history.</p>';
  return '<section class="panel world-loadout-history" id="world-loadout-history" aria-label="World add-on history">'+
   '<div class="section-line"><div><div class="eyebrow">YOUR WORLD, THROUGH TIME</div><h2>'+pinkIcon('AddOn')+' Add-on history</h2><p class="subcopy">Keep earlier add-on combinations with dates. Changes will be tracked automatically from now on, and you can enter older dates yourself.</p></div><span class="pill yellow">'+rows.length+' saved</span></div>'+
   '<div class="world-loadout-history-actions"><button type="button" class="btn btn-small btn-primary" data-loadout-snapshot="'+e(world.id)+'">Save current combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-past="'+e(world.id)+'">＋ Record an older combination</button></div>'+form+timeline+'</section>';
@@ -6817,6 +6817,7 @@ function wireApp(){
  
  app.querySelectorAll('[data-loadout-snapshot]').forEach(b=>b.addEventListener('click',()=>worldLoadoutSaveCurrent(b.dataset.loadoutSnapshot)));
  app.querySelectorAll('[data-loadout-past]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutPast=S.worldLoadoutPast===b.dataset.loadoutPast?null:b.dataset.loadoutPast;render();app.querySelector('#world-loadout-past-form')?.scrollIntoView({block:'nearest'})}));
+ app.querySelectorAll('[data-loadout-show-all]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutShowAll=S.worldLoadoutShowAll===b.dataset.loadoutShowAll?null:b.dataset.loadoutShowAll;render()}));
  app.querySelector('[data-loadout-cancel]')?.addEventListener('click',()=>{S.worldLoadoutPast=null;render()});
  app.querySelector('#world-loadout-past-form')?.addEventListener('submit',ev=>{ev.preventDefault();worldLoadoutSavePast(ev.target)});
  app.querySelector('#world-loadout-search')?.addEventListener('input',ev=>{const q=ev.target.value.trim().toLowerCase();app.querySelectorAll('[data-loadout-name]').forEach(n=>{n.hidden=!n.dataset.loadoutName.includes(q)&&!n.querySelector('input')?.checked})});
