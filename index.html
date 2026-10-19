@@ -4925,7 +4925,9 @@ function moveShopModal(m){const record=get(m.id);if(!record)return '';const targ
 async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(rec,target);if(plan.error){showToast(plan.error);return}if(S.busy)return;
  if(!confirm(`Move “${title(rec)}” from ${label(rec.kind)} to ${label(target)}?\n\nIts original record and data will stay. ${plan.changes.length} compatible relationship(s) will be updated. No duplicate will be created.`))return;
  S.busy=true;const applied=[];let kindChanged=false;
+ const historyWorlds=unique(plan.changes.filter(c=>c.oldType==='uses_addon'||c.newType==='uses_addon').map(c=>c.link.from_record_id));
  try{
+  if(historyWorlds.length)await worldLoadoutBefore(historyWorlds);
   for(const change of plan.changes){const result=await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(change.link.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({link_type:change.newType})});if(!Array.isArray(result)||result.length!==1)throw Error('A relationship did not update.');applied.push(change)}
   const saved=await api(`/rest/v1/hq_records?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({kind:target})});if(!Array.isArray(saved)||saved.length!==1)throw Error('The record did not update.');kindChanged=true;
  }catch(err){
@@ -4934,7 +4936,7 @@ async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(re
   S.modal=null;try{await loadAll()}catch{}
   showToast(rollbackFailed?'Some links could not be restored. Stop editing this item and use your backup.':'Move cancelled: '+err.message);S.busy=false;render();return;
  }
- S.modal=null;S.detail=id;S.busy=false;try{await loadAll();showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
+ S.modal=null;S.detail=id;S.busy=false;try{await loadAll();if(historyWorlds.length)await worldLoadoutAfter(historyWorlds);showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
 }
 // World Groups: a real two-way view of the existing in_group links.
 // This does not create groups, seed records or guess where unassigned Worlds belong.
@@ -5422,7 +5424,7 @@ function worldLoadoutRow(r){
 function worldLoadoutPanel(world){
  const rows=worldLoadoutHistory(world.id).sort((a,b)=>String(data(b).date||'').localeCompare(String(data(a).date||''))||String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')));
  const open=S.worldLoadoutPast===world.id,showAll=S.worldLoadoutShowAll===world.id,addons=all('AddOn').slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'}));
- const picker=addons.map(a=>'<label data-loadout-name="'+e(title(a).toLowerCase())+'"><input type="checkbox" name="addon" value="'+e(a.id)+'"><span>'+e(title(a))+(creatorName(a)?'<small>by '+e(creatorName(a))+'</small>':'')+'</span></label>').join('');
+ const picker=(open?addons:[]).map(a=>'<label data-loadout-name="'+e(title(a).toLowerCase())+'"><input type="checkbox" name="addon" value="'+e(a.id)+'"><span>'+e(title(a))+(creatorName(a)?'<small>by '+e(creatorName(a))+'</small>':'')+'</span></label>').join('');
  const form=open?'<form class="world-loadout-past-form" id="world-loadout-past-form" data-world-loadout="'+e(world.id)+'"><h3>Record an older combination</h3><p class="hint">Use the date it was actually in use. Your active World will not be changed.</p>'+
   '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label><label>Optional note<input type="text" name="note" maxlength="240" placeholder="e.g. Before adding furniture"></label></div>'+
   '<label>Find saved add-ons<input type="search" id="world-loadout-search" placeholder="Search by name…"></label><div class="world-loadout-picks">'+picker+'</div>'+
