@@ -3805,6 +3805,31 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .tk29-book .tk29-card{transform:none!important;min-width:0}
 @media(max-width:700px){#app .capture-note-shortcuts .btn{flex:1 1 120px}#app .vl-unified-upload .vl-grid{grid-template-columns:minmax(0,1fr)}}
 
+
+#app .world-loadout-history{display:grid;gap:12px;min-width:0;margin:16px 0}
+#app .world-loadout-history h2{color:#80455f;font-size:24px!important}
+#app .world-loadout-history-actions{display:flex;flex-wrap:wrap;gap:8px}
+#app .world-loadout-timeline{display:grid;gap:8px}
+#app .world-loadout-history-item{border:1px solid #efd2dc;border-radius:12px;background:#fffefa;overflow:hidden}
+#app .world-loadout-history-item>summary{padding:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;cursor:pointer}
+#app .world-loadout-history-item summary strong{color:#84415f}
+#app .world-loadout-history-item summary span{flex:1;min-width:125px;color:#746873;font-size:12px}
+#app .world-loadout-history-item summary b{font-size:12px;background:#ffe7a3;border-radius:18px;padding:5px 9px;color:#6b4756}
+#app .world-loadout-history-body{padding:13px 16px;border-top:1px solid #f1e1e6;max-height:300px;overflow:auto}
+#app .world-loadout-history-body ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:7px 18px;margin:10px 0;padding-left:18px}
+#app .world-loadout-history-body li{color:#654550;font-size:13px}
+#app .world-loadout-history-body small{color:#8e7781;font-size:11px}
+#app .world-loadout-past-form{display:grid;gap:10px;background:#fff9ed;border:1px solid #eed4d9;border-radius:13px;padding:14px}
+#app .world-loadout-past-form h3{margin:0;font-size:18px}
+#app .world-loadout-past-form label{font-size:13px;font-weight:700;color:#784c63;display:grid;gap:5px}
+#app .world-loadout-past-form :is(input,textarea){width:100%;min-width:0;font-size:16px;padding:9px;border-radius:10px;border:1px solid #e9c4d3;background:white}
+#app .world-loadout-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#app .world-loadout-picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:260px;overflow:auto;background:white;border:1px solid #ecd2db;border-radius:10px;padding:10px}
+#app .world-loadout-picks label{display:flex;flex-direction:row;align-items:flex-start;gap:8px;padding:3px}
+#app .world-loadout-picks input[type=checkbox]{width:17px;flex:none;margin-top:2px;accent-color:#ff5b9a}
+#app .world-loadout-picks small{display:block;color:#957982;font-size:11px}
+@media(max-width:600px){#app .world-loadout-form-grid,#app .world-loadout-picks{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -4090,6 +4115,9 @@ async function saveLinks(recordId,kind){
   for(const targetId of want.filter(i=>!oldIDs.includes(i)))additions.push({from_record_id:def[3]==='out'?recordId:targetId,to_record_id:def[3]==='out'?targetId:recordId,link_type:def[2]});
   removals.push(...existing.filter(l=>!want.includes(def[3]==='out'?l.to_record_id:l.from_record_id)));
  }
+ const loadoutWorldIds=unique([...additions,...removals].filter(l=>l.link_type==='uses_addon').map(l=>l.from_record_id));
+ if(loadoutWorldIds.length)await worldLoadoutBefore(loadoutWorldIds);
+ try{
  // Add-first avoids severing valid relations before replacement links can be confirmed.
  for(const link of additions){
   const created=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(link)});
@@ -4100,6 +4128,7 @@ async function saveLinks(recordId,kind){
   await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(link.id)}`,{method:'DELETE'});
   S.links=S.links.filter(row=>row.id!==link.id);
  }
+ }finally{if(loadoutWorldIds.length)await worldLoadoutAfter(loadoutWorldIds)}
 }
 function nav(page){if(page==='TikTok')page='Video';S.sidebarQuery='';S.page=page;S.sort=S.viewSort[page]||'name';S.query='';S.filter='all';S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.detail=null;S.sidebar=false;S.modal=null;const selected=GROUPS.find(([,items])=>items.some(([key])=>key===page));if(selected){S.navClosed.delete(selected[0]);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}}history.replaceState(null,'','#'+page);render()}
 const PINK_KIND_ICONS = {"WorldGroup": "bow", "World": "globe", "BuildIdea": "idea", "Build": "castle", "Subproject": "bow", "Task": "checklist", "AddOn": "puzzle", "Creator": "paint", "Texture": "texture", "Craftable": "bear", "CraftableItem": "strawberry", "Material": "thread", "Block": "cube", "Palette": "palette", "Avenue": "road", "Street": "road", "CityBlock": "city", "WishlistItem": "bag", "GardenTheme": "flower", "GardenFeature": "flower", "GeneratorPrompt": "wand", "Skin": "dress", "CraftablePlacement": "pin", "CoordinatePin": "pin", "RecoveryReview": "search", "WorldTemplate": "mountain", "StructureBlock": "columns", "Location": "map", "Photo": "camera", "Video": "film", "TikTok": "film", "Lore": "book", "Journal": "journal", "Event": "calendar", "Tag": "tag", "PageNote": "note", "home": "home", "today": "sun", "generator": "wand", "fields": "sliders", "trash": "trash", "settings": "settings", "shop": "bag", "search": "search", "photos": "camera", "quick": "star", "lock": "lock"};
@@ -4372,6 +4401,9 @@ async function captureExecuteAction(row){
  }
  const target=captureActionPickTarget(row),rel=captureActionRelation(item,target);
  const existing=S.links.filter(l=>l.from_record_id===rel.from&&l.to_record_id===rel.to&&l.link_type===rel.type);
+ const historyAffected=rel.type==='uses_addon'&&(row.operation==='link'?!existing.length:existing.length>0);
+ if(historyAffected)await worldLoadoutBefore([rel.from]);
+ try{
  if(row.operation==='link'){
   if(existing.length)return;
   const created=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({from_record_id:rel.from,to_record_id:rel.to,link_type:rel.type})});
@@ -4385,6 +4417,7 @@ async function captureExecuteAction(row){
    S.links=S.links.filter(l=>l.id!==link.id);
   }
  }
+ }finally{if(historyAffected)await worldLoadoutAfter([rel.from])}
 }
 
 function noteTargetPages(){return [{key:'home',name:'Home'},...GROUPS.flatMap(([,entries])=>entries.map(([key,name])=>({key,name})))].filter((p,i,a)=>a.findIndex(v=>v.key===p.key)===i);}
@@ -4575,9 +4608,11 @@ async function captureLinkToWorld(record,worldId){
  const forward=source==='item'?def[3]==='out':def[3]==='in';
  const from_record_id=forward?record.id:worldId,to_record_id=forward?worldId:record.id;
  if(S.links.some(l=>l.from_record_id===from_record_id&&l.to_record_id===to_record_id&&l.link_type===def[2]))return;
+ if(def[2]==='uses_addon')await worldLoadoutBefore([from_record_id]);
  const saved=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({from_record_id,to_record_id,link_type:def[2]})});
  if(!Array.isArray(saved)||!saved[0])throw Error('The World link was not confirmed.');
  S.links.push(saved[0]);
+ if(def[2]==='uses_addon')await worldLoadoutAfter([from_record_id]);
 }
 async function captureSave(){
  if(S.captureBusy)return;
@@ -4890,7 +4925,9 @@ function moveShopModal(m){const record=get(m.id);if(!record)return '';const targ
 async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(rec,target);if(plan.error){showToast(plan.error);return}if(S.busy)return;
  if(!confirm(`Move “${title(rec)}” from ${label(rec.kind)} to ${label(target)}?\n\nIts original record and data will stay. ${plan.changes.length} compatible relationship(s) will be updated. No duplicate will be created.`))return;
  S.busy=true;const applied=[];let kindChanged=false;
+ const historyWorlds=unique(plan.changes.filter(c=>c.oldType==='uses_addon'||c.newType==='uses_addon').map(c=>c.link.from_record_id));
  try{
+  if(historyWorlds.length)await worldLoadoutBefore(historyWorlds);
   for(const change of plan.changes){const result=await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(change.link.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({link_type:change.newType})});if(!Array.isArray(result)||result.length!==1)throw Error('A relationship did not update.');applied.push(change)}
   const saved=await api(`/rest/v1/hq_records?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({kind:target})});if(!Array.isArray(saved)||saved.length!==1)throw Error('The record did not update.');kindChanged=true;
  }catch(err){
@@ -4899,7 +4936,7 @@ async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(re
   S.modal=null;try{await loadAll()}catch{}
   showToast(rollbackFailed?'Some links could not be restored. Stop editing this item and use your backup.':'Move cancelled: '+err.message);S.busy=false;render();return;
  }
- S.modal=null;S.detail=id;S.busy=false;try{await loadAll();showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
+ S.modal=null;S.detail=id;S.busy=false;try{await loadAll();if(historyWorlds.length)await worldLoadoutAfter(historyWorlds);showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
 }
 // World Groups: a real two-way view of the existing in_group links.
 // This does not create groups, seed records or guess where unassigned Worlds belong.
@@ -5243,6 +5280,73 @@ function worldHubDefinitions(){
 function worldHubReverseDef(def){
  return relationDefs(def[4]).find(back=>back[4]==='World'&&back[2]===def[2]&&back[3]!==def[3]);
 }
+
+/* Each World has an independent private dated add-on combination ledger. */
+const WORLD_LOADOUT_HISTORY_KIND='WorldAddonSnapshot';
+function worldLoadoutHistory(worldId){return all(WORLD_LOADOUT_HISTORY_KIND).filter(r=>data(r).worldId===worldId);}
+function worldLoadoutEntries(ids){
+ const seen=new Set();
+ return ids.map(id=>get(id)).filter(r=>r&&r.kind==='AddOn'&&!r.archived_at&&!seen.has(r.id)&&(seen.add(r.id),true))
+ .map(r=>({id:r.id,name:title(r),creator:creatorName(r)||''}))
+ .sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base',numeric:true}));
+}
+function worldLoadoutNow(worldId){
+ const r=get(worldId);return r&&r.kind==='World'?worldLoadoutEntries(worldOverviewLinkList(r,'addons').map(a=>a.id)):[];
+}
+function worldLoadoutSignature(items){return items.map(r=>r.id?'id:'+r.id:'name:'+String(r.name||'').toLowerCase()).sort().join('||');}
+async function worldLoadoutSave(worldId,entries,options={}){
+ const w=get(worldId);if(!w||w.kind!=='World'||w.archived_at)throw Error('World not found.');
+ const date=options.date||dateOnly(),source=options.source||'automatic',signature=worldLoadoutSignature(entries);
+ const prior=worldLoadoutHistory(worldId).filter(r=>data(r).source!=='manual').sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')))[0];
+ if(!options.force&&prior&&data(prior).signature===signature)return null;
+ const saved=await saveRecord(WORLD_LOADOUT_HISTORY_KIND,{
+  name:title(w)+' add-ons '+date,worldId,worldName:title(w),date,recordedAt:new Date().toISOString(),
+  source,note:String(options.note||''),signature,addons:entries.map(a=>({id:a.id||'',name:String(a.name||''),creator:String(a.creator||'')}))
+ });
+ S.records.push(saved);return saved;
+}
+async function worldLoadoutBefore(worldIds){
+ for(const id of unique(worldIds).filter(Boolean)){
+  if(!worldLoadoutHistory(id).some(r=>data(r).source!=='manual'))
+   await worldLoadoutSave(id,worldLoadoutNow(id),{source:'baseline',force:true});
+ }
+}
+async function worldLoadoutAfter(worldIds){
+ const problems=[];
+ for(const id of unique(worldIds).filter(Boolean)){
+  try{await worldLoadoutSave(id,worldLoadoutNow(id),{source:'automatic'});}
+  catch(err){problems.push(err.message);}
+ }
+ if(problems.length)showToast('Add-ons saved, but a history snapshot failed: '+problems[0]);
+}
+function worldLoadoutDate(ymd){
+ const s=String(ymd||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return 'Undated';
+ return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+}
+async function worldLoadoutSaveCurrent(id){
+ if(S.worldLoadoutBusy)return;
+ S.worldLoadoutBusy=true;
+ try{await worldLoadoutSave(id,worldLoadoutNow(id),{source:'current',force:true});showToast('Current add-on combination saved with today’s date ♡');}
+ catch(err){showToast('Could not save combination: '+err.message);}
+ finally{S.worldLoadoutBusy=false;render();}
+}
+async function worldLoadoutSavePast(form){
+ if(S.worldLoadoutBusy)return;
+ const id=form.dataset.worldLoadout,world=get(id),fd=new FormData(form),date=String(fd.get('date')||'');
+ if(!world||world.kind!=='World')return showToast('World not available.');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateOnly())return showToast('Choose a real past date.');
+ const picked=fd.getAll('addon').map(String),entries=worldLoadoutEntries(picked);
+ if(entries.length!==new Set(picked).size)return showToast('An add-on is unavailable. Review the selected packs.');
+ for(const name of String(fd.get('other')||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,40)){
+  if(!entries.some(x=>x.name.toLowerCase()===name.toLowerCase()))entries.push({id:'',name,creator:''});
+ }
+ if(!confirm('Save '+entries.length+' add-ons for '+title(world)+' on '+worldLoadoutDate(date)+'? This will not change your current add-ons.'))return;
+ S.worldLoadoutBusy=true;
+ try{await worldLoadoutSave(id,entries,{source:'manual',date,note:String(fd.get('note')||''),force:true});S.worldLoadoutPast=null;showToast('Past add-on combination saved ♡');}
+ catch(err){showToast('History not saved: '+err.message);}
+ finally{S.worldLoadoutBusy=false;render();}
+}
+
 /* WORLD OVERVIEW LOADOUT — read only until the user chooses Edit Links. Uses existing hq_links. */
 function worldOverviewLinkList(world, key){
  const def=relationDefs('World').find(d=>d[0]===key);
@@ -5310,6 +5414,28 @@ async function chooseWorldOptional(worldId,key,show,action){
  if(action==='link-build'&&key==='future')return openWorldLinkPicker(worldId,'builds');
  render();
 }
+
+function worldLoadoutRow(r){
+ const d=data(r),items=Array.isArray(d.addons)?d.addons:[];
+ const type=d.source==='manual'?'Date entered by you':d.source==='baseline'?'First captured on this day; earlier dates unknown':'Captured when saved';
+ const contents=items.length?'<ul>'+items.map(a=>'<li>'+e(a.name||'')+(a.creator?' <small>— '+e(a.creator)+'</small>':'')+'</li>').join('')+'</ul>':'<p>No add-ons in this saved combination.</p>';
+ return '<details class="world-loadout-history-item"><summary><strong>'+e(worldLoadoutDate(d.date))+'</strong><span>'+e(d.note||type)+'</span><b>'+items.length+' add-on'+(items.length===1?'':'s')+'</b></summary><div class="world-loadout-history-body"><small>'+e(type)+'</small>'+contents+'</div></details>';
+}
+function worldLoadoutPanel(world){
+ const rows=worldLoadoutHistory(world.id).sort((a,b)=>String(data(b).date||'').localeCompare(String(data(a).date||''))||String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')));
+ const open=S.worldLoadoutPast===world.id,showAll=S.worldLoadoutShowAll===world.id,addons=all('AddOn').slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'}));
+ const picker=(open?addons:[]).map(a=>'<label data-loadout-name="'+e(title(a).toLowerCase())+'"><input type="checkbox" name="addon" value="'+e(a.id)+'"><span>'+e(title(a))+(creatorName(a)?'<small>by '+e(creatorName(a))+'</small>':'')+'</span></label>').join('');
+ const form=open?'<form class="world-loadout-past-form" id="world-loadout-past-form" data-world-loadout="'+e(world.id)+'"><h3>Record an older combination</h3><p class="hint">Use the date it was actually in use. Your active World will not be changed.</p>'+
+  '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label><label>Optional note<input type="text" name="note" maxlength="240" placeholder="e.g. Before adding furniture"></label></div>'+
+  '<label>Find saved add-ons<input type="search" id="world-loadout-search" placeholder="Search by name…"></label><div class="world-loadout-picks">'+picker+'</div>'+
+  '<label>Other old add-ons (one name per line)<textarea name="other" rows="2" placeholder="Add any missing old packs"></textarea></label>'+
+  '<div class="world-loadout-history-actions"><button type="submit" class="btn btn-primary btn-small">Save dated combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-cancel>Cancel</button></div></form>':'';
+ const timeline=rows.length?'<div class="world-loadout-timeline">'+(showAll?rows:rows.slice(0,40)).map(worldLoadoutRow).join('')+(rows.length>40?'<button type="button" class="btn btn-soft btn-small" data-loadout-show-all="'+e(world.id)+'">'+(showAll?'Show newest 40':'Show all '+rows.length+' saved combinations')+'</button>':'')+'</div>':'<p class="hint">No combinations saved yet. Save the current one, or change your linked add-ons to start a history.</p>';
+ return '<section class="panel world-loadout-history" id="world-loadout-history" aria-label="World add-on history">'+
+  '<div class="section-line"><div><div class="eyebrow">YOUR WORLD, THROUGH TIME</div><h2>'+pinkIcon('AddOn')+' Add-on history</h2><p class="subcopy">Keep earlier add-on combinations with dates. Changes will be tracked automatically from now on, and you can enter older dates yourself.</p></div><span class="pill yellow">'+rows.length+' saved</span></div>'+
+  '<div class="world-loadout-history-actions"><button type="button" class="btn btn-small btn-primary" data-loadout-snapshot="'+e(world.id)+'">Save current combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-past="'+e(world.id)+'">＋ Record an older combination</button></div>'+form+timeline+'</section>';
+}
+
 function worldOverviewStrip(world){
  const addonList=worldOverviewLinkList(world,'addons');
  const keySections=[['craftables','Craftable packs','Craftable'],['textures','Textures','Texture'],['templates','World templates','WorldTemplate'],['builds','Builds','Build'],['tiktoks','TikToks','TikTok'],['photos','Photos','Photo'],['locations','Locations','Location']];
@@ -5382,12 +5508,15 @@ async function saveWorldLinkPicker(){
  const additions=chosen.filter(id=>!currently.includes(id));
  const removals=currentActive.filter(id=>!chosen.includes(id));
  S.busy=true;
+ const historyAffected=def[2]==='uses_addon'&&(additions.length>0||removals.length>0);
  try{
+  if(historyAffected)await worldLoadoutBefore([world.id]);
   for(const id of additions){const body={from_record_id:def[3]==='out'?world.id:id,to_record_id:def[3]==='out'?id:world.id,link_type:def[2]};const created=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});if(!Array.isArray(created)||created.length!==1)throw Error('Could not confirm a link. Old links were preserved.');S.links.push(created[0]);}
   for(const id of removals){const link=S.links.find(l=>linkMatches(l,world.id,def)&&(def[3]==='out'?l.to_record_id:l.from_record_id)===id);if(link){await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(link.id)}`,{method:'DELETE'});S.links=S.links.filter(l=>l.id!==link.id);}}
+  if(historyAffected)await worldLoadoutAfter([world.id]);
   S.modal=null;
   await loadAll();showToast('World links updated ♡');
- }catch(err){showToast('Not all links were saved. Your other data is safe: '+err.message);try{await loadAll()}catch{}}
+ }catch(err){if(historyAffected)await worldLoadoutAfter([world.id]);showToast('Not all links were saved. Your other data is safe: '+err.message);try{await loadAll()}catch{}}
  finally{S.busy=false;render()}
 }
 function newFromWorld(worldId,defKey){
@@ -5410,7 +5539,7 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
- ${r.kind==='World'?worldScopedLinks(r)+worldOverviewStrip(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsHub(r):''}
+ ${r.kind==='World'?worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsHub(r):''}
 
  ${kitGallery}
  ${tiktokClipGallery}
@@ -6106,7 +6235,7 @@ function kitWorldId(){const state=kitState();if(state.worldId&&get(state.worldId
 function kitPreviewCounts(){const days=new Set(all('Lore').map(x=>Number(data(x).day)).filter(Number.isFinite));return {existing:[...Array(100)].filter((_,i)=>days.has(i+1)).length,newDays:[...Array(100)].filter((_,i)=>!days.has(i+1)).length,stored:all('Photo').filter(p=>data(p).buildKitSource===BUILD_KIT_SOURCE).length}}
 function buildKitPanel(){const s=kitState(),worldId=kitWorldId(),c=kitPreviewCounts(),worlds=all('World');return `<section class="panel kit-import-panel" id="buildkit-importer" aria-label="Private 100-day Build Kit upload"><div class="kit-top"><span class="kit-top-icon">${pinkIcon('Lore')}</span><div><div class="eyebrow">YOUR PRIVATE CREATIVE ARCHIVE</div><h2>100-Day Build Kit Pictures</h2><p class="subcopy">Add the original Day 01–100 pictures to their matching Lore days. Existing Lore days and writing stay unchanged; new days are created only when missing.</p></div></div><div class="kit-overview"><span><b>${c.existing}</b> existing Lore days</span><span><b>${c.newDays}</b> missing Lore days</span><span><b>${c.stored}</b> images already imported</span></div><div class="kit-form-grid"><label class="field"><strong>Choose the Build Kit ZIP in Files</strong><input id="buildkit-zip" type="file" accept=".zip,application/zip,application/x-zip-compressed" ${s.busy?'disabled':''}><small>Select “CTRL Group - Build Kit - 100 Days JPEGs.zip”. Nothing uploads until you tap Start.</small></label><label class="field"><strong>Save these days under which World?</strong><select id="buildkit-world" ${s.busy?'disabled':''}>${worlds.map(w=>`<option value="${e(w.id)}" ${w.id===worldId?'selected':''}>${e(title(w))}</option>`).join('')}</select><small>Default: CTRL Group - Main. You can change it before importing.</small></label></div><div class="kit-status" id="buildkit-status" role="status">${e(s.status||'Choose your ZIP to check all the day numbers first.')}</div>${s.ready?`<div class="notice kit-confirm-note">Ready: ${s.items.length} numbered Day pictures${s.cover?' plus 1 cover':''}. Matched by Day number, not alphabetical filename order. Stored privately under your account. If interrupted, choose the ZIP again to resume without duplicating completed pictures.</div>`:''}<div class="kit-actions"><button class="btn btn-primary" id="buildkit-start" ${!s.ready||s.busy?'disabled':''}>${s.busy?'Importing…':'Upload Pictures to Their Days'}</button>${s.busy?'<button class="btn btn-soft" id="buildkit-stop">Stop after this picture</button>':''}<span class="muted" id="buildkit-counter">${s.processed?`${s.processed}/100 pictures processed`:'No pictures uploaded in this session yet'}</span></div><p class="footnote">The ZIP stays on your iPhone until you choose it here. All pictures upload to your existing private Supabase media bucket—not to public Netlify assets. Leave this page open while the 100 pictures upload.</p></section>`}
 async function previewBuildKit(file){const s=kitState();if(s.busy)return;s.ready=false;s.archive=null;s.items=[];s.cover=null;s.status='Reading your ZIP locally…';s.processed=0;s.created=0;s.skipped=0;s.failed=0;render();try{if(!file||!(/\.zip$/i.test(file.name)||file.type.includes('zip')))throw Error('Choose the original ZIP file.');if(file.size>125*1024*1024)throw Error('ZIP is unexpectedly large; maximum 125 MB.');if(typeof JSZip==='undefined')throw Error('The ZIP reader did not load. Please refresh the app.');const z=await JSZip.loadAsync(file,{checkCRC32:true});const days=new Map();let cover=null;for(const [path,entry] of Object.entries(z.files)){if(entry.dir)continue;const name=path.split('/').pop();if(/^(?:__MACOSX|\.)/.test(name)||path.includes('__MACOSX/'))continue;const match=/^Day\s*(\d{1,3})\s*[-–—]\s*(.+)\.jpe?g$/i.exec(name);if(match){const day=Number(match[1]);if(day<1||day>100)throw Error('Unexpected day number '+day+'.');if(days.has(day))throw Error(`Day ${day} appears more than once; no upload started.`);days.set(day,{day,name,title:kitTitle(name),entry});}else if(/^Cover\.jpe?g$/i.test(name))cover={name,entry};else if(/\.(?:jpe?g|png|webp)$/i.test(name))throw Error('Unmatched picture: '+name+' — no upload started.');}const missing=Array.from({length:100},(_,i)=>i+1).filter(d=>!days.has(d));if(missing.length)throw Error('Missing day pictures: '+missing.join(', ')+'. No upload started.');s.items=[...days.values()].sort((a,b)=>a.day-b.day);s.cover=cover;s.archive=z;s.ready=true;s.status=`Verified all 100 day pictures${cover?' and the cover':''}. Day 01 = ${s.items[0].title}; Day 100 = ${s.items.at(-1).title}. Ready to upload.`;}catch(err){s.status='Could not prepare ZIP: '+err.message;s.ready=false;}render()}
-async function ensureKitLink(from,to,type){if(S.links.some(l=>l.from_record_id===from&&l.to_record_id===to&&l.link_type===type))return;const saved=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({from_record_id:from,to_record_id:to,link_type:type})});if(!Array.isArray(saved)||!saved.length)throw Error('A saved relationship could not be verified.');S.links.push(saved[0]);}
+async function ensureKitLink(from,to,type){if(S.links.some(l=>l.from_record_id===from&&l.to_record_id===to&&l.link_type===type))return;if(type==='uses_addon')await worldLoadoutBefore([from]);const saved=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({from_record_id:from,to_record_id:to,link_type:type})});if(!Array.isArray(saved)||!saved.length)throw Error('A saved relationship could not be verified.');S.links.push(saved[0]);if(type==='uses_addon')await worldLoadoutAfter([from]);}
 async function ensureKitLore(day,name,worldId){const existing=all('Lore').filter(r=>Number(data(r).day)===day);const linked=existing.find(r=>S.links.some(l=>l.from_record_id===r.id&&l.to_record_id===worldId&&l.link_type==='lore_world'));const unassigned=existing.find(r=>!S.links.some(l=>l.from_record_id===r.id&&l.link_type==='lore_world'));let lore=linked||unassigned;if(!lore){lore=await saveRecord('Lore',{name:`Day ${String(day).padStart(2,'0')} — ${name}`,day,description:'',notes:'',buildKitSource:BUILD_KIT_SOURCE});S.records.push(lore);}await ensureKitLink(lore.id,worldId,'lore_world');return lore}
 function updateKitProgress(message){const s=kitState();s.status=message;const node=document.getElementById('buildkit-status');if(node)node.textContent=message;const count=document.getElementById('buildkit-counter');if(count)count.textContent=`${s.processed}/100 days reviewed · ${s.created} uploaded · ${s.skipped} already present`}
 async function importKitCover(worldId){const s=kitState(),c=s.cover;if(!c)return;let p=all('Photo').find(r=>data(r).buildKitSource===BUILD_KIT_SOURCE&&data(r).buildKitRole==='cover');if(!p){updateKitProgress('Uploading the Build Kit cover…');const bytes=await c.entry.async('uint8array');const file=new File([bytes],c.name,{type:'image/jpeg'});const filePath=await uploadMedia(file);p=await saveRecord('Photo',{name:'100 Days — Build Kit Cover',description:'Cover for the 100-day Build Kit.',buildKitSource:BUILD_KIT_SOURCE,buildKitRole:'cover',fileName:c.name,filePath,fileSize:file.size,mimeType:'image/jpeg'});S.records.push(p);}await ensureKitLink(p.id,worldId,'media_world')}
@@ -6687,7 +6816,15 @@ function wireApp(){
  app.querySelectorAll('[data-world-extra-link-build]').forEach(b=>b.addEventListener('click',()=>chooseWorldOptional(b.dataset.worldId,'future',true,'link-build')));
 
  app.querySelectorAll('[data-world-section]').forEach(b=>b.addEventListener('click',ev=>{ev.preventDefault();const key=b.dataset.worldSection;const label=app.querySelector(`[data-world-manage="${key}"]`);const tile=label?.closest('.world-hub-tile');(tile||document.getElementById('world-everything'))?.scrollIntoView({block:'start',behavior:'smooth'});}));
- app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('click',async()=>{const world=get(b.dataset.copyWorldAddons);if(!world||world.kind!=='World')return;const addons=worldOverviewLinkList(world,'addons');if(!addons.length)return showToast('No add-ons linked to this World yet.');const list=title(world)+' — Add-ons\n'+addons.map((r,i)=>`${i+1}. ${title(r)}${creatorName(r)?' — '+creatorName(r):''}`).join('\n');try{await navigator.clipboard.writeText(list);showToast('World add-on list copied ♡')}catch{showToast('Copy is unavailable in this browser. The full list is shown above.')}}));
+ 
+ app.querySelectorAll('[data-loadout-snapshot]').forEach(b=>b.addEventListener('click',()=>worldLoadoutSaveCurrent(b.dataset.loadoutSnapshot)));
+ app.querySelectorAll('[data-loadout-past]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutPast=S.worldLoadoutPast===b.dataset.loadoutPast?null:b.dataset.loadoutPast;render();app.querySelector('#world-loadout-past-form')?.scrollIntoView({block:'nearest'})}));
+ app.querySelectorAll('[data-loadout-show-all]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutShowAll=S.worldLoadoutShowAll===b.dataset.loadoutShowAll?null:b.dataset.loadoutShowAll;render()}));
+ app.querySelector('[data-loadout-cancel]')?.addEventListener('click',()=>{S.worldLoadoutPast=null;render()});
+ app.querySelector('#world-loadout-past-form')?.addEventListener('submit',ev=>{ev.preventDefault();worldLoadoutSavePast(ev.target)});
+ app.querySelector('#world-loadout-search')?.addEventListener('input',ev=>{const q=ev.target.value.trim().toLowerCase();app.querySelectorAll('[data-loadout-name]').forEach(n=>{n.hidden=!n.dataset.loadoutName.includes(q)&&!n.querySelector('input')?.checked})});
+
+app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('click',async()=>{const world=get(b.dataset.copyWorldAddons);if(!world||world.kind!=='World')return;const addons=worldOverviewLinkList(world,'addons');if(!addons.length)return showToast('No add-ons linked to this World yet.');const list=title(world)+' — Add-ons\n'+addons.map((r,i)=>`${i+1}. ${title(r)}${creatorName(r)?' — '+creatorName(r):''}`).join('\n');try{await navigator.clipboard.writeText(list);showToast('World add-on list copied ♡')}catch{showToast('Copy is unavailable in this browser. The full list is shown above.')}}));
  app.querySelectorAll('[data-world-create]').forEach(b=>b.addEventListener('click',()=>newFromWorld(b.dataset.worldId,b.dataset.worldCreate)));
  // Keep the input mounted while searching; replacing the full page interrupted typing on iPhone.
  const refreshWorldPickerList=()=>{
