@@ -3142,7 +3142,9 @@ body,body:not(.no-theme) {
 <style>
 .recon-panel{margin-bottom:14px}.recon-stat{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}.recon-stat span{background:#ffe4ed;border:1px solid #ffbdd5;border-radius:12px;padding:12px 16px;color:#333}.recon-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid #f5d6e0;font-size:13px}.recon-row b{display:block;overflow-wrap:anywhere}.recon-row small{display:block;color:#777;margin-top:3px;overflow-wrap:anywhere}.recon-row>span:nth-child(2){overflow-wrap:anywhere}.recon-row:last-child{border-bottom:0}.recon-status{font-size:13px;line-height:1.45;color:#505050;margin-top:12px}.recon-panel input[type=file]{max-width:100%}@media(max-width:690px){.recon-row{grid-template-columns:minmax(0,1fr);gap:6px}.recon-world-row .btn{justify-self:start}.recon-stat span{flex:1;min-width:120px}}
 </style>
-</head>
+<style>
+.studio-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.studio-head h1{font-size:clamp(24px,5vw,38px);margin:6px 0}.studio-head p{color:#777;margin:0}.studio-clap{font-size:32px;color:#ff5b9a}.studio-feature{background:#ffe4ed;border:1px solid #ffbdd5;border-radius:22px;padding:16px;margin-bottom:14px;color:#333}.studio-feature-top{display:flex;justify-content:space-between;font-size:11px;margin-bottom:12px}.studio-feature-cover{display:flex;align-items:center;justify-content:center;position:relative;width:100%;aspect-ratio:16/9;border:0;background:#ffbdd5;border-radius:15px;overflow:hidden;padding:0;cursor:pointer}.studio-thumb-video{width:100%;height:100%;object-fit:cover}.studio-thumb-empty{display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:34px;color:#9a4767;width:100%;height:100%;background:linear-gradient(135deg,#ffbdd5,#ffe7a3)}.studio-thumb-empty small{font-size:11px}.studio-feature-play{position:absolute;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#fff9;color:#333}.studio-feature h2{font-size:20px;margin:12px 0 3px}.studio-feature p{font-size:12px;margin:0 0 14px}.studio-tools,.studio-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.studio-tools button,.studio-quick button{background:#fff8ef;border:1px solid #ffbdd5;border-radius:12px;padding:12px 8px;text-align:left;font-weight:650;font-size:12px;color:#333;cursor:pointer}.studio-quick{margin:12px 0 22px}.studio-quick button{text-align:center}.studio-strip{display:flex;gap:12px;overflow-x:auto;padding:4px 1px 15px}.studio-tile{flex:0 0 135px;min-width:0;text-align:left;border:0;background:transparent;padding:0;color:inherit;cursor:pointer}.studio-tile-cover{display:block;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#ffe4ed}.studio-tile strong,.studio-tile small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:5px}.studio-tile strong{font-size:12px}.studio-tile small{font-size:11px;color:#777}
+</style></head>
 <body>
 <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
 <defs><filter color-interpolation-filters="sRGB" height="116%" id="crayon-doodle" width="116%" x="-8%" y="-8%"><feturbulence basefrequency="0.078" numoctaves="2" result="grain" seed="4" type="fractalNoise"></feturbulence><fedisplacementmap in="SourceGraphic" in2="grain" scale="1.0" xchannelselector="R" ychannelselector="G"></fedisplacementmap></filter>
@@ -5160,6 +5162,7 @@ function videoDeskItem(r){
   </div>`:''}
  </article>`;
 }
+function studioThumb(r){const d=data(r),clip=r.kind==='Video'?d.filePath:tkClips(r).find(c=>c.manualVideoHub===true)?.filePath;const cached=clip?mediaCachedUrl(clip):'';if(clip&&!cached)signedMedia({data:{filePath:clip}}).catch(()=>{});return cached?'<video class="studio-thumb-video" muted playsinline preload="metadata" src="'+e(cached)+'#t=0.1" aria-label="Video thumbnail"></video>':'<span class="studio-thumb-empty">▸<small>'+(clip?'Preparing preview':'No footage yet')+'</small></span>';}
 function videoHubPage(){
  const allNotes=all('TikTok'),allUploads=vlManualRecords(),filter=S.videoFilter||'all',term=String(S.tkSearch||'').toLowerCase().trim();
  const records=[...allNotes,...allUploads].sort((a,b)=>String(b.created_at||data(b).uploadedAt||'').localeCompare(String(a.created_at||data(a).uploadedAt||'')));
@@ -5174,8 +5177,11 @@ function videoHubPage(){
  const perPage=15,count=Math.max(1,Math.ceil(shown.length/perPage)),page=Math.max(0,Math.min(count-1,Number(S.tkPage)||0));S.tkPage=page;
  const filters=[['all','Everything'],['notes','TikTok notes'],['uploads','Uploads'],['drafts','Drafts'],['posted','Posted']];
  return `<div class="video-desk">
-  <header class="vd-head"><div><span class="vd-overline">CTRL + CRFT · CONTENT JOURNAL</span><h1>Videos<span>.</span></h1><p>One home for your TikTok ideas and the videos you upload yourself.</p><small>${allNotes.length} TikTok notes · ${allUploads.length} uploaded videos</small></div>
-  <div class="vd-head-actions"><button type="button" data-video-new>＋ New TikTok</button><button type="button" data-video-upload>↑ Upload video</button></div></header>
+  <header class="studio-head"><div><span class="vd-overline">CTRL + CRFT · CREATIVE STUDIO</span><h1>My Video Studio ♡</h1><p>Create · Organize · Remember</p></div><span class="studio-clap">▣</span></header>
+  <section class="studio-feature"><div class="studio-feature-top"><strong>CURRENT PROJECT</strong><small>Continue creating</small></div>
+  ${records.length?`<button type="button" class="studio-feature-cover" data-video-expand="${e(records[0].id)}">${studioThumb(records[0])}<span class="studio-feature-play">▶</span></button><h2>${e(records[0].kind==='TikTok'?tkTitle(records[0]):title(records[0]))}</h2><p>${e(data(records[0]).status||'Draft')}</p>`:'<div class="studio-feature-cover">♡ Start your first project</div>'}
+  <div class="studio-tools"><button type="button" data-video-new>✎ Caption &amp; hashtags</button><button type="button" data-video-new>♫ Sound &amp; music</button><button type="button" data-video-upload>▸ Clips &amp; footage</button><button type="button" data-video-new>☑ Filming checklist</button></div></section>
+  <div class="studio-quick"><button type="button" data-video-new>＋ New project</button><button type="button" data-video-upload>↑ Upload clips</button></div>
   ${S.tkAdd?`<section class="vd-form-shell v4-new-panel"><div class="vd-compose-heading"><h2>New TikTok note</h2><button type="button" data-tk29-add aria-label="Close">×</button></div>
   <form id="tk29-add-form" class="video-v3-editor vd-editor">
    <div class="video-v3-core-fields"><label>Title<input name="title" placeholder="What is this TikTok about?" required maxlength="200"></label>
@@ -5186,7 +5192,8 @@ function videoHubPage(){
   </form></section>`:''}
   ${vlUnifiedUploads()}
   <section class="vd-library" aria-label="Videos and TikTok notes">
-   <div class="vd-library-heading"><h2>Your library</h2><span>${shown.length} entries</span></div>
+   <div class="vd-library-heading"><h2>My projects ♡</h2><span>${shown.length} entries</span></div>
+   <div class="studio-strip">${shown.slice(0,6).map(r=>`<button class="studio-tile" type="button" data-video-expand="${e(r.id)}"><span class="studio-tile-cover">${studioThumb(r)}</span><strong>${e(r.kind==='TikTok'?tkTitle(r):title(r))}</strong><small>${e(data(r).status||'Idea')}</small></button>`).join('')}</div>
    <label class="vd-search"><span aria-hidden="true">⌕</span><input id="tk29-search" type="search" autocomplete="off" placeholder="Search titles, captions or notes" value="${e(S.tkSearch||'')}"></label>
    <div class="vd-filters">${filters.map(([k,n])=>`<button type="button" data-video-filter="${k}" class="${filter===k?'active':''}" aria-pressed="${filter===k}">${n}</button>`).join('')}</div>
    <div class="vd-list v4-list">${shown.slice(page*perPage,(page+1)*perPage).map(videoDeskItem).join('')||`<p class="vd-empty">Nothing matches yet. Add a TikTok note, upload a new video, or change the filter.</p>`}</div>
