@@ -6425,6 +6425,7 @@ async function submitRecord(form,saveMode='view'){
     const videos=[];
     if(images.length>10||videos.length>10)throw Error('Select at most 10 photos and 10 videos per Lore save.');
    }
+   if(kind==='Video'&&!id)value.manualVideoHub=true;
    const saved=await saveRecord(kind,value,id);savedId=saved.id;S.records=[...S.records.filter(r=>r.id!==saved.id),saved];completed++;
    await saveLinks(saved.id,kind);
    if(kind==='TikTok'){
@@ -6435,7 +6436,7 @@ async function submitRecord(form,saveMode='view'){
      if(sha&&old.some(c=>c.sha256===sha))continue;
      const progress=document.getElementById('upload-status');if(progress)progress.textContent=`Uploading clip ${ix+1} of ${clips.length} to this TikTok…`;
      const path=await uploadMedia(file);uploaded++;
-     current=await saveRecord('TikTok',{...data(current),clips:[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:sha,uploadedAt:new Date().toISOString()}]},saved.id);
+     current=await saveRecord('TikTok',{...data(current),clips:[...old,{filePath:path,fileName:file.name,fileSize:file.size,mimeType:mediaMime(file),sha256:sha,uploadedAt:new Date().toISOString(),manualVideoHub:true}]},saved.id);
      S.records=[...S.records.filter(r=>r.id!==saved.id),current];
     }
    }
