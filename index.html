@@ -5089,60 +5089,83 @@ function tkMetadataFields(r){
 function tkMiniLinks(r){const worlds=tkLinkedNames(r,'World','tiktok_world'),addons=tkLinkedNames(r,'AddOn','tiktok_addon'),builds=tkLinkedNames(r,'Build','tiktok_build');
  return worlds.length||addons.length||builds.length?`<div class="tkplus-link-badges">${worlds.map(w=>`<span>${pinkIcon('World')} ${e(w)}</span>`).join('')}${addons.map(a=>`<span>${pinkIcon('AddOn')} ${e(a)}</span>`).join('')}${builds.map(a=>`<span>${pinkIcon('Build')} ${e(a)}</span>`).join('')}</div>`:''}
 function tkCard(r,i){
- const d=data(r),name=tkTitle(r),url=tkPostUrl(r),edit=S.tkEdit===r.id,open=edit||S.videoExpanded===r.id;
- const caption=String(d.caption||'').trim(),note=tkNote(r).trim(),concept=String(d.description||'').trim(),song=String(d.song||'').trim(),tags=String(d.hashtags||'').trim();
- const date=String(d.postDate||d.date||'').trim(),status=String(d.status||(url?'Posted':'Idea')).trim();
- const links=tkLinkedNames(r,'World','tiktok_world').length+tkLinkedNames(r,'AddOn','tiktok_addon').length+tkLinkedNames(r,'Build','tiktok_build').length;
- const clips=tkClips(r).filter(c=>c.manualVideoHub===true).length;
- const info=(heading,value)=>value?`<div class="v4-field"><b>${heading}</b><p>${e(value)}</p></div>`:'';
- return `<article class="v4-row">
-  <button type="button" class="v4-toggle" data-video-expand="${e(r.id)}" aria-expanded="${open}">
-   <span class="v4-title"><strong>${e(name)}</strong><small>${e(status)}${date?' · '+e(date):''}${tkNeedsTitle(r)?' · Title review':''}</small></span><span class="v4-plus">${open?'−':'+'}</span>
-  </button>
-  ${open?`<div class="v4-details">
-   <div class="v4-fields">${info('Caption',caption)}${info('Notes',note)}${info('Concept',concept)}${info('Audio',song)}${info('Hashtags',tags)}
-   ${links?`<div class="v4-field"><b>Connected projects</b>${tkMiniLinks(r)}</div>`:''}
-   ${clips&&!edit?`<div class="v4-field"><b>My attached videos</b>${tkClipPreview(r)}</div>`:''}
-   ${!caption&&!note&&!concept&&!song&&!tags&&!links&&!clips?'<p class="v4-empty-note">No information added yet.</p>':''}</div>
-   <div class="v4-detail-actions">
-    ${url?`<a href="${e(url)}" rel="noopener noreferrer" target="_blank">Watch on TikTok ↗</a>`:''}
-    <button type="button" data-tk29-edit="${e(r.id)}" ${S.tkSaving?'disabled':''}>${edit?'Close edit':'Edit information'}</button>
-   </div>
-   ${edit?`<form class="tk29-edit video-v3-editor v4-editor" data-tk29-form="${e(r.id)}">
-     <div class="video-v3-core-fields"><label>Title<input name="title" value="${e(name)}" required maxlength="200"></label><label>TikTok link<input name="url" type="url" value="${e(url)}"></label>
-      <label class="video-v3-note-label">Notes<textarea name="note" rows="3">${e(note)}</textarea></label></div>
-     ${tkMetadataFields(r)}${tkExtraFields(r.id)}
-     <div class="video-v3-form-actions"><button class="video-v3-save" type="submit" ${S.tkSaving?'disabled':''}>Save changes</button><button class="video-v3-cancel" type="button" data-tk29-cancel>Cancel</button></div>
-   </form>`:''}
-  </div>`:''}
- </article>`;
+ const dt=data(r),name=tkTitle(r),url=tkPostUrl(r),edit=S.tkEdit===r.id,open=edit||S.videoExpanded===r.id;
+ const caption=String(dt.caption||'').trim(),note=tkNote(r).trim(),concept=String(dt.description||'').trim(),song=String(dt.song||'').trim(),tags=String(dt.hashtags||'').trim();
+ const date=String(dt.postDate||dt.date||'').trim(),status=String(dt.status||(url?'Posted':'Idea')).trim();
+ const preview=caption||note||concept||song||'Tap to add notes, ideas, and details';
+ const attachments=tkClips(r).filter(c=>c.manualVideoHub===true).length;
+ const connections=tkLinkedNames(r,'World','tiktok_world').length+tkLinkedNames(r,'AddOn','tiktok_addon').length+tkLinkedNames(r,'Build','tiktok_build').length;
+ const info=(heading,value)=>value?`<div class="v5-field"><span>${heading}</span><p>${e(value)}</p></div>`:'';
+ return `<article class="v5-entry ${open?'is-open':''}">
+   <button type="button" class="v5-entry-toggle" data-video-expand="${e(r.id)}" aria-expanded="${open}" aria-controls="v5-detail-${e(r.id)}">
+    <span class="v5-index" aria-hidden="true">${String(i+1).padStart(2,'0')}</span>
+    <span class="v5-entry-main">
+     <span class="v5-entry-topline"><strong>${e(name)}</strong>${tkNeedsTitle(r)?'<span class="v5-title-flag">Needs title</span>':''}</span>
+     <span class="v5-preview">${e(preview)}</span>
+     <span class="v5-entry-meta">${e(status)}${date?' · '+e(date):''}${connections?' · '+connections+' linked':''}${attachments?' · '+attachments+' clip'+(attachments===1?'':'s'):''}</span>
+    </span><span class="v5-arrow" aria-hidden="true">${open?'−':'⌄'}</span>
+   </button>
+   ${open?`<div class="v5-entry-detail" id="v5-detail-${e(r.id)}">
+    <div class="v5-details-grid">
+     ${info('Caption',caption)}${info('Notes',note)}${info('Concept',concept)}${info('Song / audio',song)}${info('Hashtags',tags)}
+     ${info('Script',String(dt.script||'').trim())}${info('Shots',String(dt.shots||'').trim())}
+     ${info('Storyboard',String(dt.storyboard||'').trim())}${info('Editing notes',String(dt.editingNotes||'').trim())}
+     ${info('Date filmed',String(dt.filmDate||'').trim())}${info('Date posted',String(dt.postDate||'').trim())}
+     ${dt.likes!==undefined?info('Likes',String(dt.likes)):''}${dt.views!==undefined?info('Views',String(dt.views)):''}
+     ${connections?`<div class="v5-field"><span>Linked to</span>${tkMiniLinks(r)}</div>`:''}
+     ${attachments&&!edit?`<div class="v5-field v5-clip-field"><span>Attached clips</span>${tkClipPreview(r)}</div>`:''}
+     ${!caption&&!note&&!concept&&!song&&!tags&&!connections&&!attachments?'<p class="v5-no-details">Add your first note or caption using Edit details.</p>':''}
+    </div>
+    <div class="v5-entry-actions">${url?`<a class="v5-open-link" href="${e(url)}" target="_blank" rel="noopener noreferrer">Open on TikTok ↗</a>`:''}
+     <button type="button" data-tk29-edit="${e(r.id)}" ${S.tkSaving?'disabled':''}>${edit?'Close editor':'Edit details'}</button>
+    </div>
+    ${edit?`<form class="tk29-edit video-v3-editor v5-editor" data-tk29-form="${e(r.id)}">
+      <div class="video-v3-core-fields"><label>Title<input name="title" value="${e(name)}" required maxlength="200"></label><label>TikTok link<input name="url" type="url" value="${e(url)}"></label>
+      <label class="video-v3-note-label">Notes<textarea name="note" rows="4">${e(note)}</textarea></label></div>
+      ${tkMetadataFields(r)}${tkExtraFields(r.id)}
+      <div class="video-v3-form-actions"><button type="submit" class="video-v3-save" ${S.tkSaving?'disabled':''}>Save changes</button><button type="button" class="video-v3-cancel" data-tk29-cancel>Cancel</button></div>
+     </form>`:''}
+   </div>`:''}
+  </article>`;
 }
 function videoHubPage(){
- const allPosts=all('TikTok').slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
- const tab=S.videoTab==='uploads'?'uploads':'tiktoks',filter=S.videoFilter||'all',q=String(S.tkSearch||'').trim().toLowerCase();
+ const items=all('TikTok').slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+ const filter=S.videoFilter||'all',q=String(S.tkSearch||'').trim().toLowerCase();
  const posted=r=>!!tkPostUrl(r)||String(data(r).status||'').toLowerCase()==='posted';
- const posts=allPosts.filter(r=>(filter!=='posted'||posted(r))&&(filter!=='drafts'||!posted(r))&&(filter!=='review'||tkNeedsTitle(r))&&(!q||[tkTitle(r),tkNote(r),data(r).caption,data(r).description,data(r).song,data(r).hashtags,...tkLinkedNames(r,'World','tiktok_world')].some(v=>String(v||'').toLowerCase().includes(q))));
- const pageSize=15,pages=Math.max(1,Math.ceil(posts.length/pageSize)),page=Math.max(0,Math.min(pages-1,Number(S.tkPage)||0));S.tkPage=page;
+ const posts=items.filter(r=>(filter!=='posted'||posted(r))&&(filter!=='drafts'||!posted(r))&&(filter!=='review'||tkNeedsTitle(r))&&(!q||[
+  tkTitle(r),tkNote(r),data(r).caption,data(r).description,data(r).song,data(r).hashtags,data(r).script,
+  ...tkLinkedNames(r,'World','tiktok_world'),...tkLinkedNames(r,'AddOn','tiktok_addon')
+ ].some(v=>String(v||'').toLowerCase().includes(q))));
+ const count=vlManualRecords().length;
+ const pageSize=12,pages=Math.max(1,Math.ceil(posts.length/pageSize)),page=Math.max(0,Math.min(pages-1,Number(S.tkPage)||0));S.tkPage=page;
  const options=[['all','All'],['posted','Posted'],['drafts','Drafts'],['review','Needs title']];
- return `<div class="video-v3 video-v4">
- <header class="v4-header"><div><span class="v4-eyebrow">CTRL + CRFT / MEDIA</span><h1>Videos</h1><p>All your TikTok details and new videos in one place.</p></div>
-  <div class="v4-actions"><button type="button" data-video-new class="v4-new">+ New TikTok</button><button type="button" data-video-upload class="v4-upload">↑ Upload video</button></div></header>
- <main class="v4-panel">
-  <nav class="v4-tabs" aria-label="Videos sections"><button type="button" data-video-tab="tiktoks" class="${tab==='tiktoks'?'selected':''}">TikTok info <small>${allPosts.length}</small></button>
-   <button type="button" data-video-tab="uploads" class="${tab==='uploads'?'selected':''}">My uploads <small>${vlManualRecords().length}</small></button></nav>
-  ${tab==='tiktoks'?`
-  ${S.tkAdd?`<section class="v4-new-panel"><div class="v4-new-title"><h2>New TikTok</h2><button type="button" data-tk29-add>×</button></div>
-   <form id="tk29-add-form" class="video-v3-editor v4-editor"><div class="video-v3-core-fields"><label>Title<input name="title" required maxlength="200"></label>
-     <label>TikTok link (optional)<input type="url" name="url"></label><label class="video-v3-note-label">Notes<textarea name="note" rows="3"></textarea></label></div>
-    ${tkMetadataFields(null)}${tkExtraFields(null)}
-    <div class="video-v3-form-actions"><button type="submit" class="video-v3-save">Save TikTok</button><button type="button" class="video-v3-cancel" data-tk29-add>Cancel</button></div></form></section>`:''}
-  <div class="v4-searchline"><label class="v4-search"><span>⌕</span><input id="tk29-search" type="search" autocomplete="off" value="${e(S.tkSearch||'')}" placeholder="Search videos and notes"></label><a href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer">TikTok ↗</a></div>
-  <div class="v4-filters">${options.map(([key,label])=>`<button type="button" data-video-filter="${key}" class="${filter===key?'selected':''}" aria-pressed="${filter===key}">${label}</button>`).join('')}</div>
-  <div class="v4-count"><span>${posts.length} ${posts.length===1?'entry':'entries'}</span><span>Tap to open</span></div>
-  <div class="v4-list">${posts.slice(page*pageSize,(page+1)*pageSize).map(tkCard).join('')||'<p class="v4-empty">No entries match this view.</p>'}</div>
-  ${pages>1?`<div class="v4-pagination"><button type="button" data-tk29-page="-1" ${page===0?'disabled':''}>← Back</button><span>${page+1} / ${pages}</span><button type="button" data-tk29-page="1" ${page>=pages-1?'disabled':''}>Next →</button></div>`:''}
-  `:vlUnifiedUploads()}
- </main></div>`;
+ return `<div class="video-v3 video-v5">
+  <header class="v5-hero">
+   <div class="v5-hero-text"><span class="v5-eyebrow">CTRL + CRFT / MY CREATIVE LIBRARY</span><h1>Videos<span class="v5-hero-star" aria-hidden="true">✳</span></h1>
+    <p>Your TikTok ideas, details and footage — organized your way.</p></div>
+   <div class="v5-hero-actions"><button type="button" class="v5-button-new" data-video-new>＋ New entry</button>
+    <button type="button" class="v5-button-upload" data-video-upload>↑ Upload video</button></div>
+  </header>
+  <section class="v5-notes-section" aria-label="TikTok information">
+   <div class="v5-section-head"><div><span class="v5-section-kicker">01 / CONTENT NOTES</span><h2>TikTok library</h2><p>Titles, captions, scripts and links — without the old mismatched videos.</p></div>
+    <span class="v5-count">${items.length} saved</span></div>
+   ${S.tkAdd?`<section class="v5-new-form v4-new-panel"><div class="v5-new-head"><h3>Add a TikTok entry</h3><button type="button" data-tk29-add aria-label="Close new entry">×</button></div>
+      <form id="tk29-add-form" class="video-v3-editor v5-editor">
+       <div class="video-v3-core-fields"><label>Title<input name="title" required maxlength="200" placeholder="What is this video about?"></label>
+       <label>TikTok link (optional)<input type="url" name="url" placeholder="https://www.tiktok.com/@..."></label>
+       <label class="video-v3-note-label">Notes<textarea name="note" rows="4" placeholder="Ideas, reminders, or a caption draft"></textarea></label></div>
+       ${tkMetadataFields(null)}${tkExtraFields(null)}
+       <div class="video-v3-form-actions"><button type="submit" class="video-v3-save">Save entry</button><button type="button" class="video-v3-cancel" data-tk29-add>Cancel</button></div>
+      </form></section>`:''}
+   <div class="v5-tools"><label class="v5-search" for="tk29-search"><span aria-hidden="true">⌕</span><input id="tk29-search" type="search" autocomplete="off" value="${e(S.tkSearch||'')}" placeholder="Search titles, notes or worlds"></label>
+    <a class="v5-profile-link" href="${TK_PROFILE}" target="_blank" rel="noopener noreferrer">My TikTok ↗</a></div>
+   <div class="v5-filters" aria-label="Filter TikTok entries">${options.map(([key,label])=>`<button type="button" data-video-filter="${key}" aria-pressed="${filter===key}" class="${filter===key?'selected':''}">${label}</button>`).join('')}</div>
+   <div class="v5-list-head"><span>${posts.length} ${posts.length===1?'entry':'entries'}</span><span>Tap an entry to see details</span></div>
+   <div class="v5-entries">${posts.slice(page*pageSize,(page+1)*pageSize).map((r,i)=>tkCard(r,page*pageSize+i)).join('')||'<p class="v5-empty">No entries found. Try a different search or add a new one.</p>'}</div>
+   ${pages>1?`<nav class="v5-paging" aria-label="Video library pages"><button type="button" data-tk29-page="-1" ${page===0?'disabled':''}>← Previous</button><span>Page ${page+1} of ${pages}</span><button type="button" data-tk29-page="1" ${page>=pages-1?'disabled':''}>Next →</button></nav>`:''}
+  </section>
+  ${vlUnifiedUploads()}
+ </div>`;
 }
 function tkCheckIds(ids,kind){const verified=unique(ids.filter(Boolean));for(const id of verified){const rec=get(id);if(!rec||rec.kind!==kind||rec.archived_at)throw Error(`A selected ${kind} is no longer available. Refresh and choose it again.`)}return verified}
 async function tkSyncLinks(postId,kind,linkType,wanted){const selected=new Set(tkCheckIds(wanted,kind));const existing=S.links.filter(l=>l.from_record_id===postId&&l.link_type===linkType&&get(l.to_record_id)?.kind===kind&&!get(l.to_record_id)?.archived_at);
@@ -5518,28 +5541,40 @@ function vlTikTokLinkedClips(post){return '';}
 function vlTikTokBridge(){return ''}
 function vlManualRecords(){return all('Video').filter(r=>data(r).manualVideoHub===true);}
 function vlCompactEntry(r){
- const d=data(r),raw=String(title(r)||''),friendly=/^[a-z0-9_-]{24,}$/i.test(raw)?'New uploaded video':raw||'New uploaded video',added=String(d.date||d.uploadedAt||'').slice(0,10);
- return `<article class="vl-upload-item"><div class="vl-upload-item-top"><div class="vl-upload-item-title"><strong>${e(friendly)}</strong><small>${e([added,d.status||'Raw footage'].filter(Boolean).join(' · '))}</small></div><button type="button" class="btn btn-small btn-soft" data-vl-edit="${e(r.id)}">Edit + link</button></div>
- ${vlLabels(r)}<details class="vl-preview-toggle"><summary>Preview video ⌄</summary><div class="vl-preview-inline">${vlVideoMedia(r)}</div></details></article>`;
+ const dt=data(r),raw=String(title(r)||''),friendly=/^[a-z0-9_-]{24,}$/i.test(raw)?'New upload':raw||'New upload';
+ const added=String(dt.date||dt.uploadedAt||'').slice(0,10);
+ return `<article class="v5-upload-entry">
+  <div class="v5-upload-item-icon" aria-hidden="true">${pinkIcon('Video')}</div>
+  <div class="v5-upload-item-copy"><strong>${e(friendly)}</strong><small>${e([added,dt.status||'Raw footage'].filter(Boolean).join(' · '))}</small>
+   ${vlLabels(r)}<details class="v5-upload-preview"><summary>Watch this upload <span aria-hidden="true">⌄</span></summary>
+     <div class="v5-video-player">${vlVideoMedia(r)}</div></details></div>
+  <button type="button" class="v5-upload-edit" data-vl-edit="${e(r.id)}">Edit</button>
+ </article>`;
 }
 function vlUnifiedUploads(){
  const mine=vlManualRecords();
- return `<section class="video-v3-footage" id="video-v3-footage">
-  <div class="video-v3-library-head"><div><h2>My uploads</h2><p>Only videos you upload from now on are shown here. Old mismatched clips stay safely stored and hidden.</p></div></div>
-  <div class="vl-page vl-unified-upload"><section class="vl-upload-panel" id="vl-upload-panel">
-   <details class="vl-upload-details" ${VL.uploadOpen?'open':''}>
-    <summary><span class="video-v3-upload-icon" aria-hidden="true">↑</span><span class="vl-upload-heading"><strong>Choose videos to upload</strong><small>From Photos or Files on your iPhone</small></span><span class="vl-upload-chevron" aria-hidden="true">⌄</span></summary>
-    <div class="vl-upload-content">
-     <label class="vl-file-pick"><strong>Browse videos</strong><small>MP4, MOV and other compatible video formats</small><input type="file" id="vl-video-file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple></label>
-     <p class="vl-upload-hint">Private uploads · 25 MiB limit per file · no automatic matching</p>
-     <div id="vl-queue-status" aria-live="polite"></div><div class="vl-upload-action"><button type="button" class="vl-primary" id="vl-upload-start" ${VL.uploading||!VL.queue.some(x=>x.status==='ready')?'disabled':''}>${VL.uploading?'Uploading…':'Upload selected videos'}</button><p id="vl-live-message" role="status">${e(VL.info||'Choose a video to begin.')}</p></div>
-    </div>
-   </details></section>
-   ${mine.length?`<section class="vl-catalog vl-new-library"><div class="vl-compact-list">${VL.editId&&get(VL.editId)&&data(get(VL.editId)).manualVideoHub?vlEditor(get(VL.editId)):''}${mine.map(vlCompactEntry).join('')}</div></section>`:`<p class="video-v3-upload-empty">No new uploads yet. Add your own footage whenever you're ready.</p>`}
-  </div>
+ return `<section class="v5-uploads-section" id="video-v5-uploads" aria-label="Uploaded footage">
+   <div class="v5-section-head"><div><span class="v5-section-kicker">02 / MY FOOTAGE</span><h2>Uploaded videos</h2>
+    <p>Only your newly uploaded videos appear here. Older files remain safely stored, but hidden.</p></div>
+    <span class="v5-count">${mine.length} saved</span></div>
+   <div class="v5-upload-body vl-page vl-unified-upload"><div class="vl-upload-panel" id="vl-upload-panel">
+    <details class="vl-upload-details" ${VL.uploadOpen?'open':''}>
+     <summary><span class="v5-upload-arrow" aria-hidden="true">↑</span>
+      <span class="vl-upload-heading"><strong>Add footage from iPhone</strong><small>Select a clip from Photos or Files</small></span>
+      <span class="vl-upload-chevron" aria-hidden="true">⌄</span></summary>
+     <div class="vl-upload-content"><label class="vl-file-pick"><strong>Choose videos</strong><small>MP4, MOV and compatible video formats</small>
+      <input type="file" id="vl-video-file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple></label>
+      <p class="vl-upload-hint">Private storage · 25 MiB per file · no automatic video matching</p>
+      <div id="vl-queue-status" aria-live="polite"></div><div class="vl-upload-action">
+       <button type="button" class="vl-primary" id="vl-upload-start" ${VL.uploading||!VL.queue.some(x=>x.status==='ready')?'disabled':''}>${VL.uploading?'Uploading…':'Upload selected clips'}</button>
+       <p id="vl-live-message" role="status">${e(VL.info||'Your new videos will appear below.')}</p>
+      </div></div></details></div>
+    ${VL.editId&&get(VL.editId)&&data(get(VL.editId)).manualVideoHub?vlEditor(get(VL.editId)):''}
+    ${mine.length?`<div class="v5-upload-list">${mine.map(vlCompactEntry).join('')}</div>`:
+       '<div class="v5-uploads-empty">No new uploads yet. When you add a video, it will appear here.</div>'}
+   </div>
  </section>`;
 }
-
 function videoLibraryPage(){const items=all('Video'),q=VL.search.trim().toLowerCase();let visible=items.filter(r=>[title(r),data(r).fileName,data(r).description,data(r).notes,data(r).tagsText].some(x=>String(x||'').toLowerCase().includes(q)));
  const liveLinked=items.filter(r=>S.links.some(l=>l.from_record_id===r.id&&/^video_(tiktok|world|build|addon)$/.test(l.link_type))).length;
  const favorites=items.filter(r=>data(r).favorite).length;
@@ -7403,6 +7438,122 @@ boot();
 #app .video-v4 .video-v3-footage .vl-page{padding:0 12px 17px!important}
 }
 @media(prefers-reduced-motion:reduce){#app .video-v4 *{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* VIDEOS v5 — one continuous, accessible mobile-first library. */
+#app .video-v5{--v5-hot:#ff5b9a;--v5-pale:#ffe4ed;--v5-baby:#ffbdd5;--v5-yellow:#ffe7a3;--v5-cream:#fff8ef;--v5-ink:#333;--v5-sub:#75696e;--v5-rule:#eedfe4;max-width:960px;margin:0 auto 60px;display:grid;gap:25px;min-width:0;color:var(--v5-ink)}
+#app .video-v5 *{box-sizing:border-box}
+#app .v5-hero{background:#fff9f3;border:1px solid #efdae0;border-radius:17px;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;box-shadow:0 5px 0 #ffe9b9}
+#app .v5-eyebrow{font:800 10px/1.3 var(--scrap-body,system-ui);letter-spacing:1.4px;color:#a55a7b}
+#app .v5-hero h1{font:780 clamp(43px,6vw,59px)/1 var(--scrap-hand,system-ui)!important;color:var(--v5-ink)!important;margin:8px 0 11px!important;letter-spacing:-.02em;display:block}
+#app .v5-hero h1:after{content:'';display:block;background:var(--v5-yellow);height:7px;width:97px;transform:rotate(-2deg);border-radius:4px;margin-top:-2px}
+#app .v5-hero-star{color:var(--v5-hot);font-size:23px;vertical-align:top;margin-left:9px}
+#app .v5-hero p{font:480 14px/1.55 var(--scrap-body,system-ui)!important;color:var(--v5-sub)!important;margin:0!important;max-width:420px}
+#app .v5-hero-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+#app .v5-hero-actions button{min-height:48px;border-radius:11px;padding:11px 17px;cursor:pointer;font:760 13px/1.3 var(--scrap-body,system-ui)!important;white-space:nowrap}
+#app .v5-button-new{background:white;border:1px solid #e8c4d0;color:#7c425a}
+#app .v5-button-upload{background:var(--v5-hot);border:1px solid var(--v5-hot);color:#fff}
+#app .v5-notes-section,#app .v5-uploads-section{border:1px solid var(--v5-rule);border-radius:16px;overflow:hidden;background:white;min-width:0}
+#app .v5-section-head{padding:21px 24px 17px;display:flex;justify-content:space-between;align-items:center;gap:15px;background:#fff}
+#app .v5-section-head h2{font:750 clamp(25px,3.5vw,33px)/1.17 var(--scrap-hand,system-ui)!important;margin:5px 0 4px!important;color:#383134!important}
+#app .v5-section-head p{font:460 13px/1.45 var(--scrap-body,system-ui)!important;color:var(--v5-sub)!important;margin:0!important;max-width:570px}
+#app .v5-section-kicker{font:790 10px/1.3 var(--scrap-body,system-ui);letter-spacing:1.15px;color:#b35b82}
+#app .v5-count{flex:none;border:1px solid #efdae1;background:#fff8f9;padding:7px 10px;border-radius:8px;font:720 11px/1.2 var(--scrap-body,system-ui);color:#895768}
+#app .v5-tools{padding:4px 23px 12px;display:flex;align-items:center;gap:14px}
+#app .v5-search{display:flex;align-items:center;gap:9px;padding:0 12px;min-height:47px;border:1px solid #dfccd2;border-radius:11px;background:#fff;flex:1;min-width:0}
+#app .v5-search>span{font-size:24px;line-height:1;color:#ba819b}
+#app .v5-search input{flex:1;min-width:0;width:100%;height:45px;border:0!important;outline:none!important;background:transparent!important;box-shadow:none!important;padding:8px 0!important;color:#333!important;font:480 16px/1.4 var(--scrap-body,system-ui)!important}
+#app .v5-profile-link{color:#9e4a72!important;text-decoration:underline;text-underline-offset:3px;font:700 12px/1.3 var(--scrap-body,system-ui)!important;white-space:nowrap}
+#app .v5-filters{display:flex;align-items:center;gap:7px;overflow-x:auto;padding:0 23px 16px;scrollbar-width:thin}
+#app .v5-filters button{flex:none;background:white;border:1px solid #e7d7dd;border-radius:10px;min-height:39px;padding:8px 13px;color:#77666c;font:690 12px/1.2 var(--scrap-body,system-ui)!important;cursor:pointer}
+#app .v5-filters button.selected{background:var(--v5-pale);color:#87405b;border-color:var(--v5-baby)}
+#app .v5-list-head{background:#fffafc;border-top:1px solid var(--v5-rule);border-bottom:1px solid var(--v5-rule);padding:11px 23px;display:flex;align-items:center;justify-content:space-between;gap:15px;font:580 11px/1.25 var(--scrap-body,system-ui);color:#806f77}
+#app .v5-entry{border-bottom:1px solid #f0e5e9;background:white;margin:0}
+#app .v5-entry:last-child{border-bottom:0}
+#app .v5-entry.is-open{background:#fffafc}
+#app .v5-entry-toggle{display:flex;align-items:center;gap:13px;width:100%;min-height:96px;text-align:left;border:0;background:transparent;padding:16px 23px;cursor:pointer}
+#app .v5-entry-toggle:hover{background:#fff9fb}
+#app .v5-index{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:11px;border:1px solid #f2dbe5;background:#ffeef4;color:#a75076;font:800 13px/1.3 var(--scrap-body,system-ui)}
+#app .v5-entry-main{display:grid;gap:5px;min-width:0;flex:1}
+#app .v5-entry-topline{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;min-width:0}
+#app .v5-entry-topline strong{font:750 15px/1.35 var(--scrap-body,system-ui)!important;color:#3a3235!important;overflow-wrap:anywhere}
+#app .v5-title-flag{font:650 10px/1.3 var(--scrap-body,system-ui);color:#a44f75}
+#app .v5-preview{font:480 12px/1.45 var(--scrap-body,system-ui);color:#665e61;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:normal;overflow-wrap:anywhere}
+#app .v5-entry-meta{color:#a08791;font:550 11px/1.3 var(--scrap-body,system-ui)}
+#app .v5-arrow{font-size:22px;color:#b77695;flex:0 0 25px;text-align:center}
+#app .v5-entry-detail{margin:0 22px 18px 74px;padding:17px 17px 20px;background:white;border:1px solid #f0dfe5;border-radius:11px;min-width:0}
+#app .v5-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 25px}
+#app .v5-field{min-width:0;display:grid;gap:5px;align-content:start}
+#app .v5-field>span{font:800 10px/1.3 var(--scrap-body,system-ui);color:#a25676;text-transform:uppercase;letter-spacing:.55px}
+#app .v5-field>p{font:480 13px/1.6 var(--scrap-body,system-ui)!important;color:#544b4e!important;white-space:pre-wrap;overflow-wrap:anywhere;display:block!important;max-height:none!important;overflow:visible!important;margin:0!important}
+#app .v5-field .tkplus-link-badges{display:flex;flex-wrap:wrap;gap:6px}
+#app .v5-field .tkplus-link-badges span{background:#fff6f9;border:1px solid #f0dce5;border-radius:7px;color:#80566b;font-size:11px;padding:4px 7px}
+#app .v5-no-details{grid-column:1/-1;margin:0;color:#86767b;font-size:13px}
+#app .v5-clip-field{grid-column:1/-1}
+#app .v5-entry-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:19px;padding-top:15px;border-top:1px solid #f0e4e9}
+#app .v5-entry-actions a,#app .v5-entry-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;border-radius:9px;padding:10px 15px;font:760 13px/1.3 var(--scrap-body,system-ui)!important;text-decoration:none!important;cursor:pointer}
+#app .v5-entry-actions a{border:1px solid #e9cbd6;background:#fff;color:#924d6b!important}
+#app .v5-entry-actions button{border:1px solid #e17eaa;background:var(--v5-pale);color:#803a5b}
+#app .v5-editor{display:grid!important;gap:13px!important;margin-top:15px!important;padding-top:16px!important;border-top:1px solid #f0dce5!important;background:transparent!important}
+#app .v5-editor :is(input,select,textarea){font-size:16px!important;min-width:0;max-width:100%}
+#app .v5-new-form{margin:0 22px 17px;padding:19px 20px;background:#fffaf5;border:1px solid #f4e0d8;border-radius:13px}
+#app .v5-new-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+#app .v5-new-head h3{margin:0!important;font:730 23px/1.3 var(--scrap-hand,system-ui)!important;color:#593c4a}
+#app .v5-new-head>button{min-width:42px;min-height:42px;background:transparent;border:0;font-size:26px;color:#a77088;cursor:pointer}
+#app .v5-paging{display:flex;align-items:center;justify-content:center;gap:13px;border-top:1px solid var(--v5-rule);padding:16px}
+#app .v5-paging span{font-size:12px;color:#796e71}
+#app .v5-paging button{border:1px solid #e8d8dd;background:white;border-radius:9px;padding:8px 13px;min-height:42px;color:#89556b;cursor:pointer}
+#app .v5-paging button:disabled{opacity:.38;cursor:default}
+#app .v5-empty{padding:30px 18px;margin:0;text-align:center;color:#786c70;font-size:13px}
+#app .v5-upload-body.vl-page{padding:4px 23px 24px!important;display:grid;gap:13px;min-width:0}
+#app .v5-upload-body .vl-upload-panel{border:1px solid #e9d9df!important;border-radius:12px!important;box-shadow:none!important;overflow:hidden;background:white!important}
+#app .v5-upload-body .vl-upload-details>summary{display:flex;align-items:center;gap:12px;min-height:68px;background:white!important;padding:13px 15px}
+#app .v5-upload-body .vl-upload-heading{display:grid;gap:3px;flex:1}
+#app .v5-upload-body .vl-upload-heading strong{font:740 14px/1.3 var(--scrap-body,system-ui);color:#4b3b43}
+#app .v5-upload-body .vl-upload-heading small{font:470 12px/1.4 var(--scrap-body,system-ui);color:#897b81}
+#app .v5-upload-arrow{display:grid;place-items:center;width:40px;height:40px;flex:none;background:#ffe4ed;color:#a74d78;border-radius:10px;font-size:23px}
+#app .v5-upload-body .vl-file-pick{border:1px dashed #e7a8c2!important;background:#fffafd!important;border-radius:11px!important;margin-top:13px;min-height:118px}
+#app .v5-upload-body .vl-file-pick:before{display:none!important}
+#app .v5-upload-body .vl-upload-content{padding:0 15px 18px}
+#app .v5-upload-body .vl-upload-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#app .v5-upload-body #vl-upload-start{min-height:44px}
+#app .v5-upload-list{border:1px solid #eee0e5;border-radius:11px;overflow:hidden}
+#app .v5-upload-entry{display:flex;gap:12px;align-items:flex-start;flex-wrap:nowrap;padding:14px 15px;background:white;border-bottom:1px solid #f1e8eb;min-width:0}
+#app .v5-upload-entry:last-child{border-bottom:0}
+#app .v5-upload-item-icon{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#fff0f5}
+#app .v5-upload-item-icon .pink-icon{width:23px;height:23px}
+#app .v5-upload-item-copy{flex:1;display:grid;gap:5px;min-width:0}
+#app .v5-upload-item-copy>strong{font:740 14px/1.4 var(--scrap-body,system-ui);overflow-wrap:anywhere}
+#app .v5-upload-item-copy>small{font:520 11px/1.3 var(--scrap-body,system-ui);color:#8c7a81}
+#app .v5-upload-edit{border:1px solid #e8d6df;border-radius:9px;background:white;color:#87516a;padding:9px 13px;min-height:41px;font-size:12px;font-weight:700;cursor:pointer}
+#app .v5-upload-preview{margin-top:5px}
+#app .v5-upload-preview summary{min-height:37px;display:inline-flex;align-items:center;gap:7px;color:#a55177;font-size:12px;font-weight:720;cursor:pointer}
+#app .v5-video-player{margin:8px 0 5px;max-width:450px;min-width:0}
+#app .v5-video-player .vl-video-wrap{aspect-ratio:16/10}
+#app .v5-uploads-empty{background:#fffafc;border:1px dashed #edcbd9;border-radius:11px;padding:27px 15px;text-align:center;color:#8b7b81;font-size:13px}
+#app .video-v5 :is(button,a,input,textarea,select,summary):focus-visible{outline:3px solid #ff5b9a!important;outline-offset:3px}
+@media(max-width:700px){
+ #app .video-v5{gap:18px;padding-bottom:34px}
+ #app .v5-hero{padding:20px 17px;gap:16px;box-shadow:0 3px 0 #ffe9b9}
+ #app .v5-hero-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .v5-hero-actions button{white-space:normal;min-width:0;min-height:49px;padding:10px 8px}
+ #app .v5-section-head{padding:20px 15px 14px;gap:9px}
+ #app .v5-section-head p{font-size:12px!important}
+ #app .v5-count{font-size:10px;padding:6px 8px}
+ #app .v5-tools{padding:3px 14px 12px;gap:10px}
+ #app .v5-filters{padding:0 14px 14px}
+ #app .v5-list-head{padding:10px 14px}
+ #app .v5-entry-toggle{padding:14px 13px;gap:11px;min-height:91px}
+ #app .v5-index{width:33px;height:33px;flex-basis:33px;font-size:11px}
+ #app .v5-entry-topline strong{font-size:14px!important}
+ #app .v5-entry-detail{margin:0 11px 13px;padding:14px 13px}
+ #app .v5-details-grid{grid-template-columns:minmax(0,1fr);gap:13px}
+ #app .v5-clip-field,#app .v5-no-details{grid-column:auto}
+ #app .v5-new-form{margin:0 12px 13px;padding:14px 12px}
+ #app .v5-upload-body.vl-page{padding:2px 12px 19px!important}
+}
+@media(max-width:360px){#app .v5-profile-link{font-size:11px!important}#app .v5-entry-meta{font-size:10px!important}#app .v5-hero-actions button{font-size:12px!important}}
+@media(prefers-reduced-motion:reduce){#app .video-v5 *{transition:none!important;scroll-behavior:auto!important}}
 
 </style>
 </body>
