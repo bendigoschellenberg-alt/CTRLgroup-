@@ -5139,7 +5139,7 @@ function videoHubPage(){
  const count=vlManualRecords().length;
  const pageSize=12,pages=Math.max(1,Math.ceil(posts.length/pageSize)),page=Math.max(0,Math.min(pages-1,Number(S.tkPage)||0));S.tkPage=page;
  const options=[['all','All'],['posted','Posted'],['drafts','Drafts'],['review','Needs title']];
- return `<div class="video-v3 video-v5">
+ return `<div class="video-v3 video-v5 video-v6">
   <header class="v5-hero">
    <div class="v5-hero-text"><span class="v5-eyebrow">CTRL + CRFT / MY CREATIVE LIBRARY</span><h1>Videos<span class="v5-hero-star" aria-hidden="true">✳</span></h1>
     <p>Your TikTok ideas, details and footage — organized your way.</p></div>
@@ -7554,6 +7554,52 @@ boot();
 }
 @media(max-width:360px){#app .v5-profile-link{font-size:11px!important}#app .v5-entry-meta{font-size:10px!important}#app .v5-hero-actions button{font-size:12px!important}}
 @media(prefers-reduced-motion:reduce){#app .video-v5 *{transition:none!important;scroll-behavior:auto!important}}
+
+
+#app .video-v6{max-width:760px!important;display:block!important;margin:0 auto 50px!important;padding:0!important;color:#333!important;font-family:var(--scrap-body,system-ui)!important}
+#app .video-v6 *{box-sizing:border-box}
+#app .video-v6 .v5-hero{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:5px 0 18px!important;gap:12px!important}
+#app .video-v6 .v5-hero h1{font:780 clamp(29px,6vw,39px)/1.1 var(--scrap-body,system-ui)!important;letter-spacing:-.05em!important;color:#333!important;margin:0 0 4px!important;background:none!important}
+#app .video-v6 .v5-eyebrow,#app .video-v6 .v5-hero-star,#app .video-v6 .v5-hero h1:after{display:none!important}
+#app .video-v6 .v5-hero p{font:450 13px/1.5 var(--scrap-body,system-ui)!important;color:#766d72!important;margin:0!important}
+#app .video-v6 .v5-hero-actions{display:flex!important;width:auto!important;gap:7px!important}
+#app .video-v6 .v5-hero-actions button{min-height:42px!important;border-radius:9px!important;padding:9px 12px!important;white-space:nowrap!important;font:730 13px var(--scrap-body,system-ui)!important}
+#app .video-v6 .v5-button-new{background:#ff5b9a!important;color:white!important;border-color:#ff5b9a!important}
+#app .video-v6 .v5-button-upload{background:white!important;color:#8e4d6a!important;border-color:#e5cbd6!important}
+#app .video-v6 .v5-notes-section,#app .video-v6 .v5-uploads-section{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;overflow:visible!important}
+#app .video-v6 .v5-section-head{padding:3px 0 12px!important;background:transparent!important}
+#app .video-v6 .v5-section-head h2{font:730 18px var(--scrap-body,system-ui)!important;margin:0!important;color:#453941!important}
+#app .video-v6 .v5-section-head p,#app .video-v6 .v5-section-kicker,#app .video-v6 .v5-count,#app .video-v6 .v5-list-head span:last-child{display:none!important}
+#app .video-v6 .v5-tools{padding:0 0 11px!important}
+#app .video-v6 .v5-search{min-height:44px!important;border-radius:10px!important;border-color:#e7d9e0!important}
+#app .video-v6 .v5-search input{font:450 16px var(--scrap-body,system-ui)!important}
+#app .video-v6 .v5-filters{padding:0 0 11px!important}
+#app .video-v6 .v5-filters button{border:0!important;background:transparent!important;border-radius:8px!important;min-height:38px!important;color:#887b82!important}
+#app .video-v6 .v5-filters button.selected{background:#ffe4ed!important;color:#824660!important}
+#app .video-v6 .v5-list-head{border:0!important;background:transparent!important;padding:5px 1px 10px!important}
+#app .video-v6 .v5-entries{border-top:1px solid #ece4e8}
+#app .video-v6 .v5-entry{border:0!important;border-bottom:1px solid #ece4e8!important;background:transparent!important;box-shadow:none!important}
+#app .video-v6 .v5-entry.is-open{background:transparent!important}
+#app .video-v6 .v5-entry-toggle{min-height:70px!important;padding:13px 1px!important;gap:9px!important}
+#app .video-v6 .v5-index{display:none!important}
+#app .video-v6 .v5-entry-main{gap:4px!important}
+#app .video-v6 .v5-entry-topline strong{font:740 15px/1.35 var(--scrap-body,system-ui)!important;color:#333!important}
+#app .video-v6 .v5-preview{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;font:450 13px/1.35 var(--scrap-body,system-ui)!important;color:#756c71!important}
+#app .video-v6 .v5-entry-meta{font:500 11px var(--scrap-body,system-ui)!important;color:#a08c96!important}
+#app .video-v6 .v5-arrow{font-size:23px!important;color:#c388a1!important}
+#app .video-v6 .v5-entry-detail{margin:0 0 14px!important;padding:8px 0 15px!important;border:0!important;border-radius:0!important;background:transparent!important}
+#app .video-v6 .v5-details-grid{grid-template-columns:minmax(0,1fr)!important;gap:13px!important;border-top:1px solid #f2e9ed;padding:13px 0}
+#app .video-v6 .v5-field>span{font:700 11px var(--scrap-body,system-ui)!important;text-transform:none!important;letter-spacing:0!important}
+#app .video-v6 .v5-field>p{font:450 14px/1.5 var(--scrap-body,system-ui)!important}
+#app .video-v6 .v5-new-form{background:transparent!important;border:0!important;border-bottom:1px solid #f0e5e9!important;border-radius:0!important;margin:0 0 15px!important;padding:15px 0 20px!important}
+#app .video-v6 .v5-upload-body.vl-page{padding:0!important}
+#app .video-v6 .v5-upload-body .vl-upload-panel{background:transparent!important;border:0!important;box-shadow:none!important}
+#app .video-v6 .v5-upload-body .vl-upload-details>summary{background:#fff3f7!important;border:1px solid #f0d8e3;border-radius:10px;min-height:54px}
+#app .video-v6 .v5-upload-list{border:0!important;border-top:1px solid #ece4e8!important;border-radius:0!important}
+#app .video-v6 .v5-upload-entry{border:0!important;border-bottom:1px solid #ece4e8!important;padding:14px 0!important}
+#app .video-v6 .v5-upload-item-icon{display:none!important}
+#app .video-v6 .v5-uploads-empty{background:transparent!important;border:0!important;text-align:left!important;padding:18px 0!important}
+@media(max-width:600px){#app .video-v6 .v5-hero-actions{width:auto!important;display:flex!important}#app .video-v6 .v5-entry-toggle{padding:13px 0!important}#app .video-v6 .v5-entry-detail{margin:0!important}}
 
 </style>
 </body>
