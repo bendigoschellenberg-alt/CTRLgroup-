@@ -3177,7 +3177,60 @@ html,body,#app,.app-layout,.main,.content{background-color:#fff0b9!important}
 #app .sidebar-v4-pin-grid .nav-item{min-height:55px;padding:10px 7px;border-radius:12px}
 #app .sidebar-v4-pin-grid .nav-label{font-size:12px;overflow-wrap:anywhere}
 @media(max-width:650px){#app .sidebar-v4-pin-grid .nav-item{min-height:60px}#app .sidebar-v4-library{padding:8px}}
-</style></head>
+</style>
+<style id="ctrl-oct19-world-photo-dashboard">
+/* Home: clear white, hot-pink and butter-yellow visual hierarchy. */
+#app .hq-home-launch{border:2px solid #ffbdd5;border-radius:22px;background:#fff;padding:18px 19px;box-shadow:0 8px 0 #ffe7a3,0 11px 25px #ff5b9a16;margin:12px 0 24px;min-width:0}
+#app .hq-launch-intro{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-bottom:13px;flex-wrap:wrap}
+#app .hq-launch-intro h2{color:#333;font-size:clamp(19px,2.6vw,27px);letter-spacing:-.5px;line-height:1.16;margin:4px 0 0}
+#app .hq-launch-intro h2 span{color:#ff5b9a}
+#app .hq-home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+#app .hq-home-shortcuts button{display:flex;align-items:center;gap:10px;text-align:left;min-width:0;min-height:75px;padding:12px;background:#ffe4ed;border:1px solid #ffbdd5;border-radius:15px;color:#333;cursor:pointer;transition:transform .18s,background .18s}
+#app .hq-home-shortcuts button:nth-child(2),#app .hq-home-shortcuts button:nth-child(4){background:#fff3cb;border-color:#ffe7a3}
+#app .hq-home-shortcuts button:hover,#app .hq-home-shortcuts button:focus-visible{transform:translateY(-2px);outline:2px solid #ff5b9a;outline-offset:2px}
+#app .hq-shortcut-icon{display:grid;place-items:center;flex:none;width:33px;height:33px;border-radius:11px;background:#fff;color:#ff5b9a}
+#app .hq-shortcut-icon .pink-icon{width:19px;height:19px}
+#app .hq-shortcut-text{display:grid;gap:3px;min-width:0;flex:1}
+#app .hq-shortcut-text strong{font-size:13px;line-height:1.2}
+#app .hq-shortcut-text small{font-size:10px;color:#765c68;line-height:1.25}
+#app .hq-home-shortcuts button>span:last-child{color:#aa4e78;font-size:16px;flex:none}
+#app .hq3-world-cover{position:relative;overflow:hidden}
+#app .hq3-world-cover .hq-world-real-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:3;border-radius:inherit;filter:saturate(1.035)}
+#app .hq3-world-cover:has(.hq-world-real-cover)::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#2e152a45);z-index:3;pointer-events:none}
+#app .hq3-world-cover .hq3-world-sticker{z-index:5}
+#app .hq3-world-cover .hq-world-photo-tag{position:absolute;right:10px;bottom:9px;z-index:5;background:#fff;color:#9e3564;padding:5px 9px;font:750 10px/1 var(--scrap-body,system-ui);border-radius:999px;box-shadow:0 2px 6px #34102522}
+#app .hq-photo-await{position:absolute;inset:0;display:grid;place-items:center;color:#ff5b9a;font-size:28px;background:linear-gradient(135deg,#ffe4ed90,#ffe7a380)}
+#app .hq3-world-card{border:1px solid #ffbdd5!important;box-shadow:0 4px 12px #b7507517;overflow:hidden}
+#app .hq3-world-card .hq3-world-cover{height:clamp(138px,12.4vw,180px)}
+#app .hq3-world-card .hq3-world-bottom{padding:12px 10px}
+#app .hq3-world-card .hq3-world-name{font-size:clamp(15px,1.65vw,19px);line-height:1.2}
+#app .record-card.kind-world .thumb{position:relative;overflow:hidden;border-radius:13px;background:linear-gradient(125deg,#ffe4ed,#ffe7a3)!important}
+#app .record-card.kind-world .thumb img{object-fit:cover;width:100%;height:100%}
+#app .hq-world-mini-photos{display:flex;align-items:center;gap:5px;margin:-7px 0 10px;min-height:26px;max-width:100%}
+#app .hq-world-mini-photo{width:34px;height:27px;flex:none;border:2px solid #fff;border-radius:8px;background:#ffe4ed;overflow:hidden;display:grid;place-items:center;color:#e25993;font-size:12px;box-shadow:0 1px 4px #804a6a22}
+#app .hq-world-mini-photo img{width:100%;height:100%;object-fit:cover}
+#app .hq-world-mini-count{font-size:10px;color:#a14d75;margin-left:auto;text-align:right}
+#app .hq-world-album{padding:22px!important;border:1px solid #ffbdd5!important;background:#fff!important;box-shadow:0 5px 18px #ff5b9a12}
+#app .hq-world-album-head{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:15px}
+#app .hq-world-album-head h2,#app .hq-world-album-empty h2{font-size:clamp(22px,3vw,30px);color:#333;margin:5px 0}
+#app .hq-world-album-head p,#app .hq-world-album-empty p{color:#76616a;font-size:13px;line-height:1.5;margin:0}
+#app .hq-world-album-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+#app .hq-world-album-count{background:#ffe7a3;color:#694923;font-size:12px;border-radius:999px;padding:7px 11px;font-weight:800}
+#app .hq-world-photo-mosaic{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:116px;gap:9px}
+#app .hq-world-photo-tile{position:relative;overflow:hidden;display:block;padding:0;border:2px solid white;border-radius:13px;background:linear-gradient(125deg,#ffe4ed,#ffe7a3);box-shadow:0 2px 8px #9c37631b;cursor:pointer;min-width:0}
+#app .hq-world-photo-tile.is-featured{grid-column:span 2;grid-row:span 2}
+#app .hq-world-photo-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .22s}
+#app .hq-world-photo-tile:hover img{transform:scale(1.045)}
+#app .hq-world-photo-tile:focus-visible{outline:3px solid #ff5b9a;outline-offset:1px}
+#app .hq-world-photo-label{position:absolute;left:0;right:0;bottom:0;padding:19px 8px 7px;color:white;background:linear-gradient(transparent,#241425a8);font-size:11px;line-height:1.2;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .hq-world-album-empty{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#fff7fa!important;border:1px dashed #ffbdd5!important;padding:19px!important}
+@media(max-width:960px){#app .hq-home-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){#app .hq-home-launch{padding:14px;margin:10px 0 18px;border-radius:17px}#app .hq-home-shortcuts{gap:7px}#app .hq-home-shortcuts button{padding:10px 8px;min-height:66px;gap:7px;border-radius:12px}#app .hq-shortcut-icon{width:29px;height:29px}#app .hq-shortcut-text strong{font-size:12px}#app .hq-shortcut-text small{font-size:10px}#app .hq-home-shortcuts button>span:last-child{display:none}#app .hq3-world-card .hq3-world-cover{height:150px}#app .hq-world-photo-mosaic{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:108px;gap:6px}#app .hq-world-photo-tile.is-featured{grid-column:span 2;grid-row:span 2}#app .hq-world-album{padding:13px!important}#app .hq-world-album-head{align-items:start}}
+@media(max-width:365px){#app .hq-home-shortcuts button{flex-direction:column;align-items:start}#app .hq-world-photo-mosaic{grid-auto-rows:95px}}
+@media(prefers-reduced-motion:reduce){#app .hq-home-shortcuts button,#app .hq-world-photo-tile img{transition:none!important}}
+</style>
+
+</head>
 <body>
 <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
 <defs><filter color-interpolation-filters="sRGB" height="116%" id="crayon-doodle" width="116%" x="-8%" y="-8%"><feturbulence basefrequency="0.078" numoctaves="2" result="grain" seed="4" type="fractalNoise"></feturbulence><fedisplacementmap in="SourceGraphic" in2="grain" scale="1.0" xchannelselector="R" ychannelselector="G"></fedisplacementmap></filter>
@@ -4757,6 +4810,78 @@ function hqDailyFocus(){
  </div><p class="hq-focus-footnote">These are suggestions pulled from your real saved records, not automatic changes. You can pick something different anytime.</p></section>`;
 }
 
+
+/* 2026-10-19: Safe world-photo presentation; all links stay in their existing private Supabase records. */
+const worldPhotoPending=new Set();
+function worldPhotoCollection(world){
+  if(!world||world.kind!=='World')return [];
+  const selected=new Map();
+  function gather(record){
+    const def=relationDefs(record.kind).find(x=>x[0]==='photos'&&x[4]==='Photo');
+    if(!def)return;
+    for(const p of relatedRecords(record.id,def)){
+      if(p.kind==='Photo'&&data(p).filePath)selected.set(p.id,p);
+    }
+  }
+  gather(world);
+  for(const relation of ['builds','lore']){
+    const def=relationDefs('World').find(x=>x[0]===relation);
+    if(def)for(const item of relatedRecords(world.id,def))gather(item);
+  }
+  return [...selected.values()].sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
+}
+
+function worldPhotoUrl(pic){
+  if(!pic)return '';
+  const path=data(pic).filePath;
+  if(!path)return '';
+  const url=mediaCachedUrl(path);
+  if(!url&&!worldPhotoPending.has(path)&&sessionValid()){
+    worldPhotoPending.add(path);
+    signedMedia(pic).catch(()=>{}).finally(()=>worldPhotoPending.delete(path));
+  }
+  return url;
+}
+
+function worldPrimaryUrl(world){
+  return worldPhotoUrl(worldPhotoCollection(world)[0]);
+}
+
+function worldHomeCover(world){
+  const photos=worldPhotoCollection(world),first=photos[0];
+  if(!first)return '';
+  const url=worldPhotoUrl(first);
+  return `${url?`<img class="hq-world-real-cover" src="${e(url)}" loading="lazy" alt="Snapshot of ${e(title(world))}">`:`<span class="hq-photo-await" aria-hidden="true">✿</span>`}<span class="hq-world-photo-tag">${photos.length} photo${photos.length===1?'':'s'}</span>`;
+}
+
+function worldCardPhotoStrip(world){
+  const photos=worldPhotoCollection(world);
+  if(photos.length<2)return '';
+  return `<div class="hq-world-mini-photos" aria-label="More linked photos for ${e(title(world))}">${photos.slice(1,4).map(p=>{
+    const url=worldPhotoUrl(p);
+    return `<span class="hq-world-mini-photo">${url?`<img src="${e(url)}" alt="${e(title(p))}" loading="lazy">`:`<span aria-hidden="true">✿</span>`}</span>`;
+  }).join('')}<span class="hq-world-mini-count">${photos.length} linked photos</span></div>`;
+}
+
+function worldDetailPhotoSection(world){
+  const photos=worldPhotoCollection(world);
+  if(!photos.length)return `<section class="panel hq-world-album-empty" aria-label="World photo album"><div><span class="eyebrow">YOUR WORLD IN PICTURES</span><h2>Make this world yours ♡</h2><p>Photos you link to this world and its builds will show up here, on your world cards, and on your home screen.</p></div><button type="button" class="btn btn-primary" data-add-photo="${e(world.id)}">＋ Add first photo</button></section>`;
+  const previews=photos.slice(0,7);
+  return `<section class="panel hq-world-album" aria-label="Photo album for ${e(title(world))}">
+    <div class="hq-world-album-head"><div><span class="eyebrow">YOUR WORLD IN PICTURES ✦</span><h2>Snapshots of ${e(title(world))}</h2><p>Real photos from this world, its builds and story.</p></div><div class="hq-world-album-actions"><span class="hq-world-album-count">${photos.length} photo${photos.length===1?'':'s'}</span><button type="button" class="btn btn-primary btn-small" data-add-photo="${e(world.id)}">＋ Add photo</button></div></div>
+    <div class="hq-world-photo-mosaic">${previews.map((p,i)=>{const photoUrl=worldPhotoUrl(p);return `<button class="hq-world-photo-tile ${i===0?'is-featured':''}" type="button" data-detail="${e(p.id)}" aria-label="Open photo ${e(title(p))}">${photoUrl?`<img src="${e(photoUrl)}" loading="${i===0?'eager':'lazy'}" alt="${e(title(p))}">`:`<span class="hq-photo-await" aria-hidden="true">✿</span>`}<span class="hq-world-photo-label">${e(title(p))}</span></button>`}).join('')}</div>
+  </section>`;
+}
+
+function homeQuickLaunch(){
+  return `<section class="hq-home-launch" aria-label="Home dashboard shortcuts"><div class="hq-launch-intro"><span class="hq3-section-kicker">YOUR CREATIVE CONTROL CENTRE</span><h2>Pick up where you left off <span aria-hidden="true">✦</span></h2></div><div class="hq-home-shortcuts">
+    <button type="button" data-nav="World"><span class="hq-shortcut-icon">${pinkIcon('World')}</span><span class="hq-shortcut-text"><strong>My Worlds</strong><small>${count('World')} universes</small></span><span aria-hidden="true">↗</span></button>
+    <button type="button" data-nav="today"><span class="hq-shortcut-icon">${pinkIcon('today')}</span><span class="hq-shortcut-text"><strong>Today</strong><small>Notes & plans</small></span><span aria-hidden="true">↗</span></button>
+    <button type="button" data-nav="generator"><span class="hq-shortcut-icon">${pinkIcon('star')}</span><span class="hq-shortcut-text"><strong>Surprise Me</strong><small>Creative ideas</small></span><span aria-hidden="true">↗</span></button>
+    <button type="button" data-nav="Photo"><span class="hq-shortcut-icon">${pinkIcon('Photo')}</span><span class="hq-shortcut-text"><strong>My Photos</strong><small>${count('Photo')} snapshots</small></span><span aria-hidden="true">↗</span></button>
+  </div></section>`;
+}
+
 function homePage(){
  const worlds=all('World').slice().sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0)).slice(0,5);
  const builds=all('Build').filter(r=>!['complete','completed','done','finished'].includes(String(data(r).status||'').trim().toLowerCase())).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0)).slice(0,3);
@@ -4770,14 +4895,15 @@ function homePage(){
   <p>Big builds, tiny details &amp; my beautiful chaos.</p>
   <div class="hq3-hero-footer"><button type="button" data-nav="World" class="hq3-hero-action">Wander through my worlds <span aria-hidden="true">↗</span></button><span class="hq3-hero-count">${count('World')} worlds <span aria-hidden="true">·</span> ${count('Build')} builds</span></div>
  </div><div class="hq3-hero-art" aria-hidden="true"><span class="hq3-art-tape"></span><div class="hq3-art-postcard"><div class="hq3-art-sky"><span class="hq3-art-sun"></span><span class="hq3-art-cloud"></span><span class="hq3-art-hill hq3-art-hill-back"></span><span class="hq3-art-hill hq3-art-hill-front"></span><span class="hq3-art-block block-one"></span><span class="hq3-art-block block-two"></span><span class="hq3-art-block block-three"></span></div><span class="hq3-art-caption">blocks &amp; daydreams</span></div><span class="hq3-art-spark">${pinkIcon('star')}</span></div></header>
+ ${homeQuickLaunch()}
  <section class="hq-home-capture hq3-capture" aria-label="Daily quick capture">${capturePanel()}</section>
  ${hqDailyFocus()}
  <section class="hq3-worlds" aria-label="Your Minecraft worlds"><div class="hq3-section-head"><div><span class="hq3-section-kicker">THE WORLD COLLECTION</span><h2>My little universes<span class="hq3-inline-spark" aria-hidden="true">✧</span></h2></div><button type="button" data-nav="World" class="hq3-text-link">See them all <span aria-hidden="true">↗</span></button></div>
- ${worlds.length?`<div class="hq3-world-strip">${worlds.map((w,i)=>{const t=worldTheme(title(w));return `<button type="button" class="hq3-world-card hq3-theme-${t}" data-detail="${e(w.id)}" aria-label="Open world ${e(title(w))}"><span class="hq3-world-cover"><span class="hq3-world-sun"></span><span class="hq3-world-cloud"></span><span class="hq3-world-hill hq3-world-hill-back"></span><span class="hq3-world-hill hq3-world-hill-front"></span><span class="hq3-world-squares"></span><span class="hq3-world-sticker">${String(i+1).padStart(2,'0')}</span></span><span class="hq3-world-bottom"><span class="hq3-world-name">${e(title(w))}</span><span class="hq3-world-sub">${e(String(data(w).status||'Open world'))}</span><span class="hq3-world-open" aria-hidden="true">↗</span></span></button>`}).join('')}</div>`:`<div class="hq3-empty"><span aria-hidden="true">${pinkIcon('star')}</span><p>Your next little universe is waiting for its first block.</p><button type="button" data-add="World">＋ Start a new world</button></div>`}
+ ${worlds.length?`<div class="hq3-world-strip">${worlds.map((w,i)=>{const t=worldTheme(title(w));return `<button type="button" class="hq3-world-card hq3-theme-${t}" data-detail="${e(w.id)}" aria-label="Open world ${e(title(w))}"><span class="hq3-world-cover"><span class="hq3-world-sun"></span><span class="hq3-world-cloud"></span><span class="hq3-world-hill hq3-world-hill-back"></span><span class="hq3-world-hill hq3-world-hill-front"></span><span class="hq3-world-squares"></span><span class="hq3-world-sticker">${String(i+1).padStart(2,'0')}</span>${worldHomeCover(w)}</span><span class="hq3-world-bottom"><span class="hq3-world-name">${e(title(w))}</span><span class="hq3-world-sub">${e(String(data(w).status||'Open world'))}</span><span class="hq3-world-open" aria-hidden="true">↗</span></span></button>`}).join('')}</div>`:`<div class="hq3-empty"><span aria-hidden="true">${pinkIcon('star')}</span><p>Your next little universe is waiting for its first block.</p><button type="button" data-add="World">＋ Start a new world</button></div>`}
  </section>
  <div class="hq3-bottom-grid"><section class="hq3-builds" aria-label="Current builds"><div class="hq3-section-head"><div><span class="hq3-section-kicker">CURRENTLY UNDER CONSTRUCTION</span><h2>On my workbench</h2></div><button type="button" data-nav="Build" class="hq3-text-link">See my builds <span aria-hidden="true">↗</span></button></div>
  ${builds.length?`<div class="hq3-build-list">${builds.map((b,i)=>{const raw=data(b).progress;const progress=raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw))?Math.max(0,Math.min(100,Number(raw))):null;return `<button type="button" data-detail="${e(b.id)}" class="hq3-build-item"><span class="hq3-build-icon" aria-hidden="true">${pinkIcon('Build')}</span><span class="hq3-build-body"><strong>${e(title(b))}</strong><small>${e(String(data(b).status||'In progress'))}${progress!==null?' · '+Math.round(progress)+'%':''}</small>${progress!==null?`<span class="hq3-progress-track"><span style="width:${progress}%"></span></span>`:''}</span><span class="hq3-item-arrow" aria-hidden="true">↗</span></button>`}).join('')}</div>`:`<div class="hq3-small-empty">Nothing in progress yet. Time to dream something up. <button type="button" data-add="Build">Start something ↗</button></div>`}</section>
- <section class="hq3-library" aria-label="Creative library shortcuts"><div class="hq3-section-head"><div><span class="hq3-section-kicker">THE GOOD STUFF</span><h2>My creative stash</h2></div></div><div class="hq3-shelf-grid">${[['AddOn','Add-ons'],['Craftable','Craftables'],['Palette','Palettes'],['TikTok','TikToks'],['BuildIdea','Build ideas']].map(([kind,txt],i)=>`<button type="button" data-nav="${kind}" class="hq3-shelf-link hq3-shelf-${i+1}"><span class="hq3-shelf-icon">${pinkIcon(kind)}</span><span>${e(txt)} <small class="hq-shelf-count">${count(kind)}</small></span><span aria-hidden="true" class="hq3-shelf-arrow">↗</span></button>`).join('')}</div></section></div>
+ <section class="hq3-library" aria-label="Creative library shortcuts"><div class="hq3-section-head"><div><span class="hq3-section-kicker">THE GOOD STUFF</span><h2>My creative stash</h2></div></div><div class="hq3-shelf-grid">${[['AddOn','Add-ons'],['Craftable','Craftables'],['Palette','Palettes'],['TikTok','TikToks']].map(([kind,txt],i)=>`<button type="button" data-nav="${kind}" class="hq3-shelf-link hq3-shelf-${i+1}"><span class="hq3-shelf-icon">${pinkIcon(kind)}</span><span>${e(txt)} <small class="hq-shelf-count">${count(kind)}</small></span><span aria-hidden="true" class="hq3-shelf-arrow">↗</span></button>`).join('')}</div></section></div>
  ${recent.length?`<details class="hq3-history"><summary>Fresh from the notebook <span>your last 3 updates <span aria-hidden="true">⌄</span></span></summary><div class="hq3-history-items">${recent.map(r=>`<button type="button" data-detail="${e(r.id)}"><span>${e(title(r))}</span><small>${e(label(r.kind))} · ${e(dateStr(r.updated_at))}</small></button>`).join('')}</div></details>`:''}
  </div>`;
 }
@@ -4817,7 +4943,7 @@ function worldCardLoadout(world){
  const top=addons.slice(0,3);
  return `<div class="world-card-loadout" aria-label="World linked pack preview"><div class="world-card-loadout-counts"><span>${addons.length} add-ons</span><span>${craftables.length} craftables</span><span>${textures.length} textures</span></div><div class="world-card-addon-preview">${top.length?top.map(r=>`<span>${e(title(r))}</span>`).join(''):`<small>No add-ons linked yet</small>`}${addons.length>top.length?`<small>+${addons.length-top.length} more</small>`:''}</div></div>`;
 }
-function recordCard(r){const d=data(r),img=d.filePath&&r.kind==='Photo'?S.mediaUrls.get(d.filePath):null,desc=d.description||d.notes||d.theme||d.category||'';const specialized=['World','Build','BuildIdea'].includes(r.kind),kindCaption=r.kind==='World'?'MINECRAFT WORLD':r.kind==='Build'?'BUILD WORKSPACE':r.kind==='BuildIdea'?'INSPIRATION FILE':(KINDS[r.kind]?.singular||r.kind).toUpperCase();const worldGroup=r.kind==='World'?relatedRecords(r.id,relationDefs('World')[0]).map(title).join(' · '):'',worldName=r.kind==='Build'?relatedRecords(r.id,relationDefs('Build').find(x=>x[0]==='world')).map(title).join(' · '):'';const n=d.progress===null||d.progress===undefined?null:Math.min(100,Math.max(0,Number(d.progress)||0));return `<article class="record-card kind-${r.kind.toLowerCase()}" ${r.kind==='Photo'&&d.filePath?'data-private-thumb="'+e(r.id)+'"':''}><div class="thumb">${img?`<img src="${e(img)}" alt="${e(title(r))}" loading="lazy" />`:`<div class="card-art"><span class="card-art-spark" aria-hidden="true">✦</span><span class="card-art-emoji" aria-hidden="true">${emoji(r.kind)}</span><span class="card-art-doodle" aria-hidden="true">${pinkIcon('star')}</span></div>`}</div><div class="card-label">${e(kindCaption)}</div><h3>${e(title(r))}</h3><p>${e(String(desc).slice(0,120)||'')}</p>${worldGroup||worldName?`<div class="context-line">↳ ${e(worldGroup||worldName)}</div>`:''}${r.kind==='World'?worldCardLoadout(r):''}${r.kind==='Build'&&n!==null?`<div class="card-progress-meta"><span>Progress</span><strong>${n}%</strong></div><div class="card-progress"><span style="width:${n}%"></span></div>`:''}<div class="pills">${d.status?`<span class="pill">${e(d.status)}</span>`:''}${d.category?`<span class="pill yellow">${e(d.category)}</span>`:''}${r.kind==='WishlistItem'&&d.costMinecoins!=null?`<span class="pill yellow">${pinkIcon("star")} ${e(d.costMinecoins)} Minecoins</span>`:''}${r.kind==='GardenTheme'&&d.color?`<span class="pill yellow">${pinkIcon("flower")} ${e(d.color)}</span>`:''}${d.slot?`<span class="pill">${e(d.slot)}</span>`:''}</div><div class="card-foot"><small>${e(dateStr(r.updated_at))}</small><button class="btn btn-small" data-detail="${r.id}">Open</button></div></article>`}
+function recordCard(r){const d=data(r),img=d.filePath&&r.kind==='Photo'?S.mediaUrls.get(d.filePath):r.kind==='World'?worldPrimaryUrl(r):null,desc=d.description||d.notes||d.theme||d.category||'';const specialized=['World','Build','BuildIdea'].includes(r.kind),kindCaption=r.kind==='World'?'MINECRAFT WORLD':r.kind==='Build'?'BUILD WORKSPACE':r.kind==='BuildIdea'?'INSPIRATION FILE':(KINDS[r.kind]?.singular||r.kind).toUpperCase();const worldGroup=r.kind==='World'?relatedRecords(r.id,relationDefs('World')[0]).map(title).join(' · '):'',worldName=r.kind==='Build'?relatedRecords(r.id,relationDefs('Build').find(x=>x[0]==='world')).map(title).join(' · '):'';const n=d.progress===null||d.progress===undefined?null:Math.min(100,Math.max(0,Number(d.progress)||0));return `<article class="record-card kind-${r.kind.toLowerCase()}" ${r.kind==='Photo'&&d.filePath?'data-private-thumb="'+e(r.id)+'"':''}><div class="thumb">${img?`<img src="${e(img)}" alt="${e(title(r))}" loading="lazy" />`:`<div class="card-art"><span class="card-art-spark" aria-hidden="true">✦</span><span class="card-art-emoji" aria-hidden="true">${emoji(r.kind)}</span><span class="card-art-doodle" aria-hidden="true">${pinkIcon('star')}</span></div>`}</div>${r.kind==='World'?worldCardPhotoStrip(r):''}<div class="card-label">${e(kindCaption)}</div><h3>${e(title(r))}</h3><p>${e(String(desc).slice(0,120)||'')}</p>${worldGroup||worldName?`<div class="context-line">↳ ${e(worldGroup||worldName)}</div>`:''}${r.kind==='World'?worldCardLoadout(r):''}${r.kind==='Build'&&n!==null?`<div class="card-progress-meta"><span>Progress</span><strong>${n}%</strong></div><div class="card-progress"><span style="width:${n}%"></span></div>`:''}<div class="pills">${d.status?`<span class="pill">${e(d.status)}</span>`:''}${d.category?`<span class="pill yellow">${e(d.category)}</span>`:''}${r.kind==='WishlistItem'&&d.costMinecoins!=null?`<span class="pill yellow">${pinkIcon("star")} ${e(d.costMinecoins)} Minecoins</span>`:''}${r.kind==='GardenTheme'&&d.color?`<span class="pill yellow">${pinkIcon("flower")} ${e(d.color)}</span>`:''}${d.slot?`<span class="pill">${e(d.slot)}</span>`:''}</div><div class="card-foot"><small>${e(dateStr(r.updated_at))}</small><button class="btn btn-small" data-detail="${r.id}">Open</button></div></article>`}
 
 function cityGridPage(){
  const rows=all('CityBlock'),map=new Map(rows.map(r=>[String(data(r).slot||data(r).name||'').toUpperCase(),r]));
@@ -5565,7 +5691,7 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
- ${r.kind==='World'?worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsHub(r):''}
+ ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsHub(r):''}
 
  ${kitGallery}
  ${tiktokClipGallery}
