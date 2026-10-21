@@ -3917,6 +3917,50 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .world-loadout-picks input[type=checkbox]{width:17px;flex:none;margin-top:2px;accent-color:#ff5b9a}
 #app .world-loadout-picks small{display:block;color:#957982;font-size:11px}
 @media(max-width:600px){#app .world-loadout-form-grid,#app .world-loadout-picks{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style id="ctrl-world-hub-switcher">
+/* The original little gold context pill is back, on every app page. */
+#app .hub-context-row{position:sticky;top:65px;z-index:19;display:flex;align-items:center;gap:12px;min-height:52px;padding:7px clamp(16px,2vw,30px);background:#fff;border-bottom:1px solid #ffbdd5}
+#app .hub-context-caption{font-size:11px;font-weight:800;color:#8f5871;line-height:1.3}
+#app .hub-context-picker{position:relative;z-index:43;flex:none}
+#app .hub-context-trigger{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:7px 13px;border:1px solid #eccb79;border-radius:999px;background:#ffe7a3;color:#4d3540;font-size:12px;font-weight:900;letter-spacing:.3px;box-shadow:0 2px 0 #ffbdd5;cursor:pointer;white-space:nowrap}
+#app .hub-context-trigger:focus-visible,#app .hub-context-option:focus-visible{outline:3px solid #ff5b9a;outline-offset:2px}
+#app .hub-context-trigger svg{width:16px;height:16px;color:#ba4c7c}
+#app .hub-context-chevron{font-size:14px;color:#8e5070}
+#app .hub-context-scrim{position:fixed;inset:0;z-index:40;display:block;width:100vw;height:100vh;background:transparent;border:0;cursor:default}
+#app .hub-context-menu{position:absolute;z-index:44;top:calc(100% + 7px);left:0;width:min(310px,calc(100vw - 24px));max-height:min(60vh,430px);overflow:auto;padding:7px;border:1px solid #ffbdd5;border-radius:16px;background:#fff;box-shadow:0 12px 35px #572c4730}
+#app .hub-context-option{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:11px;background:#fff;color:#333;text-align:left;cursor:pointer}
+#app .hub-context-option:hover,#app .hub-context-option.is-selected{background:#ffe4ed}
+#app .hub-context-option strong{display:block;font-size:13px}
+#app .hub-context-option small{display:block;margin-top:2px;color:#866a79;font-size:10px}
+#app .hub-context-check{color:#c83c7b;font-weight:900}
+#app .hub-context-count{margin-left:auto;font-size:11px;color:#886575;white-space:nowrap}
+#app .world-hub-collapsible{margin-bottom:18px;border:1px solid #ffbdd5;border-radius:16px;background:#fff;overflow:hidden}
+#app .world-hub-collapsible>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 18px;background:#fff4c9;color:#66354d;font-size:15px;font-weight:850;cursor:pointer;list-style:none}
+#app .world-hub-collapsible>summary::-webkit-details-marker{display:none}
+#app .world-hub-collapsible[open]>summary{border-bottom:1px solid #ffbdd5}
+#app .world-hub-collapsible>.world-hub{margin:0;border:0;border-radius:0;box-shadow:none}
+#app .loadout-report{margin:12px 0 2px;padding:15px;border:1px solid #ffbdd5;border-radius:14px;background:#fffafd}
+#app .loadout-report h4{margin:0 0 5px;font-size:14px;color:#753d58}
+#app .loadout-report p{font-size:11px;color:#765d68;margin:0 0 12px}
+#app .loadout-report-grid{display:grid;grid-template-columns:minmax(140px,190px) minmax(0,1fr);gap:10px;align-items:start}
+#app .loadout-report-grid label{display:block;color:#654956;font-size:12px;font-weight:800}
+#app .loadout-report-grid select,#app .loadout-report-grid textarea{display:block;width:100%;margin-top:6px;padding:10px;border:1px solid #ecc4d7;border-radius:10px;background:#fff;color:#333;font:inherit;font-size:13px}
+#app .loadout-report textarea{min-height:76px;resize:vertical}
+#app .loadout-report-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+#app .loadout-health{display:inline-flex;align-items:center;padding:4px 8px;border:1px solid #edcbd9;border-radius:999px;background:#ffe4ed;color:#8e4d6a;font-size:10px;font-weight:850}
+#app .loadout-health.is-crashed{background:#ffe1e6;border-color:#df7d92;color:#9e2148}
+#app .loadout-health.is-unstable{background:#fff1c4;border-color:#ddbb69;color:#74501c}
+#app .loadout-health.is-working{background:#fff7e9;border-color:#f1d4a0;color:#735d37}
+#app .loadout-warning{margin:10px 0;padding:12px;border:1px solid #dc7790;border-left:5px solid #c73062;border-radius:12px;background:#fff1f3;color:#77253f}
+#app .loadout-warning strong{display:block;font-size:13px}
+#app .loadout-warning p{font-size:12px;line-height:1.45;margin:5px 0}
+#app .loadout-warning small{font-size:11px;color:#844659}
+#app .world-loadout-history-item .loadout-report{background:#fff;margin:12px 0 0}
+#app .world-loadout-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+@media(max-width:740px){#app .hub-context-row{top:59px;min-height:51px;padding:7px 12px;gap:8px}#app .hub-context-trigger{font-size:11px;padding:7px 11px}#app .hub-context-caption{font-size:10px}#app .hub-context-count{display:none}#app .world-hub-collapsible>summary{padding:14px 12px;font-size:13px}}
+@media(max-width:740px){#app .loadout-report-grid{grid-template-columns:1fr}#app .loadout-report{padding:12px}#app .world-loadout-history-item>summary{flex-wrap:wrap}}
+@media(max-width:360px){#app .hub-context-caption{display:none}}
 
 </style>
 <script data-original="assets/app.js">
@@ -4027,6 +4071,8 @@ S.creatorPrefs=(()=>{try{const p=JSON.parse(localStorage.getItem('ctrlhq.creator
 S.paletteBrowse='all';S.paletteSearch='';S.paletteUnassignedSearch='';S.paletteUnassignedPage=0;
 S.paletteThemeOverrides=(()=>{try{return JSON.parse(localStorage.getItem('ctrlcrft.paletteThemes.v1')||'{}')||{}}catch{return {}}})();
 S.shopFilter='all';S.shopSearch='';
+S.hubContext=(()=>{try{return localStorage.getItem('ctrlhq.hubContext')||'all'}catch{return 'all'}})();
+S.hubMenuOpen=false;
 S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.activeWorldContext=null;S.viewSort=(()=>{try{return JSON.parse(localStorage.getItem('ctrlhq.viewSort')||'{}')||{}}catch{return {}}})();
 S.navClosed=(()=>{const key='ctrlhq.navClosed.grouped';try{const v=JSON.parse(localStorage.getItem(key)||'null');const available=new Set(GROUPS.map(([name])=>name));return new Set(Array.isArray(v)?v.filter(name=>available.has(name)):GROUPS.map(([name])=>name).filter(name=>name!=='MY HQ'))}catch{return new Set(GROUPS.map(([name])=>name).filter(name=>name!=='MY HQ'))}})();
 function toggleNavGroup(name){if(S.navClosed.has(name))S.navClosed.delete(name);else S.navClosed.add(name);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}render()}
@@ -4240,6 +4286,43 @@ function sidebar(){if(S.allPagesOpen===undefined){try{S.allPagesOpen=localStorag
  </div></section></nav><div class="sidebar-v4-footer"><span aria-hidden="true">${pinkIcon('heart')}</span> all your little ideas, safely in one place </div></aside>`}
 function filterSidebarV4(){const allMenu=app.querySelector('#sidebar-all-pages');if(allMenu){allMenu.hidden=!(S.allPagesOpen||String(S.sidebarQuery||'').trim());}const term=String(S.sidebarQuery||'').trim().toLocaleLowerCase();const side=app.querySelector('.sidebar-v4');if(!side)return;let total=0;for(const group of side.querySelectorAll('[data-side-group]')){let hits=0;for(const b of group.querySelectorAll('[data-side-label]')){const hit=!term||b.dataset.sideLabel.includes(term);b.hidden=!hit;if(hit)hits++;}group.hidden=hits===0;total+=hits;const items=group.querySelector('.group-items');const toggle=group.querySelector('[data-toggle-group]');if(items&&toggle){if(term){items.classList.remove('is-collapsed');toggle.setAttribute('aria-expanded','true');}else{const isClosed=S.navClosed.has(toggle.dataset.toggleGroup);items.classList.toggle('is-collapsed',isClosed);toggle.setAttribute('aria-expanded',String(!isClosed))}}}const status=side.querySelector('#sidebar-search-status-v4');if(status)status.textContent=term?total+' page'+(total===1?'':'s')+' found':'';const clear=side.querySelector('#sidebar-clear-v4');if(clear)clear.hidden=!term;}
 function topbar(){return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs"><span class="crumb-heart">${pinkIcon("star")}</span> CTRL + CRFT <span class="crumb-divider">/</span> ${e(S.page==='home'?'My HQ':S.page==='today'?'Today':label(S.page))}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${(S.page==='home'&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
+/* A presentation-only context picker: it uses existing World Group links and never edits records. */
+function hubContextChoices(){
+ const base=[{key:'all',name:'ALL HQ',note:'My complete creative HQ'},{key:'worlds',name:'ALL WORLDS',note:'Every saved Minecraft world'},{key:'ctrl',name:'CTRL GROUP',note:'My connected world collection'},{key:'pink',name:'PINK WINK',note:'My separate story world'}];
+ const known=new Set(['ctrl group','pink wink']);
+ const extra=all('WorldGroup').filter(g=>!known.has(normalizeWorldTitle(title(g)))).sort((a,b)=>title(a).localeCompare(title(b))).map(g=>({key:'group:'+g.id,name:title(g),note:'Saved World Group'}));
+ return [...base,...extra];
+}
+function hubContextTitle(key=S.hubContext){return hubContextChoices().find(item=>item.key===key)?.name||'ALL HQ';}
+function hubWorldIds(key=S.hubContext){
+ const worlds=all('World');
+ if(key==='all'||key==='worlds')return new Set(worlds.map(w=>w.id));
+ const groupName=key==='ctrl'?'ctrl group':key==='pink'?'pink wink':'';
+ const group=key.startsWith('group:')?get(key.slice(6)):all('WorldGroup').find(g=>normalizeWorldTitle(title(g))===groupName);
+ if(group&&group.kind==='WorldGroup'&&!group.archived_at){
+  const def=relationDefs('WorldGroup').find(d=>d[0]==='worlds');
+  return new Set(def?relatedRecords(group.id,def).map(w=>w.id):[]);
+ }
+ // Older imports sometimes had correctly named Worlds but no group record yet.
+ if(groupName)return new Set(worlds.filter(w=>normalizeWorldTitle(title(w)).startsWith(groupName)).map(w=>w.id));
+ return new Set();
+}
+function chooseHubContext(key){
+ if(!hubContextChoices().some(x=>x.key===key))return;
+ S.hubContext=key;S.hubMenuOpen=false;
+ try{localStorage.setItem('ctrlhq.hubContext',key)}catch{}
+ nav(key==='all'?'home':'World');
+}
+function hubContextBar(){
+ const choices=hubContextChoices(),current=choices.find(x=>x.key===S.hubContext)||choices[0];
+ if(current.key!==S.hubContext)S.hubContext='all';
+ const count=hubWorldIds(current.key).size;
+ return `<div class="hub-context-row" aria-label="World and HQ context"><div class="hub-context-picker">
+  <button type="button" class="hub-context-trigger" data-hub-open aria-haspopup="true" aria-expanded="${S.hubMenuOpen}" aria-controls="hub-context-menu">${pinkIcon('WorldGroup')} <span>${e(current.name)}</span><span class="hub-context-chevron" aria-hidden="true">⌄</span></button>
+  ${S.hubMenuOpen?`<button type="button" class="hub-context-scrim" data-hub-dismiss aria-label="Close world menu"></button><div class="hub-context-menu" id="hub-context-menu" role="group" aria-label="Choose world collection">${choices.map(c=>`<button type="button" class="hub-context-option ${c.key===current.key?'is-selected':''}" data-hub-choice="${e(c.key)}"><span><strong>${e(c.name)}</strong><small>${e(c.note)}</small></span>${c.key===current.key?'<span class="hub-context-check" aria-hidden="true">✓</span>':''}</button>`).join('')}</div>`:''}
+ </div><span class="hub-context-caption">${current.key==='all'?'Switch between my worlds':current.key==='worlds'?'All my worlds, together':'Viewing this world collection'}</span><span class="hub-context-count">${count} world${count===1?'':'s'}</span></div>`;
+}
+
 
 function pageNoteKey(){return S.detail?`record:${S.detail}`:`page:${S.page}`}
 function existingPageNote(page){return S.records.find(r=>r.kind==='PageNote'&&!r.archived_at&&data(r).pageKey===page)}
@@ -4272,7 +4355,7 @@ async function savePageNote(key){
  }catch(err){showToast('Note not saved: '+err.message)}
  finally{S.pageNoteSaving.delete(key);render()}
 }
-function shell(contents){app.innerHTML=`<div class="app-layout ${S.sidebar?'menu-open':''}">${sidebar()}<div class="mobile-shade" data-close-menu></div><div class="main">${topbar()}<main class="content">${S.loading?'<div class="statusbar">Refreshing your library — saved records remain visible</div>':''}${contents}${(S.page==='home'&&!S.detail)?'':pageNotesPanel()}</main></div></div><nav class="scrap-mobile-tabs" aria-label="Quick navigation">
+function shell(contents){app.innerHTML=`<div class="app-layout ${S.sidebar?'menu-open':''}">${sidebar()}<div class="mobile-shade" data-close-menu></div><div class="main">${topbar()}${hubContextBar()}<main class="content">${S.loading?'<div class="statusbar">Refreshing your library — saved records remain visible</div>':''}${contents}${(S.page==='home'&&!S.detail)?'':pageNotesPanel()}</main></div></div><nav class="scrap-mobile-tabs" aria-label="Quick navigation">
 ${[['home','Home','home'],['World','Worlds','World'],['AddOn','Add-ons','AddOn'],['Video','Videos','Video']].map(([key,label,iconName])=>`<button type="button" class="scrap-mobile-tab ${S.page===key&&!S.detail?'is-active':''}" data-nav="${key}" ${S.page===key&&!S.detail?'aria-current="page"':''}><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon(iconName)}</span><span>${label}</span></button>`).join('')}
 <button type="button" class="scrap-mobile-tab" data-open-scrap-menu aria-label="More pages"><span class="scrap-mobile-tab-icon" aria-hidden="true">${pinkIcon('note')}</span><span>More</span></button>
 </nav>${S.modal?modalView():''}`;pinkifyDecorations(app);wireApp();app.querySelector('[data-open-scrap-menu]')?.addEventListener('click',()=>{S.sidebar=true;render()});filterSidebarV4();observePrivateThumbs()}
@@ -4934,7 +5017,7 @@ function categoryOf(r){return String(data(r).category||data(r).theme||'').trim()
 function recordWorldIDs(r){const defs=relationDefs(r.kind).filter(d=>d[4]==='World');return new Set(defs.flatMap(def=>relatedIDs(r.id,def)))}
 
 function defaultSort(a,b){if(S.sort==='newest')return new Date(b.updated_at)-new Date(a.updated_at);if(S.sort==='oldest')return new Date(a.created_at)-new Date(b.created_at);return title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'})}
-function filterRecords(kind){let records=S.records.filter(r=>r.kind===kind&&(S.showArchived||!r.archived_at));if(S.query.trim()){const q=S.query.trim().toLowerCase();records=records.filter(r=>[r.kind,...Object.values(data(r)).filter(x=>typeof x==='string'||typeof x==='number')].join(' ').toLowerCase().includes(q)||relationDefs(kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(q))))}if(S.filter!=='all')records=records.filter(r=>data(r).status===S.filter);if(S.categoryFilter!=='all')records=records.filter(r=>categoryOf(r)===S.categoryFilter);if(S.worldFilter!=='all')records=records.filter(r=>recordWorldIDs(r).has(S.worldFilter));return records.sort(defaultSort)}
+function filterRecords(kind){let records=S.records.filter(r=>r.kind===kind&&(S.showArchived||!r.archived_at));if(kind==='World'&&!['all','worlds'].includes(S.hubContext)){const allowed=hubWorldIds();records=records.filter(r=>allowed.has(r.id));}if(S.query.trim()){const q=S.query.trim().toLowerCase();records=records.filter(r=>[r.kind,...Object.values(data(r)).filter(x=>typeof x==='string'||typeof x==='number')].join(' ').toLowerCase().includes(q)||relationDefs(kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(q))))}if(S.filter!=='all')records=records.filter(r=>data(r).status===S.filter);if(S.categoryFilter!=='all')records=records.filter(r=>categoryOf(r)===S.categoryFilter);if(S.worldFilter!=='all')records=records.filter(r=>recordWorldIDs(r).has(S.worldFilter));return records.sort(defaultSort)}
 
 function worldCardLoadout(world){
  const addons=worldOverviewLinkList(world,'addons');
@@ -5453,7 +5536,7 @@ async function worldLoadoutSave(worldId,entries,options={}){
  if(!options.force&&prior&&data(prior).signature===signature)return null;
  const saved=await saveRecord(WORLD_LOADOUT_HISTORY_KIND,{
   name:title(w)+' add-ons '+date,worldId,worldName:title(w),date,recordedAt:new Date().toISOString(),
-  source,note:String(options.note||''),signature,addons:entries.map(a=>({id:a.id||'',name:String(a.name||''),creator:String(a.creator||'')}))
+  source,note:String(options.note||''),health:String(options.health||''),signature,addons:entries.map(a=>({id:a.id||'',name:String(a.name||''),creator:String(a.creator||'')}))
  });
  S.records.push(saved);return saved;
 }
@@ -5474,6 +5557,75 @@ async function worldLoadoutAfter(worldIds){
 function worldLoadoutDate(ymd){
  const s=String(ymd||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return 'Undated';
  return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+const WORLD_LOADOUT_HEALTH=['Not recorded','Untested','Working','Unstable','Crashed'];
+function worldLoadoutHealth(value){return WORLD_LOADOUT_HEALTH.includes(value)?value:'Not recorded';}
+function worldLoadoutHealthBadge(value){
+ const status=worldLoadoutHealth(value);
+ return status==='Not recorded'?'':`<span class="loadout-health is-${status.toLowerCase()}">${e(status)}</span>`;
+}
+function worldLoadoutReportFields(health,note){
+ return `<div class="loadout-report-grid"><label>How did this group run?
+  <select name="health" aria-label="Add-on combination status">${WORLD_LOADOUT_HEALTH.map(x=>`<option value="${e(x)}" ${worldLoadoutHealth(health)===x?'selected':''}>${e(x)}</option>`).join('')}</select></label>
+  <label>Notes about these add-ons
+  <textarea name="note" maxlength="4000" rows="3" placeholder="e.g. World crashed loading, removed two packs, tested again…">${e(note||'')}</textarea></label></div>`;
+}
+/* These warnings are evidence from the user's own saved incidents, not a diagnosis of individual packs. */
+function worldLoadoutIssueWarnings(entries){
+ if(!entries.length)return '';
+ const sig=worldLoadoutSignature(entries);
+ const flagged=all(WORLD_LOADOUT_HISTORY_KIND).filter(r=>data(r).signature===sig&&['Crashed','Unstable'].includes(data(r).health))
+  .sort((a,b)=>String(data(b).reportedAt||data(b).recordedAt||'').localeCompare(String(data(a).reportedAt||data(a).recordedAt||'')));
+ if(!flagged.length)return '';
+ return `<aside class="loadout-warning" role="status" aria-label="Previously reported add-on issue"><strong>! This exact combination has a saved warning</strong>
+  ${flagged.slice(0,3).map(r=>{const d=data(r);return `<p><b>${e(d.health)}</b> · ${e(d.worldName||'A saved World')} · ${e(worldLoadoutDate(d.date))}${d.note?` — ${e(String(d.note).slice(0,220))}`:''}</p>`}).join('')}
+  <small>From your own add-on history. A crash report does not prove which individual pack caused it.</small></aside>`;
+}
+function worldCurrentLoadoutReport(world){
+ const entries=worldLoadoutNow(world.id);
+ if(!entries.length)return '';
+ const signature=worldLoadoutSignature(entries);
+ const current=worldLoadoutHistory(world.id).filter(r=>data(r).source!=='manual'&&data(r).signature===signature)
+  .sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')))[0];
+ const d=data(current);
+ return `${worldLoadoutIssueWarnings(entries)}<form class="loadout-report" data-current-loadout-report="${e(world.id)}" data-signature="${e(signature)}">
+  <h4>Notes for this current add-on group</h4><p>Record whether this exact set works, becomes unstable, or crashes. Your report stays with the dated combination.</p>
+  ${worldLoadoutReportFields(d.health,d.note)}
+  <div class="loadout-report-actions"><button type="submit" class="btn btn-primary btn-small" ${S.worldLoadoutBusy?'disabled':''}>Save group notes</button></div></form>`;
+}
+async function saveWorldLoadoutReport(form){
+ if(S.worldLoadoutBusy)return;
+ const historyReportId=form.dataset.historyLoadoutReport||'';
+ const health=String(new FormData(form).get('health')||'Not recorded');
+ const note=String(new FormData(form).get('note')||'').trim();
+ if(!WORLD_LOADOUT_HEALTH.includes(health)||note.length>4000)return showToast('Review the status and keep the notes under 4,000 characters.');
+ let record=null,world=null,entries=[];
+ if(form.dataset.currentLoadoutReport){
+  world=get(form.dataset.currentLoadoutReport);
+  if(!world||world.kind!=='World')return showToast('The World is unavailable.');
+  entries=worldLoadoutNow(world.id);
+  const signature=worldLoadoutSignature(entries);
+  if(signature!==form.dataset.signature)return showToast('This World’s add-ons have changed. Reopen the notes before saving.');
+  record=worldLoadoutHistory(world.id).filter(r=>data(r).source!=='manual'&&data(r).signature===signature)
+   .sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')))[0];
+ }else{
+  record=get(form.dataset.historyLoadoutReport);
+  if(!record||record.kind!==WORLD_LOADOUT_HISTORY_KIND)return showToast('That dated combination is unavailable.');
+ }
+ S.worldLoadoutBusy=true;
+ try{
+  if(record){
+   const saved=await saveRecord(WORLD_LOADOUT_HISTORY_KIND,{...data(record),health,note,reportedAt:new Date().toISOString()},record.id);
+   S.records=[...S.records.filter(r=>r.id!==saved.id),saved];
+  }else if(world&&entries.length){
+   await worldLoadoutSave(world.id,entries,{source:'current',force:true,health,note});
+  }else throw Error('Link at least one add-on before saving group notes.');
+  showToast('Combination status and notes saved to your private history ♡');
+ }catch(err){showToast('Could not save group notes: '+err.message)}
+ finally{
+  S.worldLoadoutBusy=false;render();
+  if(historyReportId){const report=app.querySelectorAll('[data-history-loadout-report]');for(const item of report){if(item.dataset.historyLoadoutReport===historyReportId){item.closest('details')?.setAttribute('open','');break}}}
+ }
+}
 }
 async function worldLoadoutSaveCurrent(id){
  if(S.worldLoadoutBusy)return;
@@ -5494,7 +5646,7 @@ async function worldLoadoutSavePast(form){
  }
  if(!confirm('Save '+entries.length+' add-ons for '+title(world)+' on '+worldLoadoutDate(date)+'? This will not change your current add-ons.'))return;
  S.worldLoadoutBusy=true;
- try{await worldLoadoutSave(id,entries,{source:'manual',date,note:String(fd.get('note')||''),force:true});S.worldLoadoutPast=null;showToast('Past add-on combination saved ♡');}
+ try{await worldLoadoutSave(id,entries,{source:'manual',date,note:String(fd.get('note')||'').trim(),health:worldLoadoutHealth(String(fd.get('health')||'')),force:true});S.worldLoadoutPast=null;showToast('Past add-on combination saved ♡');}
  catch(err){showToast('History not saved: '+err.message);}
  finally{S.worldLoadoutBusy=false;render();}
 }
@@ -5571,20 +5723,23 @@ function worldLoadoutRow(r){
  const d=data(r),items=Array.isArray(d.addons)?d.addons:[];
  const type=d.source==='manual'?'Date entered by you':d.source==='baseline'?'First captured on this day; earlier dates unknown':'Captured when saved';
  const contents=items.length?'<ul>'+items.map(a=>'<li>'+e(a.name||'')+(a.creator?' <small>— '+e(a.creator)+'</small>':'')+'</li>').join('')+'</ul>':'<p>No add-ons in this saved combination.</p>';
- return '<details class="world-loadout-history-item"><summary><strong>'+e(worldLoadoutDate(d.date))+'</strong><span>'+e(d.note||type)+'</span><b>'+items.length+' add-on'+(items.length===1?'':'s')+'</b></summary><div class="world-loadout-history-body"><small>'+e(type)+'</small>'+contents+'</div></details>';
+ const summary=e(String(d.note||type).slice(0,90));
+ return '<details class="world-loadout-history-item"><summary><strong>'+e(worldLoadoutDate(d.date))+'</strong>'+worldLoadoutHealthBadge(d.health)+'<span>'+summary+'</span><b>'+items.length+' add-on'+(items.length===1?'':'s')+'</b></summary><div class="world-loadout-history-body"><small>'+e(type)+'</small>'+contents+
+  '<form class="loadout-report" data-history-loadout-report="'+e(r.id)+'"><h4>How did this dated combination work?</h4>'+worldLoadoutReportFields(d.health,d.note)+'<div class="loadout-report-actions"><button type="submit" class="btn btn-primary btn-small" '+(S.worldLoadoutBusy?'disabled':'')+'>Save status &amp; notes</button></div></form></div></details>';
 }
 function worldLoadoutPanel(world){
  const rows=worldLoadoutHistory(world.id).sort((a,b)=>String(data(b).date||'').localeCompare(String(data(a).date||''))||String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')));
  const open=S.worldLoadoutPast===world.id,showAll=S.worldLoadoutShowAll===world.id,addons=all('AddOn').slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'}));
  const picker=(open?addons:[]).map(a=>'<label data-loadout-name="'+e(title(a).toLowerCase())+'"><input type="checkbox" name="addon" value="'+e(a.id)+'"><span>'+e(title(a))+(creatorName(a)?'<small>by '+e(creatorName(a))+'</small>':'')+'</span></label>').join('');
  const form=open?'<form class="world-loadout-past-form" id="world-loadout-past-form" data-world-loadout="'+e(world.id)+'"><h3>Record an older combination</h3><p class="hint">Use the date it was actually in use. Your active World will not be changed.</p>'+
-  '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label><label>Optional note<input type="text" name="note" maxlength="240" placeholder="e.g. Before adding furniture"></label></div>'+
+  '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label></div>'+
   '<label>Find saved add-ons<input type="search" id="world-loadout-search" placeholder="Search by name…"></label><div class="world-loadout-picks">'+picker+'</div>'+
+  worldLoadoutReportFields('Not recorded','')+
   '<label>Other old add-ons (one name per line)<textarea name="other" rows="2" placeholder="Add any missing old packs"></textarea></label>'+
   '<div class="world-loadout-history-actions"><button type="submit" class="btn btn-primary btn-small">Save dated combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-cancel>Cancel</button></div></form>':'';
  const timeline=rows.length?'<div class="world-loadout-timeline">'+(showAll?rows:rows.slice(0,40)).map(worldLoadoutRow).join('')+(rows.length>40?'<button type="button" class="btn btn-soft btn-small" data-loadout-show-all="'+e(world.id)+'">'+(showAll?'Show newest 40':'Show all '+rows.length+' saved combinations')+'</button>':'')+'</div>':'<p class="hint">No combinations saved yet. Save the current one, or change your linked add-ons to start a history.</p>';
  return '<section class="panel world-loadout-history" id="world-loadout-history" aria-label="World add-on history">'+
-  '<div class="section-line"><div><div class="eyebrow">YOUR WORLD, THROUGH TIME</div><h2>'+pinkIcon('AddOn')+' Add-on history</h2><p class="subcopy">Keep earlier add-on combinations with dates. Changes will be tracked automatically from now on, and you can enter older dates yourself.</p></div><span class="pill yellow">'+rows.length+' saved</span></div>'+
+  '<div class="section-line"><div><div class="eyebrow">YOUR WORLD, THROUGH TIME</div><h2>'+pinkIcon('AddOn')+' Add-on history</h2><p class="subcopy">Every saved group has editable notes and a Working, Unstable or Crashed status. New link changes are also dated automatically.</p></div><span class="pill yellow">'+rows.length+' saved</span></div>'+
   '<div class="world-loadout-history-actions"><button type="button" class="btn btn-small btn-primary" data-loadout-snapshot="'+e(world.id)+'">Save current combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-past="'+e(world.id)+'">＋ Record an older combination</button></div>'+form+timeline+'</section>';
 }
 
@@ -5594,19 +5749,14 @@ function worldOverviewStrip(world){
  const counts=keySections.map(([key,label,kind])=>({key,label,kind,items:worldOverviewLinkList(world,key).filter(r=>key!=='builds'||!worldIsFutureRecord(r))}));
  const stats=[{key:'addons',label:'Add-ons',items:addonList},...counts.filter(s=>['craftables','textures','builds','tiktoks'].includes(s.key))];
  const addonCards=addonList.map(r=>{const d=data(r);return `<button type="button" class="world-loadout-item" data-detail="${e(r.id)}" title="Open ${e(title(r))}"><span class="world-loadout-item-name">${e(title(r))}</span><span class="world-loadout-item-details">${e(creatorName(r)||'Creator not assigned')}${d.category?` · ${e(d.category)}`:''}${d.sizeMB!=null&&String(d.sizeMB)!==''?` · ${e(d.sizeMB)} MB`:''}</span></button>`}).join('');
- const linkedCards=counts.map(section=>{
-  const preview=section.items.slice(0,8);
-  const extra=section.items.length-preview.length;
-  return `<article class="world-overview-linked-card"><div class="world-overview-linked-heading"><h3>${pinkIcon(section.kind)} ${e(section.label)} <span class="muted">(${section.items.length})</span></h3><button class="btn btn-small btn-soft" type="button" data-world-manage="${e(section.key)}" data-world-id="${e(world.id)}" aria-label="Edit ${e(section.label)} in ${e(title(world))}">Edit</button></div><div class="world-overview-linked-list">${preview.length?preview.map(r=>`<button type="button" class="world-overview-linked-name" data-detail="${e(r.id)}">${e(title(r))}</button>`).join(''):`<span class="world-overview-not-linked">None linked yet</span>`}${extra?`<a href="#world-everything" class="world-overview-more" data-world-section="${e(section.key)}" aria-label="See ${extra} more ${e(section.label)} in linked section below">+ ${extra} more below ↓</a>`:''}</div></article>`;
- }).join('');
  return `<section class="panel world-overview-panel" aria-label="Linked information and world add-on loadout" id="world-overview-loadout"><div class="section-line world-overview-heading"><div><div class="eyebrow">YOUR WORLD, AT A GLANCE</div><h2>${pinkIcon('AddOn')} Add-ons to use in ${e(title(world))}</h2><p class="subcopy">This is your saved World loadout. Every name here comes from a real link in your app, not a suggestion or a note.</p></div></div>
  <div class="world-overview-stats">${stats.map(s=>`<div class="world-overview-stat"><strong>${s.items.length}</strong><span>${e(s.label)}</span></div>`).join('')}</div>
- <div class="world-loadout-panel"><div class="world-loadout-head"><h3>Current add-on loadout <span class="pill yellow">${addonList.length} linked</span></h3><div class="world-loadout-buttons"><button type="button" class="btn btn-small btn-primary" data-world-manage="addons" data-world-id="${e(world.id)}">＋ Edit Add-ons</button>${addonList.length?`<button type="button" class="btn btn-small btn-soft" data-copy-world-addons="${e(world.id)}">Copy list</button>`:''}</div></div>${addonList.length?`<div class="world-loadout-list">${addonCards}</div>`:`<div class="world-overview-empty"><strong>No add-ons linked to this World yet.</strong><p>Tap Edit Add-ons to pick from your saved library. Nothing will be added to Minecraft automatically.</p></div>`}</div>
- <div class="world-overview-secondary-head"><h3>Other linked information</h3><p class="hint">Tap a name to open its record, or Edit to change the actual World relationship. See every other category in “Everything connected” below.</p></div><div class="world-overview-linked-grid">${linkedCards}</div>
+ <div class="world-loadout-panel"><div class="world-loadout-head"><h3>Current add-on loadout <span class="pill yellow">${addonList.length} linked</span></h3><div class="world-loadout-buttons"><button type="button" class="btn btn-small btn-primary" data-world-manage="addons" data-world-id="${e(world.id)}">＋ Edit Add-ons</button>${addonList.length?`<button type="button" class="btn btn-small btn-soft" data-copy-world-addons="${e(world.id)}">Copy list</button>`:''}</div></div>${addonList.length?`<div class="world-loadout-list">${addonCards}</div>`:`<div class="world-overview-empty"><strong>No add-ons linked to this World yet.</strong><p>Tap Edit Add-ons to pick from your saved library. Nothing will be added to Minecraft automatically.</p></div>`}${worldCurrentLoadoutReport(world)}</div>
+ <p class="hint">Craftables, textures, builds and the rest of your links are organized once in “Manage linked records” below.</p>
  </section>`;
 }
 function worldConnectionsHub(world){
- const defs=worldHubDefinitions().filter(def=>!['lore','ideas'].includes(def[0])||worldOptionalVisible(world,def[0]==='lore'?'lore':'future'));
+ const defs=worldHubDefinitions().filter(def=>def[0]!=='addons'&&(!['lore','ideas'].includes(def[0])||worldOptionalVisible(world,def[0]==='lore'?'lore':'future')));
  const visibleRows=def=>relatedRecords(world.id,def).filter(r=>(def[0]!=='builds'||!worldIsFutureRecord(r)||worldOptionalVisible(world,'future'))&&(def[0]!=='ideas'||worldIsFutureRecord(r)));
  const connected=defs.reduce((n,def)=>n+visibleRows(def).length,0);
  const tiles=defs.map(def=>{
@@ -5623,6 +5773,9 @@ function worldConnectionsHub(world){
   </article>`;
  }).join('');
  return `<section class="panel world-hub" id="world-everything"><div class="section-line"><div><div class="eyebrow">YOUR WORLD · ONE PLACE FOR EVERYTHING</div><h2>Everything connected to ${e(title(world))}</h2><p class="subcopy">${connected} active connections across ${defs.length} sections. Tap any item to open it, or add and link it right here.</p></div><button class="btn btn-small btn-soft" data-edit="${e(world.id)}">Edit world details</button></div><div class="world-hub-grid">${tiles}</div></section>`;
+function worldConnectionsPanel(world){
+ return `<details class="world-hub-collapsible" aria-label="Manage connected records for ${e(title(world))}"><summary><span>${pinkIcon('WorldGroup')} Manage linked records &amp; projects</span><span aria-hidden="true">⌄</span></summary>${worldConnectionsHub(world)}</details>`;
+}
 }
 function openWorldLinkPicker(worldId,defKey){
  const world=get(worldId),def=relationDefs('World').find(x=>x[0]===defKey);
@@ -5645,6 +5798,7 @@ function worldLinkPickerModal(m){
  <label class="world-picker-search-label" for="world-picker-search">Search saved ${e(label(def[4]).toLowerCase())}</label><input id="world-picker-search" type="search" placeholder="Find by name or Creator…" value="${e(m.query||'')}" autocomplete="off" />
  <div class="world-picker-meta">${m.chosen.length} selected · ${matches.length} matching records${remaining>60?' · keep typing to narrow the list':''}</div>
  ${inlineCreateWidget(def[4],'world-link')}
+ <div data-world-loadout-warning>${m.defKey==='addons'?worldLoadoutIssueWarnings(worldLoadoutEntries(m.chosen)):''}</div>
  <div class="world-picker-choices">${visible.length?visible.map(r=>`<button type="button" class="world-picker-option ${m.chosen.includes(r.id)?'chosen':''}" data-world-pick="${e(r.id)}" aria-pressed="${m.chosen.includes(r.id)?'true':'false'}"><span class="world-picker-check">${m.chosen.includes(r.id)?'✓':'＋'}</span><span><strong>${e(title(r))}</strong>${creatorName(r)?`<small>by ${e(creatorName(r))}</small>`:''}</span></button>`).join(''):'<p class="empty">No matching saved records. Use “Not listed? Add new” above.</p>'}</div>
  <div class="form-footer world-picker-footer"><button type="button" class="btn" data-close-modal>Cancel</button><button type="button" class="btn btn-primary" data-world-pick-save="1" ${S.busy?'disabled':''}>${S.busy?'Saving…':'Save World Links'}</button></div></div></div></div>`;
 }
@@ -5679,7 +5833,7 @@ function newFromWorld(worldId,defKey){
  openForm(def[4],null,{_links:{[back[0]]:[world.id]}});
  if(S.modal?.type==='form')S.modal.returnWorldId=world.id;
 }
-function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind]){S.detail=null;return homePage()}const d=data(r),cfg=KINDS[r.kind],fields=fieldDefs(r.kind).filter(f=>!['name','description'].includes(f.key)&&d[f.key]!==null&&d[f.key]!==undefined&&d[f.key]!=='').map(f=>[f.key,f.label]);let relationBlocks=relationDefs(r.kind).map(def=>{const arr=relatedRecords(r.id,def),archive=relatedIDs(r.id,def).map(get).filter(x=>x&&x.archived_at);return `<div class="relation-panel"><h3>${e(def[1])} <span class="muted">(${arr.length})</span></h3>${arr.length?arr.map(x=>`<button class="rel-chip" data-detail="${x.id}">${emoji(x.kind)} ${e(title(x))}</button>`).join(''):'<span class="rel-empty">Nothing active linked yet</span>'}${archive.length?`<div class="audit-archived-rels" role="note">${pinkIcon('lock')} ${archive.length} archived link${archive.length===1?'':'s'}: ${archive.map(x=>e(title(x))).join(', ')}. <button class="btn btn-small btn-soft" data-nav="trash">Review in Trash</button></div>`:''}</div>`}).join('');
+function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind]){S.detail=null;return homePage()}const d=data(r),cfg=KINDS[r.kind],fields=fieldDefs(r.kind).filter(f=>!['name','description',...(r.kind==='World'?['notes']:[])].includes(f.key)&&d[f.key]!==null&&d[f.key]!==undefined&&d[f.key]!=='').map(f=>[f.key,f.label]);let relationBlocks=relationDefs(r.kind).map(def=>{const arr=relatedRecords(r.id,def),archive=relatedIDs(r.id,def).map(get).filter(x=>x&&x.archived_at);return `<div class="relation-panel"><h3>${e(def[1])} <span class="muted">(${arr.length})</span></h3>${arr.length?arr.map(x=>`<button class="rel-chip" data-detail="${x.id}">${emoji(x.kind)} ${e(title(x))}</button>`).join(''):'<span class="rel-empty">Nothing active linked yet</span>'}${archive.length?`<div class="audit-archived-rels" role="note">${pinkIcon('lock')} ${archive.length} archived link${archive.length===1?'':'s'}: ${archive.map(x=>e(title(x))).join(', ')}. <button class="btn btn-small btn-soft" data-nav="trash">Review in Trash</button></div>`:''}</div>`}).join('');
 
  const kitPhotos=r.kind==='Lore'?relatedRecords(r.id,relationDefs('Lore').find(def=>def[0]==='photos')).filter(p=>p.kind==='Photo'&&data(p).filePath):[];
  for(const pic of kitPhotos){if(!S.mediaUrls.has(data(pic).filePath))signedMedia(pic).catch(()=>{});}
@@ -5691,7 +5845,7 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
- ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsHub(r):''}
+ ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsPanel(r):''}
 
  ${kitGallery}
  ${tiktokClipGallery}
@@ -6909,6 +7063,13 @@ async function preview2000BuildIdeas(){
   showToast(`Pack ready: ${p.records.length-duplicates-invalid} potential new ideas. Please review before importing.`);
  }catch(err){showToast('Could not preview ideas: '+err.message);if(opener){opener.disabled=false;opener.innerHTML='Preview 2,000 Idea Pack'}}
 }
+ app.querySelector('[data-hub-open]')?.addEventListener('click',()=>{
+  S.hubMenuOpen=!S.hubMenuOpen;render();
+  if(S.hubMenuOpen)app.querySelector('[data-hub-choice]')?.focus();
+ });
+ app.querySelector('[data-hub-dismiss]')?.addEventListener('click',()=>{S.hubMenuOpen=false;render()});
+ app.querySelectorAll('[data-hub-choice]').forEach(button=>button.addEventListener('click',()=>chooseHubContext(button.dataset.hubChoice)));
+ app.querySelector('#hub-context-menu')?.addEventListener('keydown',event=>{if(event.key==='Escape'){S.hubMenuOpen=false;render();app.querySelector('[data-hub-open]')?.focus()}});
 function wireApp(){
  wireCreativeSuite();
  vlBind(app);
@@ -7014,6 +7175,7 @@ function wireApp(){
  app.querySelectorAll('[data-loadout-past]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutPast=S.worldLoadoutPast===b.dataset.loadoutPast?null:b.dataset.loadoutPast;render();app.querySelector('#world-loadout-past-form')?.scrollIntoView({block:'nearest'})}));
  app.querySelectorAll('[data-loadout-show-all]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutShowAll=S.worldLoadoutShowAll===b.dataset.loadoutShowAll?null:b.dataset.loadoutShowAll;render()}));
  app.querySelector('[data-loadout-cancel]')?.addEventListener('click',()=>{S.worldLoadoutPast=null;render()});
+ app.querySelectorAll('[data-current-loadout-report],[data-history-loadout-report]').forEach(form=>form.addEventListener('submit',ev=>{ev.preventDefault();saveWorldLoadoutReport(form)}));
  app.querySelector('#world-loadout-past-form')?.addEventListener('submit',ev=>{ev.preventDefault();worldLoadoutSavePast(ev.target)});
  app.querySelector('#world-loadout-search')?.addEventListener('input',ev=>{const q=ev.target.value.trim().toLowerCase();app.querySelectorAll('[data-loadout-name]').forEach(n=>{n.hidden=!n.dataset.loadoutName.includes(q)&&!n.querySelector('input')?.checked})});
 
@@ -7028,6 +7190,8 @@ app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('
   const next=scratch.querySelector('.world-picker-choices');
   if(target&&next)target.innerHTML=next.innerHTML;
   const meta=app.querySelector('.world-picker-meta');const nextMeta=scratch.querySelector('.world-picker-meta');
+  const warning=app.querySelector('[data-world-loadout-warning]'),nextWarning=scratch.querySelector('[data-world-loadout-warning]');
+  if(warning&&nextWarning)warning.innerHTML=nextWarning.innerHTML;
   if(meta&&nextMeta)meta.textContent=nextMeta.textContent;
  };
  app.querySelector('#world-picker-search')?.addEventListener('input',ev=>{
