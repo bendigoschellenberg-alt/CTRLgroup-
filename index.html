@@ -3917,6 +3917,7 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .world-loadout-picks input[type=checkbox]{width:17px;flex:none;margin-top:2px;accent-color:#ff5b9a}
 #app .world-loadout-picks small{display:block;color:#957982;font-size:11px}
 @media(max-width:600px){#app .world-loadout-form-grid,#app .world-loadout-picks{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <style id="ctrl-world-hub-switcher">
 /* The original little gold context pill is back, on every app page. */
@@ -3935,6 +3936,10 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .hub-context-option small{display:block;margin-top:2px;color:#866a79;font-size:10px}
 #app .hub-context-check{color:#c83c7b;font-weight:900}
 #app .hub-context-count{margin-left:auto;font-size:11px;color:#886575;white-space:nowrap}
+#app .world-collection-scope{display:flex;align-items:center;gap:9px 15px;flex-wrap:wrap;margin:0 0 13px;padding:12px 15px;background:#fff5bf;border:1px solid #f1d68d;border-radius:14px;color:#644250;font-size:12px}
+#app .world-collection-scope strong{font-size:13px}
+#app .world-collection-scope span{flex:1;min-width:170px}
+#app .world-collection-scope button{white-space:nowrap}
 #app .world-hub-collapsible{margin-bottom:18px;border:1px solid #ffbdd5;border-radius:16px;background:#fff;overflow:hidden}
 #app .world-hub-collapsible>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 18px;background:#fff4c9;color:#66354d;font-size:15px;font-weight:850;cursor:pointer;list-style:none}
 #app .world-hub-collapsible>summary::-webkit-details-marker{display:none}
@@ -3958,10 +3963,16 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .loadout-warning small{font-size:11px;color:#844659}
 #app .world-loadout-history-item .loadout-report{background:#fff;margin:12px 0 0}
 #app .world-loadout-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#app .video-safekeeping{margin:12px 0;padding:10px 14px;border:1px solid #ffbdd5;border-radius:14px;background:#fff}
+#app .video-safekeeping>summary{cursor:pointer;color:#774460;font-size:13px;font-weight:800}
+#app .video-safekeeping p{color:#795e70;font-size:12px}
+#app .video-safekeeping-list{display:grid;gap:5px}
+#app .video-safekeeping-item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:9px 10px;border:1px solid #f4d7e2;border-radius:9px;background:#fffafd;color:#333;text-align:left}
+#app .video-safekeeping-item span{font-size:12px;font-weight:700}
+#app .video-safekeeping-item small{font-size:11px;color:#a35c7e}
 @media(max-width:740px){#app .hub-context-row{top:59px;min-height:51px;padding:7px 12px;gap:8px}#app .hub-context-trigger{font-size:11px;padding:7px 11px}#app .hub-context-caption{font-size:10px}#app .hub-context-count{display:none}#app .world-hub-collapsible>summary{padding:14px 12px;font-size:13px}}
 @media(max-width:740px){#app .loadout-report-grid{grid-template-columns:1fr}#app .loadout-report{padding:12px}#app .world-loadout-history-item>summary{flex-wrap:wrap}}
 @media(max-width:360px){#app .hub-context-caption{display:none}}
-
 </style>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -4032,8 +4043,8 @@ const WORLD_SCOPED_PAGES = Object.freeze({
  CityBlock:{owner:'CTRL Group Main',section:'City planning'},
  Avenue:{owner:'CTRL Group Main',section:'City planning'},
  Street:{owner:'CTRL Group Main',section:'City planning'},
- GardenTheme:{owner:'CTRL Group Garden',section:'Garden planning'},
- GardenFeature:{owner:'CTRL Group Garden',section:'Garden planning'}
+ GardenTheme:{owner:'CTRL Group - Garden District',section:'Garden planning'},
+ GardenFeature:{owner:'CTRL Group - Garden District',section:'Garden planning'}
 });
 function normalizeWorldTitle(value){return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
 function ownerWorldForPage(kind){
@@ -4071,9 +4082,9 @@ S.creatorPrefs=(()=>{try{const p=JSON.parse(localStorage.getItem('ctrlhq.creator
 S.paletteBrowse='all';S.paletteSearch='';S.paletteUnassignedSearch='';S.paletteUnassignedPage=0;
 S.paletteThemeOverrides=(()=>{try{return JSON.parse(localStorage.getItem('ctrlcrft.paletteThemes.v1')||'{}')||{}}catch{return {}}})();
 S.shopFilter='all';S.shopSearch='';
+S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.activeWorldContext=null;S.viewSort=(()=>{try{return JSON.parse(localStorage.getItem('ctrlhq.viewSort')||'{}')||{}}catch{return {}}})();
 S.hubContext=(()=>{try{return localStorage.getItem('ctrlhq.hubContext')||'all'}catch{return 'all'}})();
 S.hubMenuOpen=false;
-S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.activeWorldContext=null;S.viewSort=(()=>{try{return JSON.parse(localStorage.getItem('ctrlhq.viewSort')||'{}')||{}}catch{return {}}})();
 S.navClosed=(()=>{const key='ctrlhq.navClosed.grouped';try{const v=JSON.parse(localStorage.getItem(key)||'null');const available=new Set(GROUPS.map(([name])=>name));return new Set(Array.isArray(v)?v.filter(name=>available.has(name)):GROUPS.map(([name])=>name).filter(name=>name!=='MY HQ'))}catch{return new Set(GROUPS.map(([name])=>name).filter(name=>name!=='MY HQ'))}})();
 function toggleNavGroup(name){if(S.navClosed.has(name))S.navClosed.delete(name);else S.navClosed.add(name);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}render()}
 const e=(x)=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -4184,8 +4195,33 @@ async function auth(event){event.preventDefault();if(S.busy)return;S.busy=true;c
  }catch(err){S.authMessage=err.message}finally{S.busy=false;render()}
 }
 function signOut(silent=false){captureRemember();S.captureText='';S.captureRows=[];S.captureDefaultWorld='';S.captureDefaultKind='DailyNote';S.captureSummary='';S.captureBusy=false;S.mediaBackup=null;bulkVideoReset();S.spreadsheetImport=null;S.pageNoteDrafts.clear();S.recordNoteDrafts.clear();saveSession(null);S.records=[];S.links=[];S.recon=null;S.mediaUrls.clear();S.detail=null;S.modal=null;S.authMode='login';S.authOpen=false;if(!silent)showToast('Signed out');render()}
-async function fetchPaged(table){let out=[],offset=0;while(true){let list=await api(`/rest/v1/${table}?select=*&order=created_at.asc&limit=1000&offset=${offset}`);out.push(...list);if(list.length<1000)break;offset+=1000;if(offset>30000)throw Error('Your library is large; pagination limit reached. Contact support before importing more.')}return out}
-async function loadAll(){S.loading=true;render();try{const [records,links]=await Promise.all([fetchPaged('hq_records'),fetchPaged('hq_links')]);S.records=records;S.links=links;S.lastLoad=new Date();S.mediaUrls.clear();S.loading=false;render();loadMediaThumbnails()}catch(err){S.loading=false;showToast(err.message);render();throw err}}
+/* A unique tiebreaker is essential: thousands of imported records share the
+   same created_at and offset pagination otherwise drops/repeats rows. */
+async function fetchPaged(table,onProgress){
+ const out=[],seen=new Set();let offset=0;
+ while(true){
+  const list=await api(`/rest/v1/${table}?select=*&order=created_at.asc,id.asc&limit=1000&offset=${offset}`);
+  for(const record of list){
+   if(seen.has(record.id))throw Error('Repeated records were returned while loading '+table+'. Your saved data has not been changed; please retry.');
+   seen.add(record.id);out.push(record);
+  }
+  if(onProgress)onProgress(out.length);
+  if(list.length<1000)break;
+  offset+=list.length;
+  if(offset>30000)throw Error('Your library is large; pagination limit reached. Contact support before importing more.');
+ }
+ return out;
+}
+async function loadAll(){
+ S.loading=true;S.loadingCount=0;render();
+ try{
+  const [records,links]=await Promise.all([
+   fetchPaged('hq_records',n=>{S.loadingCount=n;const el=app.querySelector('#load-progress');if(el)el.textContent=n.toLocaleString()+' records securely loaded so far…';}),
+   fetchPaged('hq_links')
+  ]);
+  S.records=records;S.links=links;S.lastLoad=new Date();S.mediaUrls.clear();S.loading=false;render();loadMediaThumbnails();
+ }catch(err){S.loading=false;showToast(err.message);render();throw err}
+}
 function loadMediaThumbnails(){
  // No eager requests on login. Photo thumbnails use a visibility observer after rendering.
  // Lore and Video previews are signed on demand by their existing detail views.
@@ -4286,6 +4322,7 @@ function sidebar(){if(S.allPagesOpen===undefined){try{S.allPagesOpen=localStorag
  </div></section></nav><div class="sidebar-v4-footer"><span aria-hidden="true">${pinkIcon('heart')}</span> all your little ideas, safely in one place </div></aside>`}
 function filterSidebarV4(){const allMenu=app.querySelector('#sidebar-all-pages');if(allMenu){allMenu.hidden=!(S.allPagesOpen||String(S.sidebarQuery||'').trim());}const term=String(S.sidebarQuery||'').trim().toLocaleLowerCase();const side=app.querySelector('.sidebar-v4');if(!side)return;let total=0;for(const group of side.querySelectorAll('[data-side-group]')){let hits=0;for(const b of group.querySelectorAll('[data-side-label]')){const hit=!term||b.dataset.sideLabel.includes(term);b.hidden=!hit;if(hit)hits++;}group.hidden=hits===0;total+=hits;const items=group.querySelector('.group-items');const toggle=group.querySelector('[data-toggle-group]');if(items&&toggle){if(term){items.classList.remove('is-collapsed');toggle.setAttribute('aria-expanded','true');}else{const isClosed=S.navClosed.has(toggle.dataset.toggleGroup);items.classList.toggle('is-collapsed',isClosed);toggle.setAttribute('aria-expanded',String(!isClosed))}}}const status=side.querySelector('#sidebar-search-status-v4');if(status)status.textContent=term?total+' page'+(total===1?'':'s')+' found':'';const clear=side.querySelector('#sidebar-clear-v4');if(clear)clear.hidden=!term;}
 function topbar(){return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs"><span class="crumb-heart">${pinkIcon("star")}</span> CTRL + CRFT <span class="crumb-divider">/</span> ${e(S.page==='home'?'My HQ':S.page==='today'?'Today':label(S.page))}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${(S.page==='home'&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
+
 /* A presentation-only context picker: it uses existing World Group links and never edits records. */
 function hubContextChoices(){
  const base=[{key:'all',name:'ALL HQ',note:'My complete creative HQ'},{key:'worlds',name:'ALL WORLDS',note:'Every saved Minecraft world'},{key:'ctrl',name:'CTRL GROUP',note:'My connected world collection'},{key:'pink',name:'PINK WINK',note:'My separate story world'}];
@@ -4322,7 +4359,16 @@ function hubContextBar(){
   ${S.hubMenuOpen?`<button type="button" class="hub-context-scrim" data-hub-dismiss aria-label="Close world menu"></button><div class="hub-context-menu" id="hub-context-menu" role="group" aria-label="Choose world collection">${choices.map(c=>`<button type="button" class="hub-context-option ${c.key===current.key?'is-selected':''}" data-hub-choice="${e(c.key)}"><span><strong>${e(c.name)}</strong><small>${e(c.note)}</small></span>${c.key===current.key?'<span class="hub-context-check" aria-hidden="true">✓</span>':''}</button>`).join('')}</div>`:''}
  </div><span class="hub-context-caption">${current.key==='all'?'Switch between my worlds':current.key==='worlds'?'All my worlds, together':'Viewing this world collection'}</span><span class="hub-context-count">${count} world${count===1?'':'s'}</span></div>`;
 }
-
+function worldCollectionScopeNotice(){
+ const total=all('World').length,scoped=hubWorldIds().size;
+ const isScoped=!['all','worlds'].includes(S.hubContext);
+ const ungrouped=all('World').filter(world=>!relatedIDs(world.id,relationDefs('World').find(d=>d[0]==='groups')).length).length;
+ return `<section class="world-collection-scope" role="status">
+  <strong>${isScoped?e(hubContextTitle())+' · '+scoped+' of '+total+' Worlds':'All '+total+' saved Worlds'}</strong>
+  <span>${isScoped?`${total-scoped} other Worlds are still safely saved, just outside this view.`:`${ungrouped} World${ungrouped===1?' is':'s are'} not assigned to a collection; they remain visible here.`}</span>
+  ${isScoped?'<button class="btn btn-small btn-primary" type="button" data-hub-choice="worlds">Show All Worlds</button>':''}
+ </section>`;
+}
 
 function pageNoteKey(){return S.detail?`record:${S.detail}`:`page:${S.page}`}
 function existingPageNote(page){return S.records.find(r=>r.kind==='PageNote'&&!r.archived_at&&data(r).pageKey===page)}
@@ -5253,6 +5299,7 @@ function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" sty
  const pageControls=ideasOnly&&records.length>ideaPageSize?`<div class="compact-library-bar" style="flex-wrap:wrap;gap:8px"><span>Showing ${S.buildIdeasPage*ideaPageSize+1}–${Math.min(records.length,(S.buildIdeasPage+1)*ideaPageSize)} of ${records.length} ideas</span><div class="actions"><button class="btn btn-soft btn-small" data-ideas-page="-1" ${S.buildIdeasPage===0?'disabled':''}>← Earlier</button><strong>Page ${S.buildIdeasPage+1}/${ideaPageCount}</strong><button class="btn btn-soft btn-small" data-ideas-page="1" ${S.buildIdeasPage>=ideaPageCount-1?'disabled':''}>More →</button></div></div>`:'';
  const extras=kind==='World'?`<button class="btn btn-soft btn-small" data-nav="WorldGroup">World Groups</button>`:kind==='Build'?`<button class="btn btn-soft btn-small" data-nav="BuildIdea">Build Ideas</button>`:kind==='BuildIdea'?`<button class="btn btn-soft btn-small" id="preview-2000-ideas">${pinkIcon('star')} Preview 2,000 Idea Pack</button>`:kind==='Lore'?`<button class="btn btn-soft btn-small" data-nav="settings">Import 100-Day Pictures</button>`:'';
  return `${header(cfg.label,'Your saved '+cfg.label.toLowerCase()+' — simple, searchable and connected.',`${extras}<button class="btn btn-soft btn-small" data-manage-fields="${kind}">Fields</button><button class="btn btn-primary" data-add="${kind}">＋ Add ${e(cfg.singular)}</button>`)}
+ ${kind==='World'?worldCollectionScopeNotice():''}
  <section class="panel compact-library-panel"><div class="record-toolbar compact-toolbar"><input type="search" class="search-input" id="local-search" placeholder="Search ${e(cfg.label.toLowerCase())}…" value="${e(S.query)}" aria-label="Search ${e(cfg.label)}" />
  ${st.length?`<select id="status-filter" aria-label="Filter status"><option value="all">All statuses</option>${st.map(x=>`<option value="${e(x)}" ${S.filter===x?'selected':''}>${e(x)}</option>`).join('')}</select>`:''}
  ${categories.length?`<select id="category-filter" aria-label="Filter category"><option value="all">All categories</option>${categories.map(x=>`<option value="${e(x)}" ${S.categoryFilter===x?'selected':''}>${e(x)}</option>`).join('')}</select>`:''}
@@ -5408,6 +5455,7 @@ function videoDeskItem(r){
 function studioThumb(r){const d=data(r),clip=r.kind==='Video'?d.filePath:tkClips(r).find(c=>c.manualVideoHub===true)?.filePath;const cached=clip?mediaCachedUrl(clip):'';if(clip&&!cached)signedMedia({data:{filePath:clip}}).catch(()=>{});return cached?'<video class="studio-thumb-video" muted playsinline preload="metadata" src="'+e(cached)+'#t=0.1" aria-label="Video thumbnail"></video>':'<span class="studio-thumb-empty">▸<small>'+(clip?'Preparing preview':'No footage yet')+'</small></span>';}
 function videoHubPage(){
  const allNotes=all('TikTok'),allUploads=vlManualRecords(),filter=S.videoFilter||'all',term=String(S.tkSearch||'').toLowerCase().trim();
+ const olderVideos=all('Video').filter(r=>data(r).manualVideoHub!==true);
  const records=[...allNotes,...allUploads].sort((a,b)=>String(b.created_at||data(b).uploadedAt||'').localeCompare(String(a.created_at||data(a).uploadedAt||'')));
  const posted=r=>r.kind==='TikTok'&&(!!tkPostUrl(r)||String(data(r).status||'').toLowerCase()==='posted');
  const shown=records.filter(r=>{
@@ -5441,7 +5489,11 @@ function videoHubPage(){
    <div class="vd-filters">${filters.map(([k,n])=>`<button type="button" data-video-filter="${k}" class="${filter===k?'active':''}" aria-pressed="${filter===k}">${n}</button>`).join('')}</div>
    <div class="vd-list v4-list">${shown.slice(page*perPage,(page+1)*perPage).map(videoDeskItem).join('')||`<p class="vd-empty">Nothing matches yet. Add a TikTok note, upload a new video, or change the filter.</p>`}</div>
    ${count>1?`<div class="vd-pager"><button data-tk29-page="-1" type="button" ${page===0?'disabled':''}>← Previous</button><span>Page ${page+1} / ${count}</span><button data-tk29-page="1" type="button" ${page===count-1?'disabled':''}>Next →</button></div>`:''}
-  </section><p class="vd-footnote">Older mismatched video files remain privately stored, but are hidden. Nothing has been deleted.</p>
+  </section>
+  ${olderVideos.length?`<details class="video-safekeeping"><summary>${olderVideos.length} older Video record${olderVideos.length===1?'':'s'} kept safely · tap to review</summary>
+   <p>These were excluded from the redesigned Video Studio, but your original records are still saved. Reviewing them does not re-upload or delete anything.</p>
+   <div class="video-safekeeping-list">${olderVideos.map(r=>`<button type="button" class="video-safekeeping-item" data-detail="${e(r.id)}"><span>${e(title(r))}</span><small>Open saved record →</small></button>`).join('')}</div></details>`:''}
+  <p class="vd-footnote">Your earlier videos and TikTok notes remain privately stored. Nothing has been deleted.</p>
  </div>`;
 }
 
@@ -5557,6 +5609,7 @@ async function worldLoadoutAfter(worldIds){
 function worldLoadoutDate(ymd){
  const s=String(ymd||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return 'Undated';
  return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+}
 const WORLD_LOADOUT_HEALTH=['Not recorded','Untested','Working','Unstable','Crashed'];
 function worldLoadoutHealth(value){return WORLD_LOADOUT_HEALTH.includes(value)?value:'Not recorded';}
 function worldLoadoutHealthBadge(value){
@@ -5625,7 +5678,6 @@ async function saveWorldLoadoutReport(form){
   S.worldLoadoutBusy=false;render();
   if(historyReportId){const report=app.querySelectorAll('[data-history-loadout-report]');for(const item of report){if(item.dataset.historyLoadoutReport===historyReportId){item.closest('details')?.setAttribute('open','');break}}}
  }
-}
 }
 async function worldLoadoutSaveCurrent(id){
  if(S.worldLoadoutBusy)return;
@@ -5734,8 +5786,8 @@ function worldLoadoutPanel(world){
  const form=open?'<form class="world-loadout-past-form" id="world-loadout-past-form" data-world-loadout="'+e(world.id)+'"><h3>Record an older combination</h3><p class="hint">Use the date it was actually in use. Your active World will not be changed.</p>'+
   '<div class="world-loadout-form-grid"><label>Date used<input type="date" name="date" value="'+e(dateOnly())+'" max="'+e(dateOnly())+'" required></label></div>'+
   '<label>Find saved add-ons<input type="search" id="world-loadout-search" placeholder="Search by name…"></label><div class="world-loadout-picks">'+picker+'</div>'+
-  worldLoadoutReportFields('Not recorded','')+
   '<label>Other old add-ons (one name per line)<textarea name="other" rows="2" placeholder="Add any missing old packs"></textarea></label>'+
+  worldLoadoutReportFields('Not recorded','')+
   '<div class="world-loadout-history-actions"><button type="submit" class="btn btn-primary btn-small">Save dated combination</button><button type="button" class="btn btn-small btn-soft" data-loadout-cancel>Cancel</button></div></form>':'';
  const timeline=rows.length?'<div class="world-loadout-timeline">'+(showAll?rows:rows.slice(0,40)).map(worldLoadoutRow).join('')+(rows.length>40?'<button type="button" class="btn btn-soft btn-small" data-loadout-show-all="'+e(world.id)+'">'+(showAll?'Show newest 40':'Show all '+rows.length+' saved combinations')+'</button>':'')+'</div>':'<p class="hint">No combinations saved yet. Save the current one, or change your linked add-ons to start a history.</p>';
  return '<section class="panel world-loadout-history" id="world-loadout-history" aria-label="World add-on history">'+
@@ -5752,7 +5804,7 @@ function worldOverviewStrip(world){
  return `<section class="panel world-overview-panel" aria-label="Linked information and world add-on loadout" id="world-overview-loadout"><div class="section-line world-overview-heading"><div><div class="eyebrow">YOUR WORLD, AT A GLANCE</div><h2>${pinkIcon('AddOn')} Add-ons to use in ${e(title(world))}</h2><p class="subcopy">This is your saved World loadout. Every name here comes from a real link in your app, not a suggestion or a note.</p></div></div>
  <div class="world-overview-stats">${stats.map(s=>`<div class="world-overview-stat"><strong>${s.items.length}</strong><span>${e(s.label)}</span></div>`).join('')}</div>
  <div class="world-loadout-panel"><div class="world-loadout-head"><h3>Current add-on loadout <span class="pill yellow">${addonList.length} linked</span></h3><div class="world-loadout-buttons"><button type="button" class="btn btn-small btn-primary" data-world-manage="addons" data-world-id="${e(world.id)}">＋ Edit Add-ons</button>${addonList.length?`<button type="button" class="btn btn-small btn-soft" data-copy-world-addons="${e(world.id)}">Copy list</button>`:''}</div></div>${addonList.length?`<div class="world-loadout-list">${addonCards}</div>`:`<div class="world-overview-empty"><strong>No add-ons linked to this World yet.</strong><p>Tap Edit Add-ons to pick from your saved library. Nothing will be added to Minecraft automatically.</p></div>`}${worldCurrentLoadoutReport(world)}</div>
- <p class="hint">Craftables, textures, builds and the rest of your links are organized once in “Manage linked records” below.</p>
+ <p class="hint">Craftables, textures, builds and other saved links are in “Manage linked records” below. Tap that heading to expand them; nothing has been removed.</p>
  </section>`;
 }
 function worldConnectionsHub(world){
@@ -5773,9 +5825,10 @@ function worldConnectionsHub(world){
   </article>`;
  }).join('');
  return `<section class="panel world-hub" id="world-everything"><div class="section-line"><div><div class="eyebrow">YOUR WORLD · ONE PLACE FOR EVERYTHING</div><h2>Everything connected to ${e(title(world))}</h2><p class="subcopy">${connected} active connections across ${defs.length} sections. Tap any item to open it, or add and link it right here.</p></div><button class="btn btn-small btn-soft" data-edit="${e(world.id)}">Edit world details</button></div><div class="world-hub-grid">${tiles}</div></section>`;
-function worldConnectionsPanel(world){
- return `<details class="world-hub-collapsible" aria-label="Manage connected records for ${e(title(world))}"><summary><span>${pinkIcon('WorldGroup')} Manage linked records &amp; projects</span><span aria-hidden="true">⌄</span></summary>${worldConnectionsHub(world)}</details>`;
 }
+function worldConnectionsPanel(world){
+ const total=worldHubDefinitions().filter(d=>d[0]!=='addons').reduce((n,def)=>n+relatedRecords(world.id,def).length,0);
+ return `<details class="world-hub-collapsible" aria-label="Manage connected records for ${e(title(world))}"><summary><span>${pinkIcon('WorldGroup')} Manage linked records &amp; projects <small>· ${total} saved links · tap to open</small></span><span aria-hidden="true">⌄</span></summary>${worldConnectionsHub(world)}</details>`;
 }
 function openWorldLinkPicker(worldId,defKey){
  const world=get(worldId),def=relationDefs('World').find(x=>x[0]===defKey);
@@ -5798,8 +5851,8 @@ function worldLinkPickerModal(m){
  <label class="world-picker-search-label" for="world-picker-search">Search saved ${e(label(def[4]).toLowerCase())}</label><input id="world-picker-search" type="search" placeholder="Find by name or Creator…" value="${e(m.query||'')}" autocomplete="off" />
  <div class="world-picker-meta">${m.chosen.length} selected · ${matches.length} matching records${remaining>60?' · keep typing to narrow the list':''}</div>
  ${inlineCreateWidget(def[4],'world-link')}
- <div data-world-loadout-warning>${m.defKey==='addons'?worldLoadoutIssueWarnings(worldLoadoutEntries(m.chosen)):''}</div>
  <div class="world-picker-choices">${visible.length?visible.map(r=>`<button type="button" class="world-picker-option ${m.chosen.includes(r.id)?'chosen':''}" data-world-pick="${e(r.id)}" aria-pressed="${m.chosen.includes(r.id)?'true':'false'}"><span class="world-picker-check">${m.chosen.includes(r.id)?'✓':'＋'}</span><span><strong>${e(title(r))}</strong>${creatorName(r)?`<small>by ${e(creatorName(r))}</small>`:''}</span></button>`).join(''):'<p class="empty">No matching saved records. Use “Not listed? Add new” above.</p>'}</div>
+ <div data-world-loadout-warning>${m.defKey==='addons'?worldLoadoutIssueWarnings(worldLoadoutEntries(m.chosen)):''}</div>
  <div class="form-footer world-picker-footer"><button type="button" class="btn" data-close-modal>Cancel</button><button type="button" class="btn btn-primary" data-world-pick-save="1" ${S.busy?'disabled':''}>${S.busy?'Saving…':'Save World Links'}</button></div></div></div></div>`;
 }
 async function saveWorldLinkPicker(){
@@ -6143,7 +6196,7 @@ function wireCreativeSuite(){
  app.querySelector('[data-cs-status]')?.addEventListener('change',ev=>{S.csStatus=ev.target.value;render()});
 }
 
-function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=videoHubPage()+creativeStudioPanel();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
+function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=videoHubPage()+creativeStudioPanel();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
 function globalSearchPage(){
  const query=S.query.trim().toLowerCase();
  const matches=query?S.records.filter(r=>!r.archived_at && r.kind!=='PageNote' && r.kind!=='FieldConfig' && ([r.kind,title(r),...Object.values(data(r)).filter(v=>typeof v==='string'||typeof v==='number')].join(' ').toLowerCase().includes(query)||relationDefs(r.kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(query))))).sort(defaultSort):[];
@@ -7063,6 +7116,7 @@ async function preview2000BuildIdeas(){
   showToast(`Pack ready: ${p.records.length-duplicates-invalid} potential new ideas. Please review before importing.`);
  }catch(err){showToast('Could not preview ideas: '+err.message);if(opener){opener.disabled=false;opener.innerHTML='Preview 2,000 Idea Pack'}}
 }
+function wireApp(){
  app.querySelector('[data-hub-open]')?.addEventListener('click',()=>{
   S.hubMenuOpen=!S.hubMenuOpen;render();
   if(S.hubMenuOpen)app.querySelector('[data-hub-choice]')?.focus();
@@ -7070,7 +7124,6 @@ async function preview2000BuildIdeas(){
  app.querySelector('[data-hub-dismiss]')?.addEventListener('click',()=>{S.hubMenuOpen=false;render()});
  app.querySelectorAll('[data-hub-choice]').forEach(button=>button.addEventListener('click',()=>chooseHubContext(button.dataset.hubChoice)));
  app.querySelector('#hub-context-menu')?.addEventListener('keydown',event=>{if(event.key==='Escape'){S.hubMenuOpen=false;render();app.querySelector('[data-hub-open]')?.focus()}});
-function wireApp(){
  wireCreativeSuite();
  vlBind(app);
  app.querySelector('#recon-backup')?.addEventListener('click',exportBackup);
@@ -7175,8 +7228,8 @@ function wireApp(){
  app.querySelectorAll('[data-loadout-past]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutPast=S.worldLoadoutPast===b.dataset.loadoutPast?null:b.dataset.loadoutPast;render();app.querySelector('#world-loadout-past-form')?.scrollIntoView({block:'nearest'})}));
  app.querySelectorAll('[data-loadout-show-all]').forEach(b=>b.addEventListener('click',()=>{S.worldLoadoutShowAll=S.worldLoadoutShowAll===b.dataset.loadoutShowAll?null:b.dataset.loadoutShowAll;render()}));
  app.querySelector('[data-loadout-cancel]')?.addEventListener('click',()=>{S.worldLoadoutPast=null;render()});
- app.querySelectorAll('[data-current-loadout-report],[data-history-loadout-report]').forEach(form=>form.addEventListener('submit',ev=>{ev.preventDefault();saveWorldLoadoutReport(form)}));
  app.querySelector('#world-loadout-past-form')?.addEventListener('submit',ev=>{ev.preventDefault();worldLoadoutSavePast(ev.target)});
+ app.querySelectorAll('[data-current-loadout-report],[data-history-loadout-report]').forEach(form=>form.addEventListener('submit',ev=>{ev.preventDefault();saveWorldLoadoutReport(form)}));
  app.querySelector('#world-loadout-search')?.addEventListener('input',ev=>{const q=ev.target.value.trim().toLowerCase();app.querySelectorAll('[data-loadout-name]').forEach(n=>{n.hidden=!n.dataset.loadoutName.includes(q)&&!n.querySelector('input')?.checked})});
 
 app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('click',async()=>{const world=get(b.dataset.copyWorldAddons);if(!world||world.kind!=='World')return;const addons=worldOverviewLinkList(world,'addons');if(!addons.length)return showToast('No add-ons linked to this World yet.');const list=title(world)+' — Add-ons\n'+addons.map((r,i)=>`${i+1}. ${title(r)}${creatorName(r)?' — '+creatorName(r):''}`).join('\n');try{await navigator.clipboard.writeText(list);showToast('World add-on list copied ♡')}catch{showToast('Copy is unavailable in this browser. The full list is shown above.')}}));
@@ -7190,9 +7243,9 @@ app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('
   const next=scratch.querySelector('.world-picker-choices');
   if(target&&next)target.innerHTML=next.innerHTML;
   const meta=app.querySelector('.world-picker-meta');const nextMeta=scratch.querySelector('.world-picker-meta');
+  if(meta&&nextMeta)meta.textContent=nextMeta.textContent;
   const warning=app.querySelector('[data-world-loadout-warning]'),nextWarning=scratch.querySelector('[data-world-loadout-warning]');
   if(warning&&nextWarning)warning.innerHTML=nextWarning.innerHTML;
-  if(meta&&nextMeta)meta.textContent=nextMeta.textContent;
  };
  app.querySelector('#world-picker-search')?.addEventListener('input',ev=>{
   if(S.modal?.type!=='world-links')return;
