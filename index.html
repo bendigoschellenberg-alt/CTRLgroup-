@@ -4194,7 +4194,7 @@ async function auth(event){event.preventDefault();if(S.busy)return;S.busy=true;c
   } else {const r=await api('/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});saveSession(r);S.authOpen=false;captureRestore();S.authMessage='';await loadAll();S.page='home';}
  }catch(err){S.authMessage=err.message}finally{S.busy=false;render()}
 }
-function signOut(silent=false){captureRemember();S.captureText='';S.captureRows=[];S.captureDefaultWorld='';S.captureDefaultKind='DailyNote';S.captureSummary='';S.captureBusy=false;S.mediaBackup=null;bulkVideoReset();S.spreadsheetImport=null;S.pageNoteDrafts.clear();S.recordNoteDrafts.clear();saveSession(null);S.records=[];S.links=[];S.recon=null;S.mediaUrls.clear();S.detail=null;S.modal=null;S.authMode='login';S.authOpen=false;if(!silent)showToast('Signed out');render()}
+function signOut(silent=false){captureRemember();S.captureText='';S.captureRows=[];S.captureDefaultWorld='';S.captureDefaultKind='DailyNote';S.captureSummary='';S.captureBusy=false;S.mediaBackup=null;S.mediaInventory=null;S.mediaRestorePreview=null;S.mediaRestoreMessage='';VL.unlinked=null;VL.recoveryStatus='';bulkVideoReset();S.spreadsheetImport=null;S.pageNoteDrafts.clear();S.recordNoteDrafts.clear();saveSession(null);S.records=[];S.links=[];S.recon=null;S.mediaUrls.clear();S.detail=null;S.modal=null;S.authMode='login';S.authOpen=false;if(!silent)showToast('Signed out');render()}
 /* A unique tiebreaker is essential: thousands of imported records share the
    same created_at and offset pagination otherwise drops/repeats rows. */
 async function fetchPaged(table,onProgress){
