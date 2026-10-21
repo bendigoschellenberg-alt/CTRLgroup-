@@ -4325,7 +4325,7 @@ function topbar(){return `<header class="topbar"><button class="icon-btn mobile-
 
 /* A presentation-only context picker: it uses existing World Group links and never edits records. */
 function hubContextChoices(){
- const base=[{key:'all',name:'ALL HQ',note:'My complete creative HQ'},{key:'worlds',name:'ALL WORLDS',note:'Every saved Minecraft world'},{key:'ctrl',name:'CTRL GROUP',note:'My connected world collection'},{key:'pink',name:'PINK WINK',note:'My separate story world'}];
+ const base=[{key:'all',name:'ALL HQ',note:'My complete creative HQ'},{key:'worlds',name:'ALL WORLDS',note:'Every saved Minecraft world'},{key:'ctrl',name:'CTRL GROUP',note:'My connected world collection'},{key:'pink',name:'PINK WINK',note:'My separate story world'},{key:'ungrouped',name:'NOT YET GROUPED',note:'Saved Worlds awaiting a collection'}];
  const known=new Set(['ctrl group','pink wink']);
  const extra=all('WorldGroup').filter(g=>!known.has(normalizeWorldTitle(title(g)))).sort((a,b)=>title(a).localeCompare(title(b))).map(g=>({key:'group:'+g.id,name:title(g),note:'Saved World Group'}));
  return [...base,...extra];
@@ -4334,6 +4334,10 @@ function hubContextTitle(key=S.hubContext){return hubContextChoices().find(item=
 function hubWorldIds(key=S.hubContext){
  const worlds=all('World');
  if(key==='all'||key==='worlds')return new Set(worlds.map(w=>w.id));
+ if(key==='ungrouped'){
+  const def=relationDefs('World').find(d=>d[0]==='groups');
+  return new Set(worlds.filter(w=>!def||!relatedRecords(w.id,def).length).map(w=>w.id));
+ }
  const groupName=key==='ctrl'?'ctrl group':key==='pink'?'pink wink':'';
  const group=key.startsWith('group:')?get(key.slice(6)):all('WorldGroup').find(g=>normalizeWorldTitle(title(g))===groupName);
  if(group&&group.kind==='WorldGroup'&&!group.archived_at){
@@ -5482,6 +5486,7 @@ function videoHubPage(){
    <div class="video-v3-form-actions"><button class="video-v3-save" type="submit">Save note</button><button class="video-v3-cancel" data-tk29-add type="button">Cancel</button></div>
   </form></section>`:''}
   ${vlUnifiedUploads()}
+  ${vlRecoveryPanel()}
   <section class="vd-library" aria-label="Videos and TikTok notes">
    <div class="vd-library-heading"><h2>My projects ♡</h2><span>${shown.length} entries</span></div>
    <div class="studio-strip">${shown.slice(0,6).map(r=>`<button class="studio-tile" type="button" data-video-expand="${e(r.id)}"><span class="studio-tile-cover">${studioThumb(r)}</span><strong>${e(r.kind==='TikTok'?tkTitle(r):title(r))}</strong><small>${e(data(r).status||'Idea')}</small></button>`).join('')}</div>
@@ -5932,12 +5937,41 @@ function guestShell(){
 }
 /* Private Video Library v1 — uses existing authenticated api(), saveRecord() and hq_links. */
 const VL={queue:[],uploading:false,search:'',filter:'all',view:'grid',editId:null,info:'',saving:false,
- signed:new Map(),busySigning:new Set(),legacyBusy:false};
+ signed:new Map(),busySigning:new Set(),legacyBusy:false,scanning:false,recovering:false,unlinked:null,recoveryStatus:''};
 const VL_LIMIT=25*1024*1024; // Confirmed CURRENT hq-media bucket setting, not a guess.
 const VL_TUS_URL='https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js';
 function vlMime(file){const ext=String(file.name||'').split('.').pop().toLowerCase();const mapping={mp4:'video/mp4',mov:'video/quicktime',m4v:'video/x-m4v',webm:'video/webm'};return file.type?.startsWith('video/')?file.type:(mapping[ext]||file.type||'');}
 const vlBytes=n=>n>=1048576?(n/1048576).toFixed(1)+' MiB':(Math.max(0,n)/1024).toFixed(0)+' KiB';
 function vlClips(){return all('TikTok').flatMap(t=>tkClips(t).map(c=>({post:t,clip:c})));}
+function vlRecoveryPanel(){
+ const orphan=VL.unlinked||[];
+ return `<section class="panel" aria-label="Private video recovery"><div class="section-line"><h2>Find missing video records ♡</h2><button type="button" class="btn btn-soft" id="vl-scan-private" ${VL.scanning||VL.recovering?'disabled':''}>${VL.scanning?'Checking storage…':'Scan original files'}</button></div>
+  <p class="subcopy">Look for uploaded videos that are still safely stored but no longer attached to a Video or TikTok record. This check does not delete or move any file.</p>
+  <p class="footnote" role="status">${e(VL.recoveryStatus||'Tap Scan original files to check your private media.')}</p>
+  ${orphan.length?`<details><summary><strong>${orphan.length} unlinked original video${orphan.length===1?'':'s'} found</strong> — review filenames</summary><div class="recovery-results">${orphan.slice(0,100).map(f=>`<div class="recovery-row"><strong>${e(f.fileName)}</strong><small>${e(vlBytes(f.fileSize))} · Private original preserved</small></div>`).join('')}</div></details><div class="actions"><button type="button" class="btn btn-primary" id="vl-recover-all" ${VL.recovering?'disabled':''}>${VL.recovering?'Recovering…':`Restore ${orphan.length} Video records`}</button></div><p class="footnote">Restoration creates library entries that point to the existing original files. It cannot guess which World or TikTok they belong to; you can link those after reviewing each clip.</p>`:''}</section>`;
+}
+async function vlScanPrivate(){if(VL.scanning||VL.recovering)return;VL.scanning=true;VL.recoveryStatus='Reading original filenames from your private storage…';render();
+ try{const files=await listPrivateStoredMedia();S.mediaInventory=files;
+  const referenced=new Set(backedUpMedia().filter(r=>r.kind!=='UnlinkedMedia').map(r=>data(r).filePath));
+  VL.unlinked=files.filter(f=>(f.mimeType.startsWith('video/')||/\.(mp4|mov|m4v|webm)$/i.test(f.fileName))&&!referenced.has(f.path));
+  VL.recoveryStatus=`Found ${files.length} originals in storage; ${VL.unlinked.length} videos have no matching record. No data changed.`;
+ }catch(err){VL.unlinked=null;VL.recoveryStatus='Storage scan paused: '+String(err.message||err)+'. Your originals are untouched.'}
+ finally{VL.scanning=false;render()}
+}
+async function vlRecoverAll(){if(VL.recovering||!VL.unlinked?.length)return;
+ const total=VL.unlinked.length;
+ if(!confirm(`Create ${total} new Video entries pointing to your EXISTING private originals?\n\nNo files will be moved, removed or reuploaded. No TikTok/World association will be guessed. Original dates may need your review.`))return;
+ VL.recovering=true;let saved=0;render();
+ try{for(const file of [...VL.unlinked]){
+  if(S.records.some(r=>(r.kind==='Video'||r.kind==='TikTok')&&data(r).filePath===file.path)){VL.unlinked=VL.unlinked.filter(f=>f.path!==file.path);continue;}
+  const record=await saveRecord('Video',{name:'Recovered clip '+(saved+1),filePath:file.path,fileName:file.fileName,fileSize:file.fileSize,mimeType:file.mimeType||'video/mp4',uploadedAt:file.updatedAt||'',status:'Raw footage',notes:'Original footage recovered from private storage. Please review the clip and add its correct title, World and TikTok links.',manualVideoHub:true,recoveredFromStorage:true});
+  S.records.push(record);VL.unlinked=VL.unlinked.filter(f=>f.path!==file.path);saved++;
+  VL.recoveryStatus=`Recovered ${saved} of ${total} records; original video bytes were not changed.`;
+ }
+  await loadAll();VL.recoveryStatus=`Recovered ${saved} videos as editable entries. Original files remain intact.`;
+ }catch(err){VL.recoveryStatus=`Paused after ${saved} recovered records: ${String(err.message||err)}. Nothing was deleted; safe to retry.`;await loadAll().catch(()=>{});}
+ finally{VL.recovering=false;render()}
+}
 function vlLinkIds(id,type){return S.links.filter(l=>l.link_type===type&&l.from_record_id===id).map(l=>l.to_record_id);}
 function vlLinked(v,kind,type){return vlLinkIds(v.id,type).map(get).filter(r=>r&&r.kind===kind&&!r.archived_at);}
 function vlStatusLine(s){VL.info=s;const target=app.querySelector('#vl-live-message');if(target)target.textContent=s;}
@@ -6109,7 +6143,7 @@ async function vlRunUploads(){if(VL.uploading)return;VL.uploading=true;vlQueueDO
  const duration=await vlMeta(file);
  const name=file.name.replace(/\.[a-z0-9]{2,6}$/i,'').trim()||'New video';
  const record=has||await saveRecord('Video',{name,fileName:file.name,filePath:entry.path,fileSize:file.size,mimeType:vlMime(file),durationSeconds:duration,date:file.lastModified?new Date(file.lastModified).toISOString().slice(0,10):'',uploadedAt:new Date().toISOString(),status:'Raw footage',description:'',notes:'',manualVideoHub:true});
- S.records=[...S.records.filter(r=>r.id!==record.id),record];entry.recordId=record.id;entry.status='done';entry.error='';success++;vlStatusLine(`Saved ${success} video(s) in your private library.`);
+ S.records=[...S.records.filter(r=>r.id!==record.id),record];S.mediaInventory=null;entry.recordId=record.id;entry.status='done';entry.error='';success++;vlStatusLine(`Saved ${success} video(s) in your private library.`);
  }catch(err){entry.status='error';entry.error=String(err.message||err);vlStatusLine(`Upload paused for ${file.name}: ${entry.error}`)}vlQueueDOM();}
  VL.uploading=false;await loadAll().catch(()=>render());vlQueueDOM();vlStatusLine(`Done. ${success} saved · ${VL.queue.filter(x=>x.status==='error').length} need attention. Already saved files are kept.`);
 }
@@ -6142,6 +6176,8 @@ function vlPreloadVisiblePlayers(root){
  cards.forEach(card=>VL.previewObserver.observe(card));
 }
 function vlBind(root){root.querySelector('#vl-jump-upload')?.addEventListener('click',()=>{VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({behavior:'smooth',block:'center'})});
+ root.querySelector('#vl-scan-private')?.addEventListener('click',vlScanPrivate);
+ root.querySelector('#vl-recover-all')?.addEventListener('click',vlRecoverAll);
  root.querySelector('#vl-empty-upload')?.addEventListener('click',()=>{VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({behavior:'smooth',block:'center'})});
  root.querySelector('.vl-upload-details')?.addEventListener('toggle',ev=>{VL.uploadOpen=ev.target.open});
  root.querySelectorAll('[data-vl-filter]').forEach(button=>button.addEventListener('click',()=>{VL.filter=button.dataset.vlFilter;render()}));
@@ -6200,9 +6236,11 @@ function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestS
 function globalSearchPage(){
  const query=S.query.trim().toLowerCase();
  const matches=query?S.records.filter(r=>!r.archived_at && r.kind!=='PageNote' && r.kind!=='FieldConfig' && ([r.kind,title(r),...Object.values(data(r)).filter(v=>typeof v==='string'||typeof v==='number')].join(' ').toLowerCase().includes(query)||relationDefs(r.kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(query))))).sort(defaultSort):[];
- const groups=new Map();
- matches.forEach(r=>{if(!groups.has(r.kind))groups.set(r.kind,[]);groups.get(r.kind).push(r)});
- return `${header('Search Everything','Find your saved Worlds, Builds, Add-Ons, Craftables, Lore, and everything linked to them.')}${query?`<p class="subcopy" role="status">${matches.length} match${matches.length===1?'':'es'} for “${e(S.query.trim())}” across ${groups.size} categor${groups.size===1?'y':'ies'}.</p>${matches.length?[...groups].sort((a,b)=>label(a[0]).localeCompare(label(b[0]))).map(([kind,records])=>`<section class="search-section"><div class="section-line"><h2>${emoji(kind)} ${e(label(kind))} <span class="muted">(${records.length})</span></h2><button class="btn btn-small" data-nav="${e(kind)}">See all →</button></div><div class="record-grid">${records.map(recordCard).join('')}</div></section>`).join(''):'<div class="empty"><h2>No matches yet ♡</h2><p>Try another name, creator, linked World, or detail.</p></div>'}`:'<div class="empty"><div class="empty-icon"><svg class="pink-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#pink-search"></use></svg></div><h2>What are you looking for?</h2><p>Type in the search bar above to search all of your private records and their relationships.</p></div>'}`;
+ const limit=Math.max(72,Number(S.searchLimit)||72),groups=new Map(),counts=new Map();
+ for(const r of matches)counts.set(r.kind,(counts.get(r.kind)||0)+1);
+ matches.slice(0,limit).forEach(r=>{if(!groups.has(r.kind))groups.set(r.kind,[]);groups.get(r.kind).push(r)});
+ const remaining=matches.length-limit;
+ return `${header('Search Everything','Find your saved Worlds, Builds, Add-Ons, Craftables, Lore, and everything linked to them.')}${query?`<p class="subcopy" role="status">${matches.length} match${matches.length===1?'':'es'} for “${e(S.query.trim())}” across ${counts.size} categor${counts.size===1?'y':'ies'}. Showing ${Math.min(matches.length,limit)} to keep your phone responsive.</p>${matches.length?[...groups].sort((a,b)=>label(a[0]).localeCompare(label(b[0]))).map(([kind,records])=>`<section class="search-section"><div class="section-line"><h2>${emoji(kind)} ${e(label(kind))} <span class="muted">(${records.length} of ${counts.get(kind)})</span></h2><button class="btn btn-small" data-nav="${e(kind)}">See all →</button></div><div class="record-grid">${records.map(recordCard).join('')}</div></section>`).join('')+(remaining>0?`<div class="panel" style="text-align:center"><p>${remaining} more matching records are safely saved.</p><button type="button" class="btn btn-primary" data-search-more>Show next ${Math.min(72,remaining)} results</button></div>`:''):'<div class="empty"><h2>No matches yet ♡</h2><p>Try another name, creator, linked World, or detail.</p></div>'}`:'<div class="empty"><div class="empty-icon"><svg class="pink-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#pink-search"></use></svg></div><h2>What are you looking for?</h2><p>Type in the search bar above to search all of your private records and their relationships.</p></div>'}`;
 }
 function todayPage(){const now=dateOnly(),tasks=all('Task').filter(r=>data(r).status!=='Done').sort((a,b)=>(data(a).dueDate||'9999').localeCompare(data(b).dueDate||'9999'));const events=all('Event').filter(r=>data(r).date>=now).sort((a,b)=>data(a).date.localeCompare(data(b).date)).slice(0,12);return `${header('Today in My World','Your creative to-dos, important little dates, and recent progress.',`<button class="btn btn-primary" data-add="Task">＋ Task</button><button class="btn" data-add="Event">＋ Event</button>`)}<div class="columns-2"><section class="panel"><h2>Upcoming tasks (${tasks.length})</h2>${tasks.length?tasks.slice(0,20).map(r=>`<div class="activity"><span class="bubble">${pinkIcon('Task')}</span><span class="grow"><strong>${e(title(r))}</strong><br><small>${e(niceDate(data(r).dueDate)||'No due date')} · ${e(data(r).status||'To Do')}</small></span><button class="btn btn-small" data-detail="${r.id}">Open</button></div>`).join(''):'<div class="empty">No unfinished tasks right now ♡</div>'}</section><section class="panel"><h2>Coming up</h2>${events.length?events.map(r=>`<div class="activity"><span class="bubble">${pinkIcon('Event')}</span><span class="grow"><strong>${e(title(r))}</strong><br><small>${e(niceDate(data(r).date))}</small></span><button class="btn btn-small" data-detail="${r.id}">Open</button></div>`).join(''):'<div class="empty">Your calendar is a fresh page.</div>'}</section></div>`}
 // Calendar uses the same canonical doodle shapes as the rest of CTRL + CRFT.
@@ -6275,7 +6313,8 @@ function calendarPage(){
  const upcoming=allEntries.filter(x=>x.date>=today&&(x.kind==='Event'||x.kind==='Task')).slice(0,4);
  const groupLabels=['Event','Task','Journal','PageNote','Lore','Photo','Video','TikTok','World','Build','BuildIdea'];
  const legend=groupLabels.map(k=>`<span class="cal2-key-item">${pinkIcon(k)} ${e(k==='PageNote'?'Notes':k==='BuildIdea'?'Ideas':CAL_TYPE_LABELS[k])}</span>`).join('');
- const details=selectedItems.length?selectedItems.map(x=>`<button class="cal2-entry" data-detail="${e(x.id)}" aria-label="Open ${e(CAL_TYPE_LABELS[x.kind]||x.kind)}: ${e(x.name)}"><span class="cal2-entry-icon">${pinkIcon(x.icon)}</span><span class="cal2-entry-text"><span class="cal2-entry-meta">${e(CAL_TYPE_LABELS[x.kind]||x.kind)}${x.action==='added'?' · saved':x.action==='updated'?' · updated':''}${x.time?' · '+e(x.time):''}</span><strong>${e(x.name)}</strong></span><span class="cal2-entry-end" aria-hidden="true">›</span></button>`).join(''):`<div class="cal2-empty">${pinkIcon('Journal')}<p>No ${mode==='plans'?'events or tasks':mode==='activity'?'creative activity':'entries'} saved for this date.</p></div>`;
+ const dayLimit=Math.max(60,Number(S.calendarDayLimit)||60);
+ const details=selectedItems.length?selectedItems.slice(0,dayLimit).map(x=>`<button class="cal2-entry" data-detail="${e(x.id)}" aria-label="Open ${e(CAL_TYPE_LABELS[x.kind]||x.kind)}: ${e(x.name)}"><span class="cal2-entry-icon">${pinkIcon(x.icon)}</span><span class="cal2-entry-text"><span class="cal2-entry-meta">${e(CAL_TYPE_LABELS[x.kind]||x.kind)}${x.action==='added'?' · saved':x.action==='updated'?' · updated':''}${x.time?' · '+e(x.time):''}</span><strong>${e(x.name)}</strong></span><span class="cal2-entry-end" aria-hidden="true">›</span></button>`).join('')+(selectedItems.length>dayLimit?`<button class="btn btn-soft" data-cal-more>Show next ${Math.min(60,selectedItems.length-dayLimit)} of ${selectedItems.length-dayLimit} more entries</button>`:''):`<div class="cal2-empty">${pinkIcon('Journal')}<p>No ${mode==='plans'?'events or tasks':mode==='activity'?'creative activity':'entries'} saved for this date.</p></div>`;
  return `${header('Calendar','Your little creative diary, one day at a time.',`<button class="btn btn-primary" data-add="Event">＋ Event</button>`)}
  <div class="cal2-wrap">
  <section class="panel cal2-board-panel" aria-label="Calendar month">
@@ -6775,7 +6814,8 @@ function reconExportReport(){const c=reconCreatorCandidates(),w=reconWorldCandid
 
 function settingsPage(){return `${header('Settings & Imports','Your data belongs to you. Keep backups, import records carefully, and manage your private account.')}
  <section class="panel recon-launch"><div class="eyebrow">KEEP YOUR ORIGINAL DATA</div><h2>Safe Recovery ♡</h2><p class="subcopy">Repair exact Creator links, review historical World loadouts, and reconcile templates from your original files. No guessing or deletes.</p><button type="button" class="btn btn-primary" data-nav="reconcile">Open Safe Recovery →</button></section>
- <section class="panel audit-backup-panel"><div class="section-line"><h2>Complete Backup ♡</h2><span class="audit-highlighter">Records + original files</span></div><p class="subcopy">Save both parts of your scrapbook: <b>metadata</b> (all records and links) and <b>private media</b> (your actual original photos and videos). Nothing is removed or changed.</p><div class="actions"><button class="btn btn-primary" id="backup-json">↓ Download records + links (.json)</button><button class="btn btn-yellow" id="audit-prepare-media" ${S.mediaBackup?.busy?'disabled':''}>${S.mediaBackup?.parts?'↻ Recalculate media packs':'♡ Prepare media ZIP packs'}</button></div>${mediaBackupPanel()}<p class="footnote">Save the JSON <b>and every media ZIP part</b> together in Files or iCloud. A metadata-only backup does not include your photos or videos. Media restore requires matching the manifest to its original file paths; this tool downloads files but does not yet automate restoring them.</p><details class="audit-mini-export"><summary>Export one collection to CSV</summary><div class="actions"><select class="select-control" id="export-kind">${Object.keys(KINDS).filter(k=>k!=='PageNote').map(k=>`<option value="${k}">${e(label(k))}</option>`).join('')}</select><button class="btn" id="export-csv">↓ Download CSV</button></div></details></section>
+ <section class="panel audit-backup-panel"><div class="section-line"><h2>Complete Backup ♡</h2><span class="audit-highlighter">Records + original files</span></div><p class="subcopy">Save both parts of your scrapbook: <b>metadata</b> (all records and links) and <b>private media</b> (your actual original photos and videos). Nothing is removed or changed.</p><div class="actions"><button class="btn btn-primary" id="backup-json">↓ Download records + links (.json)</button><button class="btn btn-yellow" id="audit-prepare-media" ${S.mediaBackup?.busy?'disabled':''}>${S.mediaBackup?.parts?'↻ Recalculate media packs':'♡ Prepare media ZIP packs'}</button></div>${mediaBackupPanel()}<p class="footnote">Save the JSON <b>and every media ZIP part</b> together in Files or iCloud. Your private originals remain in storage. Scanning first also includes footage not attached to a record.</p><details class="audit-mini-export"><summary>Export one collection to CSV</summary><div class="actions"><select class="select-control" id="export-kind">${Object.keys(KINDS).filter(k=>k!=='PageNote').map(k=>`<option value="${k}">${e(label(k))}</option>`).join('')}</select><button class="btn" id="export-csv">↓ Download CSV</button></div></details></section>
+ <section class="panel"><h2>Restore original media from a ZIP pack</h2><p class="subcopy">Choose <b>one</b> previously downloaded CTRL + CRFT media ZIP part. Its manifest is checked before you approve restoration. Existing private files are skipped, never replaced.</p><input id="restore-media-file" type="file" accept=".zip,application/zip" ${S.mediaRestoreBusy?'disabled':''}>${mediaRestorePanel()}<p class="footnote">Restore record metadata using the JSON importer below, and repeat this step for every ZIP part. Originals can only be restored to the same signed-in account whose private paths are in the backup.</p></section>
  ${spreadsheetImportPanel()}
  ${recoveryAuditPanel()}
  ${buildKitPanel()}
@@ -6855,7 +6895,11 @@ function exportRecoveryCandidates(){
  showToast('Candidate file downloaded — nothing imported.');
 }
 
-function renderImportPreview(){const p=S.importPreview;return `<div class="notice"><b>Review before import</b>${p.description?`<p>${e(p.description)}</p>`:''}<br>${Object.entries(p.records.reduce((a,r)=>(a[r.kind]=(a[r.kind]||0)+1,a),{})).map(([k,n])=>`${n} ${e(label(k))}`).join(' · ')}<br>${p.records.length} records in the file · ${p.links.length} relationship links · ${p.duplicates} potential existing duplicates · ${p.invalid} invalid records.<br>Will create up to <b>${p.records.length-p.duplicates-p.invalid}</b> records. Existing records stay unchanged.</div><div class="actions"><button class="btn btn-primary" id="confirm-import" ${p.records.length-p.duplicates-p.invalid<=0?'disabled':''}>Confirm Import</button><button class="btn" id="cancel-import">Cancel</button></div>`}
+function renderImportPreview(){
+ const p=S.importPreview;
+ const kinds=Object.entries(p.records.reduce((a,r)=>(a[r.kind]=(a[r.kind]||0)+1,a),{})).map(([k,n])=>`${n} ${e(label(k))}`).join(' · ');
+ return `<div class="notice"><b>${p.backupMode?'Full backup restore preview':'Review before import'}</b>${p.description?`<p>${e(p.description)}</p>`:''}<br>${kinds}<br>${p.records.length} records · ${p.links.length} links · ${p.duplicates} already present or possible duplicates · ${p.invalid} invalid entries.<br>Up to <b>${Math.max(0,p.records.length-p.duplicates-p.invalid)}</b> new records. ${p.backupMode?'Distinct creators, archived timestamps and historical loadouts will be preserved. ':''}Existing records are never overwritten. Media bytes require their separate ZIP parts.</div><div class="actions"><button class="btn btn-primary" id="confirm-import" ${p.records.length-p.duplicates-p.invalid<=0&&p.links.length===0?'disabled':''}>Confirm Import</button><button class="btn" id="cancel-import">Cancel</button></div>`;
+}
 const INLINE_CREATE_KINDS=new Set(['AddOn','Texture','Craftable','WorldTemplate','World','Build','BuildIdea','CraftableItem','Material','Tag','Task','Creator','WorldGroup','Location','GardenTheme','GardenFeature','StructureBlock','Event','CoordinatePin']);
 function inlineCreateWidget(kind,key){
  if(!INLINE_CREATE_KINDS.has(kind))return '';
@@ -7305,11 +7349,13 @@ app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('
   main.innerHTML=globalSearchPage();
   main.querySelectorAll('[data-detail]').forEach(btn=>btn.addEventListener('click',()=>{S.detail=btn.dataset.detail;S.modal=null;S.sidebar=false;render()}));
   main.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click',()=>nav(btn.dataset.nav)));
+ main.querySelector('[data-search-more]')?.addEventListener('click',()=>{S.searchLimit=(S.searchLimit||72)+72;refreshSearchResults()});
   observePrivateThumbs();
  };
  app.querySelector('#global-search')?.addEventListener('input',ev=>{
   const val=ev.target.value;
   S.query=val;
+  S.searchLimit=72;
   if(val.trim()){
    if(S.page!=='search')S.searchReturn=S.page;
    S.page='search';S.detail=null;
@@ -7345,7 +7391,8 @@ app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('
  app.querySelectorAll('[data-palette-page]').forEach(b=>b.addEventListener('click',()=>{S.paletteUnassignedPage=Math.max(0,S.paletteUnassignedPage+Number(b.dataset.palettePage));render()}));
  app.querySelector('#palette-theme-save')?.addEventListener('click',()=>{const v=String(app.querySelector('#palette-theme-name')?.value||'').trim();if(!v){showToast('Please enter a theme name.');return;}S.paletteThemeOverrides[S.paletteLetter]=v;try{localStorage.setItem('ctrlcrft.paletteThemes.v1',JSON.stringify(S.paletteThemeOverrides))}catch{}showToast('Theme label saved on this device ♡');render()});
  app.querySelector('#color-count')?.addEventListener('change',ev=>{S.paletteColorCount=Number(ev.target.value);render()});app.querySelectorAll('[data-block-slot]').forEach(x=>x.addEventListener('input',ev=>{S.paletteDraft[Number(ev.target.dataset.blockSlot)]=ev.target.value}));app.querySelectorAll('[data-lock-slot]').forEach(x=>x.addEventListener('change',ev=>{S.paletteLocks[Number(ev.target.dataset.lockSlot)]=ev.target.checked}));app.querySelector('[data-generate-palette]')?.addEventListener('click',generatePalette);app.querySelector('[data-use-palette]')?.addEventListener('click',()=>openForm('Palette'));app.querySelector('[data-generate-world]')?.addEventListener('click',generateWorld);app.querySelector('#save-world-idea')?.addEventListener('click',()=>openForm('World',null,S.generatedWorld||{}));
- app.querySelectorAll('[data-cal-date]').forEach(b=>b.addEventListener('click',()=>{S.calendarSelectedDate=b.dataset.calDate;S.calendarDayOpen=true;render();if(window.matchMedia('(max-width: 740px)').matches){requestAnimationFrame(()=>document.querySelector('.cal2-sheet-close')?.focus())}}));
+ app.querySelectorAll('[data-cal-date]').forEach(b=>b.addEventListener('click',()=>{S.calendarSelectedDate=b.dataset.calDate;S.calendarDayLimit=60;S.calendarDayOpen=true;render();if(window.matchMedia('(max-width: 740px)').matches){requestAnimationFrame(()=>document.querySelector('.cal2-sheet-close')?.focus())}}));
+ app.querySelector('[data-cal-more]')?.addEventListener('click',()=>{S.calendarDayLimit=(S.calendarDayLimit||60)+60;render()});
  app.querySelectorAll('[data-cal-close]').forEach(b=>b.addEventListener('click',()=>{S.calendarDayOpen=false;render();document.querySelector(`[data-cal-date="${S.calendarSelectedDate}"]`)?.focus()}));
  app.onkeydown=ev=>{if(ev.key==='Escape'&&S.page==='Event'&&S.calendarDayOpen){S.calendarDayOpen=false;render()}};
  app.querySelectorAll('[data-cal-mode]').forEach(b=>b.addEventListener('click',()=>{S.calendarMode=b.dataset.calMode;S.calendarDayOpen=false;render()}));
@@ -7353,18 +7400,47 @@ app.querySelectorAll('[data-copy-world-addons]').forEach(b=>b.addEventListener('
  app.querySelectorAll('[data-cal-add-event]').forEach(b=>b.addEventListener('click',()=>{S.calendarDayOpen=false;openForm('Event',null,{date:b.dataset.calAddEvent})}));
  app.querySelectorAll('[data-month]').forEach(b=>b.addEventListener('click',()=>{S.calendarDate=new Date(S.calendarDate.getFullYear(),S.calendarDate.getMonth()+Number(b.dataset.month),1);S.calendarSelectedDate=null;S.calendarDayOpen=false;render()}));
  app.querySelector('#recovery-file')?.addEventListener('change',ev=>{const file=ev.target.files?.[0];ev.target.value='';chooseRecoveryFile(file)});app.querySelector('#recovery-export-audit')?.addEventListener('click',exportRecoveryAudit);app.querySelector('#recovery-export-candidates')?.addEventListener('click',exportRecoveryCandidates);app.querySelector('#recovery-clear')?.addEventListener('click',()=>{S.recoveryAudit=null;render()});
- bindSpreadsheetImporter(app);app.querySelector('#audit-prepare-media')?.addEventListener('click',prepareMediaBackup);app.querySelector('#audit-download-media')?.addEventListener('click',downloadMediaPack);app.querySelector('#backup-json')?.addEventListener('click',exportBackup);app.querySelector('#export-csv')?.addEventListener('click',exportCSV);app.querySelector('#import-file')?.addEventListener('change',ev=>previewFile(ev.target.files?.[0]));app.querySelector('#confirm-import')?.addEventListener('click',performImport);app.querySelector('#cancel-import')?.addEventListener('click',()=>{S.importPreview=null;render()});app.querySelector('#reload')?.addEventListener('click',()=>loadAll().catch(()=>{}));}
+ bindSpreadsheetImporter(app);app.querySelector('#audit-prepare-media')?.addEventListener('click',prepareMediaBackup);app.querySelector('#audit-download-media')?.addEventListener('click',downloadMediaPack);app.querySelector('#restore-media-file')?.addEventListener('change',ev=>{const file=ev.target.files?.[0];ev.target.value='';previewMediaRestore(file)});app.querySelector('#restore-media-confirm')?.addEventListener('click',restoreMediaPack);app.querySelector('#restore-media-cancel')?.addEventListener('click',()=>{S.mediaRestorePreview=null;S.mediaRestoreMessage='Restore cancelled. Private files were not changed.';render()});app.querySelector('#backup-json')?.addEventListener('click',exportBackup);app.querySelector('#export-csv')?.addEventListener('click',exportCSV);app.querySelector('#import-file')?.addEventListener('change',ev=>previewFile(ev.target.files?.[0]));app.querySelector('#confirm-import')?.addEventListener('click',performImport);app.querySelector('#cancel-import')?.addEventListener('click',()=>{S.importPreview=null;render()});app.querySelector('#reload')?.addEventListener('click',()=>loadAll().catch(()=>{}));}
 function download(name,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
 // Media backup is deliberately downloaded in small, individually verified packs.
 // On iPhone a 132MB one-shot ZIP is prone to memory exhaustion, so each tap downloads one part.
 const MEDIA_PACK_LIMIT=18*1024*1024;
+// Storage itself is the source of truth: even a file without a Video/TikTok
+// record belongs in a complete private backup. Never remove orphan objects.
+async function listPrivateStoredMedia(){
+ if(!sessionValid()||!S.session?.user?.id)throw Error('Sign in to scan your private media.');
+ const uid=S.session.user.id,files=[],seen=new Set();let offset=0;
+ while(true){
+  const page=await api('/storage/v1/object/list/hq-media',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prefix:uid+'/',limit:1000,offset,sortBy:{column:'name',order:'asc'}})});
+  if(!Array.isArray(page))throw Error('Private storage did not return a file list. Nothing was marked complete.');
+  for(const obj of page){
+   if(!obj?.id||!obj.name)continue; // folders are not files
+   const path=String(obj.name).startsWith(uid+'/')?String(obj.name):uid+'/'+String(obj.name).replace(/^\/+/, '');
+   if(!path.startsWith(uid+'/')||seen.has(path))continue;
+   seen.add(path);
+   files.push({path,fileName:path.split('/').pop(),fileSize:Number(obj.metadata?.size)||0,mimeType:String(obj.metadata?.mimetype||obj.metadata?.contentType||''),updatedAt:obj.updated_at||''});
+  }
+  if(page.length<1000)break;
+  offset+=page.length;
+  if(offset>30000)throw Error('Storage inventory is too large to verify safely. No backup was marked complete.');
+ }
+ return files;
+}
 function backedUpMedia(){
  const paths=new Set(),result=[];
  for(const r of S.records){
   if(r.kind==='Photo'&&data(r).filePath)result.push(r);
+  if(r.kind==='Video'&&data(r).filePath)result.push(r);
   if(r.kind==='TikTok')for(const clip of tkClips(r))result.push({id:r.id,kind:'TikTok',data:{name:data(r).name,filePath:clip.filePath,fileName:clip.fileName,fileSize:clip.fileSize,mimeType:clip.mimeType,sha256:clip.sha256},archived_at:r.archived_at});
  }
- return result.filter(r=>{const path=data(r).filePath;if(!path||paths.has(path))return false;paths.add(path);return true}).sort((a,b)=>String(data(a).filePath).localeCompare(String(data(b).filePath)));
+ const byPath=new Map();
+ for(const r of result){const path=data(r).filePath;if(path&&!paths.has(path)){paths.add(path);byPath.set(path,r)}}
+ if(Array.isArray(S.mediaInventory))for(const file of S.mediaInventory){
+  const previous=byPath.get(file.path);
+  const d=previous?data(previous):{};
+  byPath.set(file.path,{id:previous?.id||'',kind:previous?.kind||'UnlinkedMedia',archived_at:previous?.archived_at||null,data:{...d,name:d.name||file.fileName,filePath:file.path,fileName:d.fileName||file.fileName,fileSize:file.fileSize||d.fileSize,mimeType:file.mimeType||d.mimeType||''}});
+ }
+ return [...byPath.values()].sort((a,b)=>String(data(a).filePath).localeCompare(String(data(b).filePath)));
 }
 function mediaBackupParts(media){
  const parts=[];let batch=[],size=0;
@@ -7375,15 +7451,22 @@ function mediaBackupParts(media){
 }
 function mediaBackupPanel(){
  const bk=S.mediaBackup;
- if(!bk?.parts)return `<p class="audit-backup-status">${backedUpMedia().length} unique media paths ready for private backup.</p>`;
+ if(!bk?.parts)return `<p class="audit-backup-status" role="status">${e(bk?.message||`${backedUpMedia().length} referenced media files. Scan private storage to include unlinked originals before downloading ZIPs.`)}</p>`;
  const part=bk.parts[bk.next],complete=bk.next>=bk.parts.length;
  return `<div class="audit-backup-box"><p id="audit-media-status" role="status">${e(bk.message||'')}</p><div class="audit-backup-progress" role="progressbar" aria-label="Completed media backup packs" aria-valuemin="0" aria-valuemax="${bk.parts.length}" aria-valuenow="${bk.next}"><span style="width:${(100*bk.next/bk.parts.length)||0}%"></span></div>${!complete?`<button class="btn btn-primary" id="audit-download-media" ${bk.busy?'disabled':''}>${bk.busy?'Preparing files…':`↓ Download media pack ${bk.next+1} of ${bk.parts.length} (${part.length} files)`}</button>`:`<strong>♡ All ${bk.parts.length} media packs have been prepared for download. Confirm they are saved in your Files app along with the JSON backup.</strong>`}</div>`;
 }
-function prepareMediaBackup(){
+async function prepareMediaBackup(){
  if(S.mediaBackup?.busy)return;
- const files=backedUpMedia();if(!files.length){showToast('There are no stored media files to back up.');return}
- const parts=mediaBackupParts(files);
- S.mediaBackup={parts,next:0,busy:false,message:`Ready: ${files.length} private files in ${parts.length} smaller ZIP packs. Download each one; keep this page open.`};
+ S.mediaBackup={busy:true,message:'Checking every file in your private media storage…'};render();
+ try{
+  S.mediaInventory=await listPrivateStoredMedia();
+  const files=backedUpMedia(),inventoryPaths=new Set(S.mediaInventory.map(f=>f.path));
+  const missing=files.filter(r=>!inventoryPaths.has(data(r).filePath));
+  if(missing.length)throw Error(`${missing.length} record-linked file paths are missing from storage. Nothing was marked complete; review before backing up.`);
+  if(!files.length)throw Error('No private media files were found.');
+  const unlinked=files.filter(r=>r.kind==='UnlinkedMedia').length,parts=mediaBackupParts(files);
+  S.mediaBackup={parts,next:0,busy:false,message:`Verified ${files.length} originals (${unlinked} without records) in ${parts.length} smaller ZIP packs. Download every part; keep this page open.`};
+ }catch(err){S.mediaInventory=null;S.mediaBackup={busy:false,message:'Backup scan paused: '+String(err.message||err)+'. No files were changed.'};showToast('Storage scan needs attention — see below');}
  render();
 }
 function updateMediaBackupStatus(message){
@@ -7420,12 +7503,64 @@ async function downloadMediaPack(){
  }catch(err){bk.message=`Pack ${index+1} not completed: ${err.message}. Tap Download again to retry. Earlier files are untouched.`;showToast('Backup paused — check details below');}
  finally{bk.busy=false;render()}
 }
+function mediaRestorePanel(){
+ const p=S.mediaRestorePreview;
+ return `<div class="notice" role="status">${e(S.mediaRestoreMessage||'Select a saved media ZIP pack to preview it. Nothing is uploaded by selecting a file.')}</div>${p?`<div class="actions"><span class="pill">Part ${p.manifest.part} of ${p.manifest.total_parts} · ${p.manifest.files.length} original files</span><button class="btn btn-primary" id="restore-media-confirm" ${S.mediaRestoreBusy?'disabled':''}>Restore missing files from this pack</button><button class="btn" id="restore-media-cancel" ${S.mediaRestoreBusy?'disabled':''}>Cancel</button></div>`:''}`;
+}
+function checkedMediaManifestEntry(item,uid){
+ if(!item||typeof item.storage_path!=='string'||!item.storage_path.startsWith(uid+'/')||item.storage_path.includes('..')||item.storage_path.includes('\\'))throw Error('This pack contains a path outside the signed-in media folder.');
+ if(typeof item.archive_path!=='string'||!item.archive_path.startsWith('media/'+uid+'/')||item.archive_path.includes('..')||item.archive_path.includes('\\'))throw Error('This pack contains an unexpected archive path.');
+ if(!Number.isFinite(Number(item.file_size))||Number(item.file_size)<0||Number(item.file_size)>25*1024*1024)throw Error('A file size in the manifest is not supported.');
+ return item;
+}
+async function previewMediaRestore(file){if(!file||S.mediaRestoreBusy)return;
+ S.mediaRestorePreview=null;S.mediaRestoreMessage='Checking ZIP pack manifest locally…';render();
+ try{
+  if(typeof JSZip==='undefined')throw Error('ZIP reader did not load. Refresh the app.');
+  if(file.size>55*1024*1024)throw Error('Use one smaller downloaded media pack at a time.');
+  const archive=await JSZip.loadAsync(file),entry=archive.file('media_manifest.json');
+  if(!entry)throw Error('This is not a CTRL + CRFT private media ZIP pack.');
+  const manifest=JSON.parse(await entry.async('string'));
+  if(manifest.format!=='ctrl-crft-media-pack-v1'||!Array.isArray(manifest.files)||!manifest.files.length)throw Error('Media manifest format was not recognized.');
+  const uid=S.session?.user?.id;if(!uid)throw Error('Sign in to the original private account first.');
+  for(const item of manifest.files){checkedMediaManifestEntry(item,uid);if(!archive.file(item.archive_path))throw Error('An original media file listed in the manifest is missing from this ZIP.');}
+  S.mediaRestorePreview={archive,manifest};
+  S.mediaRestoreMessage=`Verified pack ${manifest.part}/${manifest.total_parts} with ${manifest.files.length} original file${manifest.files.length===1?'':'s'}. Nothing has been uploaded. Review and confirm.`;
+ }catch(err){S.mediaRestoreMessage='Could not prepare media restore: '+String(err.message||err)+'. Your account was not changed.';}
+ render();
+}
+async function restoreMediaPack(){const p=S.mediaRestorePreview;
+ if(!p||S.mediaRestoreBusy)return;
+ if(!confirm(`Restore only MISSING files from media pack ${p.manifest.part} of ${p.manifest.total_parts}?\n\nNo existing file will be overwritten or deleted. Re-run for each ZIP part you saved.`))return;
+ S.mediaRestoreBusy=true;let restored=0,skipped=0;render();
+ try{
+  const existing=await listPrivateStoredMedia(),byPath=new Map(existing.map(f=>[f.path,f]));
+  const uid=S.session?.user?.id;
+  for(const entry of p.manifest.files){
+   checkedMediaManifestEntry(entry,uid);
+   const found=byPath.get(entry.storage_path);
+   if(found){if(found.fileSize&&found.fileSize!==Number(entry.file_size))throw Error('Existing file size differs for '+entry.file_name+'. Nothing was overwritten.');skipped++;continue;}
+   const bytes=await p.archive.file(entry.archive_path).async('uint8array');
+   if(bytes.byteLength!==Number(entry.file_size))throw Error('ZIP file size mismatch for '+entry.file_name+'. Restore stopped safely.');
+   const mime=String(entry.mime_type||'application/octet-stream'),name=String(entry.file_name||entry.storage_path.split('/').pop());
+   const input=new File([bytes],name,{type:mime});
+   if(bytes.byteLength>6*1024*1024){await vlResumable(input,entry.storage_path,()=>{});}
+   else{await api('/storage/v1/object/hq-media/'+entry.storage_path.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:{'Content-Type':mime,'x-upsert':'false'},body:input});}
+   byPath.set(entry.storage_path,{path:entry.storage_path,fileSize:bytes.byteLength});restored++;
+   S.mediaRestoreMessage=`Restored ${restored} missing originals · skipped ${skipped} already present. Keep this page open.`;
+   const status=app.querySelector('.notice[role="status"]');if(status)status.textContent=S.mediaRestoreMessage;
+  }
+  S.mediaInventory=null;S.mediaRestorePreview=null;
+  S.mediaRestoreMessage=`Pack complete: restored ${restored} missing files, skipped ${skipped} already present. No originals were replaced.`;
+ }catch(err){S.mediaRestoreMessage=`Restore paused after ${restored} new files: ${String(err.message||err)}. Previously restored and existing originals are safe; retry this same ZIP to continue.`;}
+ finally{S.mediaRestoreBusy=false;render()}
+}
 function exportBackup(){
- const records=S.records.map(r=>({kind:r.kind,source_id:r.import_source_id||r.id,data:r.data,archived:!!r.archived_at}));
+ const records=S.records.map(r=>({kind:r.kind,source_id:r.import_source_id||r.id,data:r.data,archived:!!r.archived_at,archived_at:r.archived_at||null}));
  const links=S.links.map(l=>({from_source_id:get(l.from_record_id)?.import_source_id||l.from_record_id,to_source_id:get(l.to_record_id)?.import_source_id||l.to_record_id,type:l.link_type}));
  const media_manifest=backedUpMedia().map(r=>({record_id:r.id,kind:r.kind,name:data(r).name||'',file_path:data(r).filePath,file_name:data(r).fileName||'',file_size:data(r).fileSize??null,mime_type:data(r).mimeType||'',sha256:data(r).sha256||null,archived:!!r.archived_at}));
  // JSON captures metadata/relationships but DOES NOT download the private file bytes.
- const bundle={format:'ctrl-group-hq-v1',exported_at:new Date().toISOString(),backup_scope:'Records, record data and relationships only; private photo/video bytes not included',includes_media_bytes:false,counts:{records:records.length,links:links.length,media_paths:media_manifest.length},media_manifest,records,links};
+ const bundle={format:'ctrl-group-hq-v1',exported_at:new Date().toISOString(),backup_scope:'Records, record data and relationships only; private photo/video bytes not included',includes_media_bytes:false,media_inventory_verified:!!S.mediaInventory,counts:{records:records.length,links:links.length,media_paths:media_manifest.length},media_manifest,records,links};
  download(`CTRL_GROUP_HQ_backup_${dateOnly()}.json`,new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}));
  showToast('Metadata backup downloaded ♡ Keep separate copies of original photos/videos.');
 }
@@ -7433,36 +7568,41 @@ function csvCell(str){const x=String(str??'');return /[",\n\r]/.test(x)?'"'+x.re
 function exportCSV(){const kind=document.getElementById('export-kind').value,rr=all(kind),columns=unique(['name',...rr.flatMap(r=>Object.keys(r.data))]);const text=[columns.map(csvCell).join(','),...rr.map(r=>columns.map(k=>csvCell(r.data[k])).join(','))].join('\r\n');download(`CTRL_HQ_${kind}_${dateOnly()}.csv`,new Blob([text],{type:'text/csv;charset=utf-8'}));showToast(`Exported ${rr.length} ${label(kind).toLowerCase()}`)}
 function parseCSV(txt){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(c==='"'){if(quoted&&txt[i+1]==='"'){cell+='"';i++}else quoted=!quoted}else if(c===','&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows}
 function importNameKey(r){return `${r.kind}|${String(r.data?.name||'').trim().toLowerCase()}`;}
+const BACKUP_INTERNAL_KINDS=new Set(['WorldAddonSnapshot','MediaBackup']);
+function importAllowed(r){return !!r&&!!r.data&&typeof r.data==='object'&&!Array.isArray(r.data)&&!!String(r.data.name||'').trim()&&(!!KINDS[r.kind]||(r.kind==='FieldConfig'&&!!KINDS[r.data.targetKind])||BACKUP_INTERNAL_KINDS.has(r.kind));}
 function importSameIdentity(a,b){
  if(a.kind!==b.kind||importNameKey(a)!==importNameKey(b))return false;
- // Add-Ons from different known creators are separate products. Unknown creators
- // remain potential duplicates and require review rather than silent importing.
- if(a.kind==='AddOn'){
-  const creator=x=>String(x.data?.creatorName||x.data?.creator||'').trim().toLocaleLowerCase();
+ // A title does not uniquely identify a Marketplace product. This applies to
+ // templates and craftables just as much as add-ons.
+ if(['AddOn','Craftable','WorldTemplate','Texture'].includes(a.kind)){
+  const creator=x=>String(x.data?.creatorName||x.data?.creator||x.data?.marketplaceCreator||x.data?.creator_name||'').trim().toLocaleLowerCase();
   const ca=creator(a),cb=creator(b);
   if(ca&&cb&&ca!==cb)return false;
  }
  return true;
 }
 function importKnownMatch(candidate,existing){return existing.some(r=>importSameIdentity(candidate,r));}
-async function previewFile(file){if(!file)return;try{const txt=await file.text();let records=[],links=[],description='';if(file.name.toLowerCase().endsWith('.json')){const j=JSON.parse(txt);description=String(j.description||'');if(!Array.isArray(j.records))throw Error('JSON must contain a records array');records=j.records.map(r=>({kind:r.kind,source_id:String(r.source_id||r.id||''),data:r.data||{}}));links=Array.isArray(j.links)?j.links:[]}
+async function previewFile(file){if(!file)return;try{const txt=await file.text();let records=[],links=[],description='',backupMode=false;
+ if(file.name.toLowerCase().endsWith('.json')){const j=JSON.parse(txt);description=String(j.description||'');if(!Array.isArray(j.records))throw Error('JSON must contain a records array');backupMode=j.format==='ctrl-group-hq-v1'&&!!j.exported_at&&!!j.counts&&Array.isArray(j.links);records=j.records.map(r=>({kind:r.kind,source_id:String(r.source_id||r.id||''),data:r.data||{},archived_at:r.archived_at||null,archived:!!r.archived}));links=Array.isArray(j.links)?j.links:[]}
  else{const grid=parseCSV(txt);const header=(grid.shift()||[]).map(x=>x.trim().replace(/^\uFEFF/,''));const kind=document.getElementById('import-kind').value;if(!header.includes('name'))throw Error('CSV must have a “name” column');records=grid.map(row=>{const d={};header.forEach((h,i)=>{const val=row[i]?.trim()||'';if(!h)return;const def=KINDS[kind]?.fields?.find(x=>x[0]===h);if(def?.[2]==='number')d[h]=val===''?null:Number(val);else if(def?.[2]==='checkbox')d[h]=['true','yes','1'].includes(val.toLowerCase());else d[h]=val});return {kind,data:d,source_id:`csv:${kind}:${String(d.name).toLowerCase()}`}})}
- const known=new Set(S.records.map(r=>`${r.kind}|${r.import_source_id||''}`)),knownRecords=S.records.filter(r=>!r.archived_at).map(r=>({kind:r.kind,data:data(r)})),knownSlots=new Set(all('Palette').map(r=>String(data(r).slot||'').toUpperCase())),seen=new Set(),seenRecords=[],seenSlots=new Set();let duplicates=0,invalid=0;for(const r of records){if((!KINDS[r.kind]&&!(r.kind==='FieldConfig'&&KINDS[r.data?.targetKind]))||!r.data||typeof r.data!=='object'||!String(r.data.name||'').trim()){invalid++;continue}const key=`${r.kind}|${r.source_id}`;const nameKey=`${r.kind}|${String(r.data.name).trim().toLowerCase()}`,slot=r.kind==='Palette'?String(r.data.slot||'').toUpperCase():'';if((r.source_id&&known.has(key))||(r.source_id&&seen.has(key))||importKnownMatch(r,knownRecords)||importKnownMatch(r,seenRecords)||(slot&&(knownSlots.has(slot)||seenSlots.has(slot))))duplicates++;seen.add(key);seenRecords.push(r);if(slot)seenSlots.add(slot)}
- S.importPreview={records,links,duplicates,invalid,description};render();showToast('Import preview ready — review before confirming');}catch(err){S.importPreview=null;showToast('Could not read import: '+err.message)}}
+ const known=new Set(S.records.flatMap(r=>[`${r.kind}|${r.id}`,...(r.import_source_id?[`${r.kind}|${r.import_source_id}`]:[])])),knownRecords=S.records.map(r=>({kind:r.kind,data:data(r)})),knownSlots=new Set(S.records.filter(r=>r.kind==='Palette').map(r=>String(data(r).slot||'').toUpperCase())),seen=new Set(),seenRecords=[],seenSlots=new Set();let duplicates=0,invalid=0;
+ for(const r of records){if(!importAllowed(r)||(backupMode&&!r.source_id)){invalid++;continue}const key=`${r.kind}|${r.source_id}`,slot=r.kind==='Palette'?String(r.data.slot||'').toUpperCase():'';const bySource=!!r.source_id&&(known.has(key)||seen.has(key));const byName=!backupMode&&(importKnownMatch(r,knownRecords)||importKnownMatch(r,seenRecords)||(slot&&(knownSlots.has(slot)||seenSlots.has(slot))));if(bySource||byName)duplicates++;seen.add(key);seenRecords.push(r);if(slot)seenSlots.add(slot)}
+ S.importPreview={records,links,duplicates,invalid,description,backupMode};render();showToast('Import preview ready — review before confirming');}catch(err){S.importPreview=null;showToast('Could not read import: '+err.message)}}
 async function performImport(){
  const p=S.importPreview;
  if(!p||S.busy)return;
- const existingBySource=new Map(S.records.filter(r=>r.import_source_id).map(r=>[`${r.kind}|${r.import_source_id}`,r]));
- const knownRecords=S.records.filter(r=>!r.archived_at).map(r=>({kind:r.kind,data:data(r)}));
- const existingSlots=new Map(all('Palette').filter(r=>data(r).slot).map(r=>[String(data(r).slot).toUpperCase(),r]));
+ const existingBySource=new Map(S.records.flatMap(r=>[[`${r.kind}|${r.id}`,r],...(r.import_source_id?[[`${r.kind}|${r.import_source_id}`,r]]:[])]));
+ const knownRecords=S.records.map(r=>({kind:r.kind,data:data(r)}));
+ const existingSlots=new Map(S.records.filter(r=>r.kind==='Palette'&&data(r).slot).map(r=>[String(data(r).slot).toUpperCase(),r]));
  const wanted=[],seenSource=new Set(),seenRecords=[],seenSlots=new Set();
  for(const r of p.records){
-  if((!KINDS[r.kind]&&!(r.kind==='FieldConfig'&&KINDS[r.data?.targetKind]))||!r.data||typeof r.data!=='object'||!String(r.data.name||'').trim())continue;
-  const src=String(r.source_id||'').trim(),sourceKey=`${r.kind}|${src}`,nameKey=`${r.kind}|${String(r.data.name).trim().toLowerCase()}`,slot=r.kind==='Palette'?String(r.data.slot||'').toUpperCase():'';
-  if((src&&(existingBySource.has(sourceKey)||seenSource.has(sourceKey)))||importKnownMatch(r,knownRecords)||importKnownMatch(r,seenRecords)||(slot&&(existingSlots.has(slot)||seenSlots.has(slot))))continue;
-  if(src)seenSource.add(sourceKey);seenRecords.push(r);if(slot)seenSlots.add(slot);wanted.push({kind:r.kind,data:r.data,import_source_id:src||null});
+  if(!importAllowed(r)||(p.backupMode&&!r.source_id))continue;
+  const src=String(r.source_id||'').trim(),sourceKey=`${r.kind}|${src}`,slot=r.kind==='Palette'?String(r.data.slot||'').toUpperCase():'';
+  if((src&&(existingBySource.has(sourceKey)||seenSource.has(sourceKey)))||(!p.backupMode&&(importKnownMatch(r,knownRecords)||importKnownMatch(r,seenRecords)||(slot&&(existingSlots.has(slot)||seenSlots.has(slot))))))continue;
+  if(src)seenSource.add(sourceKey);seenRecords.push(r);if(slot)seenSlots.add(slot);
+  wanted.push({kind:r.kind,data:r.data,import_source_id:src||null,...(p.backupMode?{archived_at:r.archived_at||(r.archived?new Date().toISOString():null)}:{})});
  }
- if(!confirm(`Import ${wanted.length} NEW records now?\n\nYour existing records will not be overwritten. You can export a backup first in Settings.`))return;
+ if(!confirm(`Import ${wanted.length} NEW records and reconcile ${p.links.length} saved link references now?\n\n${p.backupMode?'This is a backup restore: original IDs, distinct Marketplace products, archived status and internal history are preserved.':'This is an ordinary import.'}\nYour existing records will not be overwritten. Save your current backup first.`))return;
  S.busy=true;S.importProgress=`Importing ${wanted.length} records…`;render();
  let added=0,linksAdded=0;
  try{
