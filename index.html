@@ -3957,6 +3957,7 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .loadout-health.is-crashed{background:#ffe1e6;border-color:#df7d92;color:#9e2148}
 #app .loadout-health.is-unstable{background:#fff1c4;border-color:#ddbb69;color:#74501c}
 #app .loadout-health.is-working{background:#fff7e9;border-color:#f1d4a0;color:#735d37}
+#app .loadout-health.is-failed-to-load{background:#ffe1e6;border-color:#df7d92;color:#9e2148}
 #app .loadout-warning{margin:10px 0;padding:12px;border:1px solid #dc7790;border-left:5px solid #c73062;border-radius:12px;background:#fff1f3;color:#77253f}
 #app .loadout-warning strong{display:block;font-size:13px}
 #app .loadout-warning p{font-size:12px;line-height:1.45;margin:5px 0}
@@ -3973,6 +3974,38 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 @media(max-width:740px){#app .hub-context-row{top:59px;min-height:51px;padding:7px 12px;gap:8px}#app .hub-context-trigger{font-size:11px;padding:7px 11px}#app .hub-context-caption{font-size:10px}#app .hub-context-count{display:none}#app .world-hub-collapsible>summary{padding:14px 12px;font-size:13px}}
 @media(max-width:740px){#app .loadout-report-grid{grid-template-columns:1fr}#app .loadout-report{padding:12px}#app .world-loadout-history-item>summary{flex-wrap:wrap}}
 @media(max-width:360px){#app .hub-context-caption{display:none}}
+/* Unified Packs, compatibility notebook, and page-linked notes. */
+#app .pack-toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+#app .pack-toolbar label{display:grid;gap:5px;flex:1 1 185px;color:#6b4a5b;font-weight:750;font-size:13px}
+#app .pack-toolbar select,#app .pack-toolbar input,#app .pack-history-form input,#app .pack-history-form textarea,#app .pack-history-form select,#app .pack-status-form select,#app .pack-status-form textarea{width:100%;min-height:42px;background:#fff;border:1px solid #e6a9c1;border-radius:10px;padding:9px;color:#333;font:inherit}
+#app .pack-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0 20px}
+#app .pack-summary button{border:1px solid #f1b5cb;border-radius:12px;background:#fff6fa;padding:13px 5px;color:#7a3a58;cursor:pointer;min-width:0}
+#app .pack-summary button.active{background:#ffe7a3;border-color:#ff5b9a}
+#app .pack-summary strong{display:block;font-size:22px;color:#333}
+#app .pack-summary small{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+#app .pack-list{display:grid;gap:9px}
+#app .pack-list-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;background:#fff;border:1px solid #f2cad9;border-radius:12px}
+#app .pack-list-row>div:first-child{min-width:0}
+#app .pack-list-row strong{display:block;overflow-wrap:anywhere}
+#app .pack-list-row small{display:block;color:#7b6470;font-size:12px;margin-top:4px}
+#app .pack-list-row .actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:end}
+#app .pack-status-form,.pack-history-form{display:grid;gap:12px;margin-top:15px}
+#app .pack-status-form label,.pack-history-form label{display:grid;gap:5px;font-size:13px;font-weight:750;color:#715061}
+#app .pack-picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:285px;overflow:auto;padding:8px;border:1px solid #f1d3df;border-radius:12px}
+#app .pack-picks label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600}
+#app .pack-picks input{width:auto;min-height:0}
+#app .pack-history-card{margin:10px 0;border:1px solid #f0c2d3;border-radius:12px;background:#fff;padding:12px}
+#app .pack-history-card>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+#app .pack-history-card p{margin:8px 0;color:#705b65;font-size:13px}
+#app .pack-kind-list{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}
+#app .pack-kind-list span{display:inline-flex;border-radius:20px;background:#ffe4ed;padding:5px 9px;font-size:12px}
+#app .note-task-row{display:flex;gap:10px;justify-content:space-between;align-items:center;border:1px solid #f2d0dc;border-radius:11px;padding:12px;background:#fff;margin:7px 0}
+#app .note-task-row>div{min-width:0;flex:1}
+#app .note-task-row p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;color:#6c5661;max-height:110px;overflow:auto}
+#app .note-task-row small{color:#a06380}
+#app .note-task-row .actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}
+#app .note-task-row select{padding:7px;border-radius:8px;border:1px solid #f0bad0;background:#fff}
+@media(max-width:600px){#app .pack-summary{grid-template-columns:repeat(2,minmax(0,1fr))}#app .pack-picks{grid-template-columns:1fr}#app .pack-list-row,#app .note-task-row{align-items:flex-start;flex-direction:column}#app .pack-list-row .actions,#app .note-task-row .actions{justify-content:start;width:100%}}
 </style>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -4026,14 +4059,14 @@ KINDS.AddOn.relations.push(['videos','Videos','video_addon','in','Video']);
 // All entries below reuse current page keys. No routes, records, forms or data models are added.
 // Six human-friendly sections; all pre-existing routes remain reachable once each.
 const GROUPS = [
- ['MY HQ', [ ['home','Dashboard',''],['ContentPlanner','Content Planner',''],['today','Today',''],['Event','Calendar',''],['Journal','Journal & Activity',''],['Task','Tasks',''] ]],
+ ['MY HQ', [ ['home','Dashboard',''],['NotesTasks','Notes & Tasks',''],['ContentPlanner','Content Planner',''],['today','Today',''],['Event','Calendar',''],['Journal','Journal & Activity',''],['Task','Tasks',''] ]],
  ['WORLDS & BUILDS', [ ['World','My Worlds',''],['WorldGroup','World Groups',''],['Build','Builds & Projects',''],['Location','Maps & Locations',''] ]],
  ['CTRL GROUP MAIN · CITY', [ ['CityBlock','Big Block City',''],['Avenue','Avenues',''],['Street','Streets',''] ]],
  ['CTRL GROUP GARDEN', [ ['GardenTheme','Garden Themes',''],['GardenFeature','Garden Features',''] ]],
- ['ASSETS', [ ['AddOn','Add-Ons',''],['Texture','Textures',''],['Craftable','Craftables',''],['CraftableItem','Craftable Items',''],['Creator','Creators',''],['Material','Materials',''],['Block','Blocks',''],['Palette','Palettes',''],['Skin','Skins',''],['shop','Shop Organizer',''],['WishlistItem','Wishlist',''] ]],
+ ['ASSETS', [ ['Packs','Packs Tracker',''],['PackRecommendations','Pack Recommendations',''],['AddOn','Add-Ons',''],['Craftable','Craftables',''],['WorldTemplate','World Templates',''],['Texture','Textures',''],['CraftableItem','Craftable Items',''],['Creator','Creators',''],['Material','Materials',''],['Block','Blocks',''],['Palette','Palettes',''],['Skin','Skins',''],['shop','Shop Organizer',''],['WishlistItem','Wishlist',''] ]],
  ['GENERATORS', [ ['generator','All Generators',''],['GeneratorPrompt','Prompt Library',''] ]],
  ['MEDIA & STORY', [ ['Photo','Photos',''],['Video','TikTok Studio',''],['Lore','Lore',''] ]],
- ['EXTRAS', [ ['WorldTemplate','World Templates',''],['StructureBlock','Structure Blocks',''],['CraftablePlacement','Craftable Locations',''],['CoordinatePin','Coordinates',''],['Tag','Tags & Master Lists',''],['fields','Custom Fields',''],['RecoveryReview','Recovery Review',''],['trash','Archived & Trash',''],['reconcile','Safe Recovery',''],['settings','Settings & Imports',''] ]]
+ ['EXTRAS', [ ['StructureBlock','Structure Blocks',''],['CraftablePlacement','Craftable Locations',''],['CoordinatePin','Coordinates',''],['Tag','Tags & Master Lists',''],['fields','Custom Fields',''],['RecoveryReview','Recovery Review',''],['trash','Archived & Trash',''],['reconcile','Safe Recovery',''],['settings','Settings & Imports',''] ]]
 ];
 
 // These five legacy libraries are pages owned by two specific Worlds.
@@ -4069,6 +4102,7 @@ const app = document.getElementById('app');
 const S={pageNoteDrafts:new Map(),recordNoteDrafts:new Map(),pageNoteSaving:new Set(),session:null,records:[],links:[],loading:false,page:'home',query:'',mediaView:'tiktok',fieldKind:'World',sort:'name',filter:'all',detail:null,modal:null,sidebar:false,authMode:'login',authMessage:'',busy:false,selection:{},paletteLetter:'A',paletteActive:'A1',searchReturn:'home',paletteDraft:['','','','','',''],paletteLocks:[false,false,false,false,false,false],paletteColorCount:0,importPreview:null,importProgress:"",recoveryAudit:null,recoveryUploadStatus:'No recovery file selected yet.',calendarDate:new Date(),mediaUrls:new Map(),lastLoad:null};
 S.calendarSelectedDate=null;S.calendarEventsOnly=false;S.calendarMode='all';S.calendarDayOpen=false;
 S.sidebarQuery='';
+S.packsKind='AddOn';S.packsWorld='';S.packsSearch='';S.packsShowAll=false;S.packPastOpen=false;S.packBusy=false;S.notesTasksFilter='all';S.notesTasksSearch='';
 // One-screen batch capture: all drafts remain in memory until the user presses Save.
 S.captureText='';S.captureDefaultWorld='';S.captureDefaultKind='DailyNote';
 S.captureRows=[];S.captureBusy=false;S.captureSummary='';
@@ -4286,7 +4320,9 @@ async function saveLinks(recordId,kind){
   removals.push(...existing.filter(l=>!want.includes(def[3]==='out'?l.to_record_id:l.from_record_id)));
  }
  const loadoutWorldIds=unique([...additions,...removals].filter(l=>l.link_type==='uses_addon').map(l=>l.from_record_id));
+ const packWorldIds=unique([...additions,...removals].filter(l=>PACK_DEFS.some(p=>p.linkType===l.link_type)).map(l=>l.from_record_id));
  if(loadoutWorldIds.length)await worldLoadoutBefore(loadoutWorldIds);
+ if(packWorldIds.length)await worldPackBefore(packWorldIds);
  try{
  // Add-first avoids severing valid relations before replacement links can be confirmed.
  for(const link of additions){
@@ -4298,17 +4334,17 @@ async function saveLinks(recordId,kind){
   await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(link.id)}`,{method:'DELETE'});
   S.links=S.links.filter(row=>row.id!==link.id);
  }
- }finally{if(loadoutWorldIds.length)await worldLoadoutAfter(loadoutWorldIds)}
+ }finally{if(loadoutWorldIds.length)await worldLoadoutAfter(loadoutWorldIds);if(packWorldIds.length)await worldPackAfter(packWorldIds)}
 }
 function nav(page){if(page==='TikTok')page='Video';S.sidebarQuery='';S.page=page;S.sort=S.viewSort[page]||'name';S.query='';S.filter='all';S.categoryFilter='all';S.worldFilter='all';S.showArchived=false;S.detail=null;S.sidebar=false;S.modal=null;const selected=GROUPS.find(([,items])=>items.some(([key])=>key===page));if(selected){S.navClosed.delete(selected[0]);try{localStorage.setItem('ctrlhq.navClosed.grouped',JSON.stringify([...S.navClosed]))}catch{}}history.replaceState(null,'','#'+page);render()}
-const PINK_KIND_ICONS = {"WorldGroup": "bow", "World": "globe", "BuildIdea": "idea", "Build": "castle", "Subproject": "bow", "Task": "checklist", "AddOn": "puzzle", "Creator": "paint", "Texture": "texture", "Craftable": "bear", "CraftableItem": "strawberry", "Material": "thread", "Block": "cube", "Palette": "palette", "Avenue": "road", "Street": "road", "CityBlock": "city", "WishlistItem": "bag", "GardenTheme": "flower", "GardenFeature": "flower", "GeneratorPrompt": "wand", "Skin": "dress", "CraftablePlacement": "pin", "CoordinatePin": "pin", "RecoveryReview": "search", "WorldTemplate": "mountain", "StructureBlock": "columns", "Location": "map", "Photo": "camera", "Video": "film", "TikTok": "film", "Lore": "book", "Journal": "journal", "Event": "calendar", "Tag": "tag", "PageNote": "note", "home": "home", "today": "sun", "generator": "wand", "fields": "sliders", "trash": "trash", "settings": "settings", "shop": "bag", "search": "search", "photos": "camera", "quick": "star", "lock": "lock"};
+const PINK_KIND_ICONS = {"WorldGroup": "bow", "World": "globe", "BuildIdea": "idea", "Build": "castle", "Subproject": "bow", "Task": "checklist", "AddOn": "puzzle", "Creator": "paint", "Texture": "texture", "Craftable": "bear", "CraftableItem": "strawberry", "Material": "thread", "Block": "cube", "Palette": "palette", "Avenue": "road", "Street": "road", "CityBlock": "city", "WishlistItem": "bag", "GardenTheme": "flower", "GardenFeature": "flower", "GeneratorPrompt": "wand", "Skin": "dress", "CraftablePlacement": "pin", "CoordinatePin": "pin", "RecoveryReview": "search", "WorldTemplate": "mountain", "StructureBlock": "columns", "Location": "map", "Photo": "camera", "Video": "film", "TikTok": "film", "Lore": "book", "Journal": "journal", "Event": "calendar", "Tag": "tag", "PageNote": "note", "Packs":"puzzle", "PackRecommendations":"star", "NotesTasks":"note", "home": "home", "today": "sun", "generator": "wand", "fields": "sliders", "trash": "trash", "settings": "settings", "shop": "bag", "search": "search", "photos": "camera", "quick": "star", "lock": "lock"};
 function pinkIcon(kind, extra=''){const shape=PINK_KIND_ICONS[kind]||kind;const id=/^[a-z]+$/.test(shape)?shape:'star';return `<svg class="pink-icon ${extra}" viewBox="0 0 48 48" focusable="false" aria-hidden="true"><use href="#pink-${id}"></use></svg>`;}
 function emoji(kind){return pinkIcon(kind)}
 // App icons come exclusively from the one crayon SVG sprite. Never turn user text into coloured emoji badges.
 function pinkifyDecorations(){ /* Native emoji in user-authored text stay untouched. */ }
 
 function label(kind){return KINDS[kind]?.label||cap(kind)}
-const SIDEBAR_FAVOURITES=[['home','Home'],['World','My Worlds'],['Build','Builds'],['AddOn','Add-Ons'],['Video','Videos & TikTok'],['ContentPlanner','Content Planner']];
+const SIDEBAR_FAVOURITES=[['home','Home'],['World','My Worlds'],['Build','Builds'],['Packs','My Packs'],['NotesTasks','Notes & Tasks'],['Video','Videos & TikTok']];
 const SIDEBAR_FAV_KEYS=new Set(SIDEBAR_FAVOURITES.map(([key])=>key));
 function sidebarLink(key,txt,extra=''){
  return `<button class="nav-item ${extra} ${S.page===key?'active':''}" data-nav="${key}" data-side-label="${e(txt.toLowerCase())}" ${S.page===key?'aria-current="page"':''}><span class="nav-emoji" aria-hidden="true">${pinkIcon(key)}</span><span class="nav-label">${e(txt)}</span>${KINDS[key]&&!extra.includes('nav-fav')?`<span class="nav-badge">${key==='Video'?count('TikTok'):count(key)}</span>`:''}</button>`;
@@ -4385,7 +4421,7 @@ function pageNotesPanel(){
  const changed=drafts.has(key)&&raw!==String(data(target).notes||'');
  const titleText=record?'Notes for this record':'Notes for this page';
  return `<section class="panel page-notes" aria-label="${titleText}"><div class="section-line"><div><div class="eyebrow">YOUR LITTLE SCRATCHPAD ♡</div><h2>${pinkIcon("note")} ${titleText}</h2></div><span class="note-status" role="status">${changed?'Unsaved changes':target?'Saved privately':'Ready for your notes'}</span></div>
- <p class="subcopy">${record?'Write details about this item. They stay with it when you edit or move between pages.':'Ideas, reminders and plans for this section, saved under your private account.'}</p>
+ <p class="subcopy">${record?'Write details about this item. They stay linked to it, and saving creates or updates a task.':'Ideas, reminders and plans for this section, saved privately and added to Notes & Tasks.'}</p>
  <label class="sr-only" for="page-notes-editor">${titleText}</label><textarea id="page-notes-editor" class="page-notes-editor" data-note-key="${e(key)}" placeholder="">${e(raw)}</textarea>
  <div class="note-actions"><small>Notes are private. Tap Save note to keep your changes.</small><button class="btn btn-primary btn-small" data-save-page-note="${e(key)}" ${!changed||S.pageNoteSaving.has(key)?'disabled':''}>${S.pageNoteSaving.has(key)?'Saving…':'♡ Save note'}</button></div></section>`;
 }
@@ -4401,7 +4437,10 @@ async function savePageNote(key){
   const saved=await saveRecord(record?r.kind:'PageNote',d,r?.id);
   S.records=[...S.records.filter(item=>item.id!==saved.id),saved];
   if(drafts.get(key)===current)drafts.delete(key);
-  showToast('Note saved privately ♡');
+  if(!record||r?.kind!=='Task'){
+   try{await syncNoteTask(key,current);showToast('Note and task saved privately ♡')}
+   catch(taskErr){showToast('Note saved, but task sync failed: '+taskErr.message)}
+  }else showToast('Task note saved privately ♡');
  }catch(err){showToast('Note not saved: '+err.message)}
  finally{S.pageNoteSaving.delete(key);render()}
 }
@@ -4624,7 +4663,9 @@ async function captureExecuteAction(row){
  const target=captureActionPickTarget(row),rel=captureActionRelation(item,target);
  const existing=S.links.filter(l=>l.from_record_id===rel.from&&l.to_record_id===rel.to&&l.link_type===rel.type);
  const historyAffected=rel.type==='uses_addon'&&(row.operation==='link'?!existing.length:existing.length>0);
+ const packsAffected=PACK_DEFS.some(p=>p.linkType===rel.type)&&(row.operation==='link'?!existing.length:existing.length>0);
  if(historyAffected)await worldLoadoutBefore([rel.from]);
+ if(packsAffected)await worldPackBefore([rel.from]);
  try{
  if(row.operation==='link'){
   if(existing.length)return;
@@ -4639,7 +4680,7 @@ async function captureExecuteAction(row){
    S.links=S.links.filter(l=>l.id!==link.id);
   }
  }
- }finally{if(historyAffected)await worldLoadoutAfter([rel.from])}
+ }finally{if(historyAffected)await worldLoadoutAfter([rel.from]);if(packsAffected)await worldPackAfter([rel.from])}
 }
 
 function noteTargetPages(){return [{key:'home',name:'Home'},...GROUPS.flatMap(([,entries])=>entries.map(([key,name])=>({key,name})))].filter((p,i,a)=>a.findIndex(v=>v.key===p.key)===i);}
@@ -4831,10 +4872,12 @@ async function captureLinkToWorld(record,worldId){
  const from_record_id=forward?record.id:worldId,to_record_id=forward?worldId:record.id;
  if(S.links.some(l=>l.from_record_id===from_record_id&&l.to_record_id===to_record_id&&l.link_type===def[2]))return;
  if(def[2]==='uses_addon')await worldLoadoutBefore([from_record_id]);
+ if(PACK_DEFS.some(p=>p.linkType===def[2]))await worldPackBefore([worldId]);
  const saved=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({from_record_id,to_record_id,link_type:def[2]})});
  if(!Array.isArray(saved)||!saved[0])throw Error('The World link was not confirmed.');
  S.links.push(saved[0]);
  if(def[2]==='uses_addon')await worldLoadoutAfter([from_record_id]);
+ if(PACK_DEFS.some(p=>p.linkType===def[2]))await worldPackAfter([worldId]);
 }
 async function captureSave(){
  if(S.captureBusy)return;
@@ -5221,8 +5264,10 @@ async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(re
  if(!confirm(`Move “${title(rec)}” from ${label(rec.kind)} to ${label(target)}?\n\nIts original record and data will stay. ${plan.changes.length} compatible relationship(s) will be updated. No duplicate will be created.`))return;
  S.busy=true;const applied=[];let kindChanged=false;
  const historyWorlds=unique(plan.changes.filter(c=>c.oldType==='uses_addon'||c.newType==='uses_addon').map(c=>c.link.from_record_id));
+ const packWorlds=unique(plan.changes.filter(c=>PACK_DEFS.some(p=>p.linkType===c.oldType||p.linkType===c.newType)).map(c=>c.link.from_record_id));
  try{
   if(historyWorlds.length)await worldLoadoutBefore(historyWorlds);
+  if(packWorlds.length)await worldPackBefore(packWorlds);
   for(const change of plan.changes){const result=await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(change.link.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({link_type:change.newType})});if(!Array.isArray(result)||result.length!==1)throw Error('A relationship did not update.');applied.push(change)}
   const saved=await api(`/rest/v1/hq_records?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({kind:target})});if(!Array.isArray(saved)||saved.length!==1)throw Error('The record did not update.');kindChanged=true;
  }catch(err){
@@ -5231,7 +5276,7 @@ async function executeShopMove(id,target){const rec=get(id),plan=planShopMove(re
   S.modal=null;try{await loadAll()}catch{}
   showToast(rollbackFailed?'Some links could not be restored. Stop editing this item and use your backup.':'Move cancelled: '+err.message);S.busy=false;render();return;
  }
- S.modal=null;S.detail=id;S.busy=false;try{await loadAll();if(historyWorlds.length)await worldLoadoutAfter(historyWorlds);showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
+ S.modal=null;S.detail=id;S.busy=false;try{await loadAll();if(historyWorlds.length)await worldLoadoutAfter(historyWorlds);if(packWorlds.length)await worldPackAfter(packWorlds);showToast(`Moved to ${label(target)} — no duplicate created ♡`)}catch(err){showToast('Move saved, but reload failed: '+err.message)}
 }
 // World Groups: a real two-way view of the existing in_group links.
 // This does not create groups, seed records or guess where unassigned Worlds belong.
@@ -5708,6 +5753,76 @@ async function worldLoadoutSavePast(form){
  finally{S.worldLoadoutBusy=false;render();}
 }
 
+/* Packs Tracker v1: additive, dated private snapshots across all four existing libraries.
+   The original WorldAddonSnapshot records are intentionally never migrated or removed. */
+const PACK_DEFS=[
+ {kind:'AddOn',key:'addons',label:'Add-ons',linkType:'uses_addon'},
+ {kind:'Craftable',key:'craftables',label:'Craftables',linkType:'uses_craftable'},
+ {kind:'WorldTemplate',key:'templates',label:'World Templates',linkType:'world_template'},
+ {kind:'Texture',key:'textures',label:'Textures',linkType:'uses_texture'}
+];
+const PACK_HEALTH=['Untested','Working','Failed to Load','Unstable','Crashed'];
+const PACK_HISTORY_KIND='WorldPackSnapshot';
+function packWorld(){const worlds=all('World');return worlds.find(w=>w.id===S.packsWorld)||worlds[0]||null;}
+function packDefinition(kind){return PACK_DEFS.find(p=>p.kind===kind)||PACK_DEFS[0];}
+function packUsage(record){const p=packDefinition(record.kind),def=relationDefs(record.kind).find(x=>x[2]===p.linkType&&x[4]==='World');return def?relatedRecords(record.id,def):[];}
+function packSnapshotItems(worldId){const world=get(worldId);if(!world||world.kind!=='World')return [];
+ return PACK_DEFS.flatMap(p=>worldOverviewLinkList(world,p.key).map(r=>({kind:p.kind,id:r.id,name:title(r),creator:creatorName(r)||''})));}
+function packSnapshotSignature(items){return items.map(a=>`${a.kind}:${a.id||String(a.name||'').toLowerCase()}`).sort().join('||');}
+function packHistory(worldId){return all(PACK_HISTORY_KIND).filter(r=>data(r).worldId===worldId);}
+async function savePackHistory(worldId,options={}){
+ const world=get(worldId);if(!world||world.kind!=='World'||world.archived_at)throw Error('World unavailable.');
+ const items=options.items||packSnapshotItems(worldId),signature=packSnapshotSignature(items);
+ const latest=packHistory(worldId).filter(r=>data(r).source!=='manual').sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')))[0];
+ if(!options.force&&latest&&data(latest).signature===signature)return null;
+ const saved=await saveRecord(PACK_HISTORY_KIND,{name:title(world)+' pack combination',worldId,worldName:title(world),date:options.date||dateOnly(),recordedAt:new Date().toISOString(),source:options.source||'automatic',signature,items:items.map(a=>({kind:a.kind,id:a.id||'',name:a.name,creator:a.creator||''})),health:options.health||'Untested',note:options.note||''});
+ S.records.push(saved);return saved;
+}
+async function worldPackBefore(worldIds){for(const id of unique(worldIds).filter(Boolean))if(!packHistory(id).some(r=>data(r).source!=='manual'))await savePackHistory(id,{force:true,source:'baseline'});}
+async function worldPackAfter(worldIds){for(const id of unique(worldIds).filter(Boolean))try{await savePackHistory(id)}catch(err){showToast('Pack links saved, but pack history could not be recorded: '+err.message)}}
+function packHealthBadge(value){return `<span class="loadout-health is-${e(String(value||'Untested').toLowerCase().replace(/\s+/g,'-'))}">${e(value||'Untested')}</span>`;}
+function packWorldPicker(){const worlds=all('World');return `<label>World<select id="packs-world">${worlds.map(w=>`<option value="${e(w.id)}" ${packWorld()?.id===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label>`;}
+function packStatusForm(record,world){const d=data(record),isHistory=!!record;
+ const latestItems=isHistory?d.items:packSnapshotItems(world.id),signature=packSnapshotSignature(latestItems);
+ return `<form class="pack-status-form" data-pack-status="${isHistory?e(record.id):''}" data-pack-world="${e(world.id)}" data-pack-signature="${e(signature)}"><label>Did this combination work?<select name="health">${PACK_HEALTH.map(x=>`<option value="${e(x)}" ${(d.health||'Untested')===x?'selected':''}>${e(x)}</option>`).join('')}</select></label><label>Notes, crashes, loading errors, replacements<textarea name="note" maxlength="4000" rows="3" placeholder="What happened when you tried these packs?">${e(d.note||'')}</textarea></label><button type="submit" class="btn btn-primary btn-small" ${S.packBusy?'disabled':''}>${isHistory?'Update this record':'Save current result with today’s date'}</button></form>`;
+}
+function packHistoryCard(record,world){const d=data(record),items=Array.isArray(d.items)?d.items:[];return `<details class="pack-history-card"><summary><strong>${e(worldLoadoutDate(d.date))}</strong>${packHealthBadge(d.health)}<span>${items.length} packs</span><small>${e(d.source||'saved')}</small></summary><div class="pack-kind-list">${PACK_DEFS.map(p=>`<span>${e(p.label)}: ${items.filter(x=>x.kind===p.kind).length}</span>`).join('')}</div>${items.length?`<p>${e(items.map(i=>i.name).join(' · '))}</p>`:'<p>Empty pack setup.</p>'}${packStatusForm(record,world)}</details>`;}
+function packHistorySection(world){const current=packSnapshotItems(world.id),sig=packSnapshotSignature(current),history=packHistory(world.id).sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||''))),legacy=worldLoadoutHistory(world.id).sort((a,b)=>String(data(b).recordedAt||'').localeCompare(String(data(a).recordedAt||'')));
+ const manual=S.packPastOpen?`<form class="pack-history-form" id="packs-past-form"><h3>Record an older pack setup</h3><label>Date used<input type="date" name="date" value="${e(dateOnly())}" max="${e(dateOnly())}" required></label>${PACK_DEFS.map(p=>`<details><summary>${e(p.label)} (${all(p.kind).length} owned / recorded)</summary><div class="pack-picks">${all(p.kind).slice().sort((a,b)=>title(a).localeCompare(title(b))).map(r=>`<label><input type="checkbox" name="pack" value="${e(r.id)}"><span>${e(title(r))}</span></label>`).join('')}</div></details>`).join('')}<label>How did it run?<select name="health">${PACK_HEALTH.map(x=>`<option>${e(x)}</option>`).join('')}</select></label><label>Notes<textarea name="note" rows="3" maxlength="4000"></textarea></label><div class="actions"><button type="submit" class="btn btn-primary btn-small" ${S.packBusy?'disabled':''}>Save past setup</button><button type="button" class="btn btn-soft btn-small" data-pack-past-toggle>Cancel</button></div></form>`:'';
+ const failed=history.filter(r=>['Failed to Load','Unstable','Crashed'].includes(data(r).health)&&data(r).signature===sig);
+ return `<section class="panel"><div class="section-line"><div><div class="eyebrow">WORLD PACK HISTORY</div><h2>${pinkIcon('Packs')} ${e(title(world))}</h2><p class="subcopy">All four pack types are recorded together. A status describes a tested combination, not proof that any single pack caused a crash.</p></div><button class="btn btn-small btn-soft" data-nav="PackRecommendations">Recommendations</button></div><div class="pack-kind-list">${PACK_DEFS.map(p=>`<span>${e(p.label)}: ${current.filter(x=>x.kind===p.kind).length}</span>`).join('')}</div>${failed.length?`<div class="loadout-warning"><strong>Previously reported problems with this exact combination</strong><p>${failed.length} saved warning(s). Review your history before loading.</p></div>`:''}${packStatusForm(null,world)}<div class="actions" style="margin:15px 0"><button class="btn btn-soft btn-small" data-pack-past-toggle>＋ Record past setup</button></div>${manual}<h3>All four pack types · ${history.length} snapshots</h3>${history.length?history.slice(0,80).map(r=>packHistoryCard(r,world)).join(''):'<p class="hint">No pack snapshots saved yet. Save a current result or edit this world’s pack selections to start tracking.</p>'}${history.length>80?'<p class="hint">Showing the newest 80 pack snapshots. Older records remain saved.</p>':''}<details class="pack-history-card"><summary><strong>Original add-on history</strong><small>${legacy.length} preserved records</small></summary><p>These records from your original Add-on Tracker remain intact, with their statuses and dates.</p>${legacy.slice(0,80).map(worldLoadoutRow).join('')||'<p>No earlier add-on history saved.</p>'}</details></section>`;
+}
+function packsPage(){const p=packDefinition(S.packsKind),world=packWorld(),q=String(S.packsSearch||'').trim().toLowerCase(),packs=all(p.kind).slice().sort((a,b)=>title(a).localeCompare(title(b),undefined,{numeric:true,sensitivity:'base'})),matches=packs.filter(r=>!q||[title(r),creatorName(r),data(r).category].some(x=>String(x||'').toLowerCase().includes(q))),shown=S.packsShowAll?matches:matches.slice(0,80);
+ return `${header('My Packs','One consistent tracker for Add-ons, Craftables, World Templates and Textures. Your four original libraries and all existing links are preserved.',`<button class="btn btn-soft" data-nav="PackRecommendations">Unused Packs & Problems →</button>`)}<section class="panel"><div class="pack-toolbar"><label>View packs<select id="packs-view">${PACK_DEFS.map(x=>`<option value="${x.kind}" ${p.kind===x.kind?'selected':''}>View ${e(x.label)}</option>`).join('')}</select></label>${packWorldPicker()}<label>Search ${e(p.label)}<input id="packs-search" type="search" value="${e(S.packsSearch)}" placeholder="Name, creator, category…"></label></div><div class="pack-summary">${PACK_DEFS.map(x=>`<button type="button" data-pack-view="${x.kind}" class="${x.kind===p.kind?'active':''}"><strong>${all(x.kind).length}</strong><small>${e(x.label)}</small></button>`).join('')}</div><div class="section-line"><h2>${e(p.label)} <span class="pill yellow">${matches.length}</span></h2>${world?`<button class="btn btn-primary btn-small" data-pack-manage="${e(p.key)}" data-world-id="${e(world.id)}">Edit ${e(p.label)} for World</button>`:''}</div><div class="pack-list">${shown.map(r=>{const usage=packUsage(r),selected=world&&usage.some(w=>w.id===world.id),d=data(r);return `<div class="pack-list-row"><div><strong>${e(title(r))}</strong><small>${e(creatorName(r)||d.creatorName||'Creator not recorded')}${d.sizeMB!==undefined&&d.sizeMB!==''?` · ${e(d.sizeMB)} MB`:''} · ${usage.length} world${usage.length===1?'':'s'} using</small>${world?`<small>${selected?'✓ Used in '+e(title(world)):'Not used in '+e(title(world))}</small>`:''}</div><div class="actions"><button class="btn btn-small btn-soft" data-detail="${e(r.id)}">Details</button></div></div>`}).join('')||'<p class="hint">No matching packs. Your saved records have not changed.</p>'}</div>${!S.packsShowAll&&matches.length>80?`<button class="btn btn-soft btn-small" data-pack-show-all>Show all ${matches.length} matches</button>`:''}</section>${world?packHistorySection(world):'<section class="panel"><p>Add a World to begin tracking pack combinations.</p></section>'}`;
+}
+async function packSaveStatus(form){if(S.packBusy)return;const world=get(form.dataset.packWorld),old=get(form.dataset.packStatus),health=String(new FormData(form).get('health')||''),note=String(new FormData(form).get('note')||'').trim();if(!world||!PACK_HEALTH.includes(health)||note.length>4000)return showToast('Review the World, status and notes.');if(old&&old.kind!==PACK_HISTORY_KIND)return;
+ if(!old&&form.dataset.packSignature!==packSnapshotSignature(packSnapshotItems(world.id)))return showToast('The World pack list changed. Reopen this page before saving.');
+ S.packBusy=true;try{if(old){const saved=await saveRecord(PACK_HISTORY_KIND,{...data(old),health,note,reportedAt:new Date().toISOString()},old.id);S.records=S.records.map(r=>r.id===old.id?saved:r);}else await savePackHistory(world.id,{force:true,source:'reported',health,note});showToast('Pack result and notes saved ♡');}catch(err){showToast('Could not save pack result: '+err.message)}finally{S.packBusy=false;render();}}
+async function packSavePast(form){if(S.packBusy)return;const world=packWorld(),fd=new FormData(form),date=String(fd.get('date')||''),ids=unique(fd.getAll('pack').map(String)),health=String(fd.get('health')||'Untested'),note=String(fd.get('note')||'').trim();if(!world||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(date)||date>dateOnly()||!PACK_HEALTH.includes(health)||note.length>4000)return showToast('Review your past date, status and notes.');const items=ids.map(id=>get(id));if(items.some(r=>!r||!PACK_DEFS.some(p=>p.kind===r.kind)))return showToast('A selected pack is unavailable.');if(!confirm(`Record ${ids.length} historical packs for ${title(world)} on ${date}? Current world selections will not change.`))return;
+ S.packBusy=true;try{await savePackHistory(world.id,{items:items.map(r=>({id:r.id,kind:r.kind,name:title(r),creator:creatorName(r)||''})),date,health,note,force:true,source:'manual'});S.packPastOpen=false;showToast('Past pack combination saved ♡');}catch(err){showToast('History not saved: '+err.message)}finally{S.packBusy=false;render();}}
+function packRecommendationsPage(){const world=packWorld();if(!world)return `${header('Pack Recommendations','Record a World first to compare your packs.')}`;
+ const current=packSnapshotItems(world.id),used=new Set(current.map(x=>x.id));
+ const unused=PACK_DEFS.map(p=>({p,records:all(p.kind).filter(r=>!used.has(r.id)).sort((a,b)=>packUsage(b).length-packUsage(a).length||title(a).localeCompare(title(b)))}));
+ const problems=[...all(PACK_HISTORY_KIND).filter(r=>['Failed to Load','Unstable','Crashed'].includes(data(r).health)).map(r=>({d:data(r),kind:'all packs'})),...all(WORLD_LOADOUT_HISTORY_KIND).filter(r=>['Unstable','Crashed'].includes(data(r).health)).map(r=>({d:data(r),kind:'add-ons only'}))].sort((a,b)=>String(b.d.reportedAt||b.d.recordedAt||'').localeCompare(String(a.d.reportedAt||a.d.recordedAt||'')));
+ const recommended=unused.flatMap(x=>x.records.slice(0,3).map(r=>({r,p:x.p}))).slice(0,10);
+ return `${header('Pack Recommendations','Unused options, combinations worth testing, and problems recorded in your own history.',`<button class="btn btn-soft" data-nav="Packs">← My Packs</button>`)}<section class="panel"><div class="pack-toolbar">${packWorldPicker()}</div><h2>Suggested packs to try in ${e(title(world))}</h2><p class="subcopy">These are packs not yet linked to this World, starting with ones used in your other Worlds. Suggestions are <b>untested</b>, not guaranteed compatible. Packs flagged in a failed exact combination are not presented as proven safe.</p><div class="pack-list">${recommended.map(({r,p})=>`<div class="pack-list-row"><div><strong>${e(title(r))}</strong><small>${e(p.label)} · ${packUsage(r).length} other world${packUsage(r).length===1?'':'s'} using · Not tested in this World</small></div><div class="actions"><button class="btn btn-small btn-soft" data-detail="${e(r.id)}">Details</button><button class="btn btn-small btn-primary" data-pack-manage="${e(p.key)}" data-world-id="${e(world.id)}">Select packs</button></div></div>`).join('')||'<p class="hint">All saved packs are linked to this World, or none are available yet.</p>'}</div></section><section class="panel"><h2>Unused in this World</h2><div class="pack-summary">${unused.map(x=>`<button data-pack-recommend-kind="${e(x.p.kind)}"><strong>${x.records.length}</strong><small>${e(x.p.label)}</small></button>`).join('')}</div><p class="hint">Tap a category to open its full inventory and selection controls.</p></section><section class="panel"><h2>Combinations that had problems <span class="pill yellow">${problems.length}</span></h2><p class="subcopy">These are your recorded incidents, across all Worlds. They do not prove the cause of a crash, and missing test data is not a successful test.</p>${problems.length?problems.slice(0,40).map(({d,kind})=>`<div class="pack-history-card"><div class="section-line"><strong>${e(d.worldName||'Previous World')} · ${e(worldLoadoutDate(d.date))}</strong>${packHealthBadge(d.health)}</div><small>${e(kind)} · ${Array.isArray(d.items)?d.items.length:Array.isArray(d.addons)?d.addons.length:0} saved packs</small><p>${e((Array.isArray(d.items)?d.items:d.addons||[]).map(x=>x.name).join(' · ').slice(0,600))}</p>${d.note?`<p><b>Your notes:</b> ${e(d.note)}</p>`:''}</div>`).join(''):'<div class="empty">No failed or unstable pack combinations reported yet.</div>'}${problems.length>40?'<p class="hint">Showing the latest 40 incidents; older records are still saved.</p>':''}</section>`;
+}
+/* Every page and record scratchpad can be represented as a private Task without
+   deleting the original note. Existing tasks keep their status and due date. */
+function noteTaskForKey(key){return all('Task').find(t=>data(t).sourceNoteKey===key);}
+function noteOrigin(key){if(key.startsWith('record:')){const r=get(key.slice(7));return r?label(r.kind)+' · '+title(r):'Saved record';}return key.startsWith('page:')?key.slice(5).replace(/([a-z])([A-Z])/g,'$1 $2')+' page':key;}
+async function syncNoteTask(key,notes){const trimmed=String(notes||'').trim();if(!trimmed)return null;const existing=noteTaskForKey(key),old=data(existing);const titleText='Note · '+noteOrigin(key);
+ const saved=await saveRecord('Task',{...old,name:titleText,description:trimmed,sourceNoteKey:key,sourcePage:key.startsWith('page:')?key.slice(5):'',sourceRecordId:key.startsWith('record:')?key.slice(7):'',status:old.status||'To Do'},existing?.id);
+ S.records=[...S.records.filter(r=>r.id!==saved.id),saved];return saved;}
+function savedNotesForHub(){const notes=[];for(const r of S.records){if(r.archived_at||r.kind==='WorldPackSnapshot'||r.kind==='WorldAddonSnapshot'||r.kind==='FieldConfig'||r.kind==='Task')continue;const d=data(r),body=String(d.notes||'').trim();if(!body)continue;const key=r.kind==='PageNote'?String(d.pageKey||'page:unknown'):'record:'+r.id;notes.push({key,body,when:r.updated_at||r.created_at||'',origin:noteOrigin(key)});}return notes.sort((a,b)=>b.when.localeCompare(a.when));}
+function notesTasksPage(){const filter=S.notesTasksFilter||'all',q=String(S.notesTasksSearch||'').trim().toLowerCase(),tasks=all('Task').filter(r=>[title(r),data(r).description,data(r).status,data(r).notes].some(s=>String(s||'').toLowerCase().includes(q))).sort((a,b)=>String(data(a).status)==='Done'?1:String(data(b).status)==='Done'?-1:title(a).localeCompare(title(b))),notes=savedNotesForHub().filter(n=>[n.origin,n.body].some(s=>s.toLowerCase().includes(q)));
+ const taskRows=tasks.slice(0,120).map(r=>{const d=data(r);return `<div class="note-task-row"><div><strong>${e(title(r))}</strong><small>${e(d.sourceNoteKey?noteOrigin(d.sourceNoteKey):'Task')}${d.dueDate?' · Due '+e(d.dueDate):''}</small>${d.description?`<p>${e(d.description)}</p>`:''}</div><div class="actions"><select data-note-task-status="${e(r.id)}" aria-label="Status of ${e(title(r))}">${['To Do','Doing','Done'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}</select>${d.sourceRecordId?`<button class="btn btn-small btn-soft" data-detail="${e(d.sourceRecordId)}">Source</button>`:d.sourcePage?`<button class="btn btn-small btn-soft" data-nav="${e(d.sourcePage)}">Source</button>`:''}<button class="btn btn-small btn-soft" data-detail="${e(r.id)}">Edit</button></div></div>`}).join('');
+ const noteRows=notes.slice(0,120).map(n=>{const task=noteTaskForKey(n.key);return `<div class="note-task-row"><div><strong>${e(n.origin)}</strong><p>${e(n.body)}</p><small>${task?'Linked to a task':'Saved note · no task created yet'}</small></div><div class="actions">${!task?`<button class="btn btn-small btn-primary" data-note-make-task="${e(n.key)}">Create task</button>`:''}${n.key.startsWith('record:')?`<button class="btn btn-small btn-soft" data-detail="${e(n.key.slice(7))}">Open</button>`:`<button class="btn btn-small btn-soft" data-nav="${e(n.key.slice(5))}">Open page</button>`}</div></div>`}).join('');
+ return `${header('Notes & Tasks','All your page notes and record notes in one place. New scratchpad notes automatically become tasks when saved.',`<button class="btn btn-primary" data-add="Task">＋ New Task</button>`)}<section class="panel"><div class="pack-toolbar"><label>Show<select id="notes-tasks-filter"><option value="all" ${filter==='all'?'selected':''}>All notes & tasks</option><option value="tasks" ${filter==='tasks'?'selected':''}>Tasks only</option><option value="notes" ${filter==='notes'?'selected':''}>Notes only</option></select></label><label>Search<input type="search" id="notes-tasks-search" value="${e(S.notesTasksSearch)}" placeholder="Find a note or task…"></label></div><div class="pack-kind-list"><span>${tasks.length} tasks</span><span>${notes.length} notes</span></div></section>${filter!=='notes'?`<section class="panel"><h2>Tasks</h2>${taskRows||'<p class="hint">No tasks match your search.</p>'}${tasks.length>120?'<p class="hint">Showing 120 tasks. Search to narrow the list; all records are preserved.</p>':''}</section>`:''}${filter!=='tasks'?`<section class="panel"><h2>Saved notes</h2>${noteRows||'<p class="hint">No saved notes match your search. Use Notes from any page.</p>'}${notes.length>120?'<p class="hint">Showing 120 notes. Search to find others; none are deleted.</p>':''}</section>`:''}`;
+}
+async function markTaskStatus(id,status){const record=get(id);if(!record||record.kind!=='Task'||!['To Do','Doing','Done'].includes(status))return;try{const saved=await saveRecord('Task',{...data(record),status},id);S.records=S.records.map(r=>r.id===id?saved:r);showToast('Task updated ♡');}catch(err){showToast('Could not save task: '+err.message)}finally{render();}}
+async function createTaskFromSavedNote(key){const n=savedNotesForHub().find(x=>x.key===key);if(!n)return showToast('That saved note is unavailable.');try{await syncNoteTask(key,n.body);showToast('Note linked to a task ♡');}catch(err){showToast('Could not create task: '+err.message)}finally{render();}}
+
 /* WORLD OVERVIEW LOADOUT — read only until the user chooses Edit Links. Uses existing hq_links. */
 function worldOverviewLinkList(world, key){
  const def=relationDefs('World').find(d=>d[0]===key);
@@ -5809,7 +5924,7 @@ function worldOverviewStrip(world){
  return `<section class="panel world-overview-panel" aria-label="Linked information and world add-on loadout" id="world-overview-loadout"><div class="section-line world-overview-heading"><div><div class="eyebrow">YOUR WORLD, AT A GLANCE</div><h2>${pinkIcon('AddOn')} Add-ons to use in ${e(title(world))}</h2><p class="subcopy">This is your saved World loadout. Every name here comes from a real link in your app, not a suggestion or a note.</p></div></div>
  <div class="world-overview-stats">${stats.map(s=>`<div class="world-overview-stat"><strong>${s.items.length}</strong><span>${e(s.label)}</span></div>`).join('')}</div>
  <div class="world-loadout-panel"><div class="world-loadout-head"><h3>Current add-on loadout <span class="pill yellow">${addonList.length} linked</span></h3><div class="world-loadout-buttons"><button type="button" class="btn btn-small btn-primary" data-world-manage="addons" data-world-id="${e(world.id)}">＋ Edit Add-ons</button>${addonList.length?`<button type="button" class="btn btn-small btn-soft" data-copy-world-addons="${e(world.id)}">Copy list</button>`:''}</div></div>${addonList.length?`<div class="world-loadout-list">${addonCards}</div>`:`<div class="world-overview-empty"><strong>No add-ons linked to this World yet.</strong><p>Tap Edit Add-ons to pick from your saved library. Nothing will be added to Minecraft automatically.</p></div>`}${worldCurrentLoadoutReport(world)}</div>
- <p class="hint">Craftables, textures, builds and other saved links are in “Manage linked records” below. Tap that heading to expand them; nothing has been removed.</p>
+ <p class="hint">Craftables, textures, builds and other saved links are in “Manage linked records” below. Tap that heading to expand them; nothing has been removed.</p><button class="btn btn-small btn-primary" type="button" data-open-pack-world="${e(world.id)}">Open all four Packs & History →</button>
  </section>`;
 }
 function worldConnectionsHub(world){
@@ -5873,14 +5988,17 @@ async function saveWorldLinkPicker(){
  const removals=currentActive.filter(id=>!chosen.includes(id));
  S.busy=true;
  const historyAffected=def[2]==='uses_addon'&&(additions.length>0||removals.length>0);
+ const packsAffected=PACK_DEFS.some(p=>p.linkType===def[2])&&(additions.length>0||removals.length>0);
  try{
   if(historyAffected)await worldLoadoutBefore([world.id]);
+  if(packsAffected)await worldPackBefore([world.id]);
   for(const id of additions){const body={from_record_id:def[3]==='out'?world.id:id,to_record_id:def[3]==='out'?id:world.id,link_type:def[2]};const created=await api('/rest/v1/hq_links',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});if(!Array.isArray(created)||created.length!==1)throw Error('Could not confirm a link. Old links were preserved.');S.links.push(created[0]);}
   for(const id of removals){const link=S.links.find(l=>linkMatches(l,world.id,def)&&(def[3]==='out'?l.to_record_id:l.from_record_id)===id);if(link){await api(`/rest/v1/hq_links?id=eq.${encodeURIComponent(link.id)}`,{method:'DELETE'});S.links=S.links.filter(l=>l.id!==link.id);}}
   if(historyAffected)await worldLoadoutAfter([world.id]);
+  if(packsAffected)await worldPackAfter([world.id]);
   S.modal=null;
   await loadAll();showToast('World links updated ♡');
- }catch(err){if(historyAffected)await worldLoadoutAfter([world.id]);showToast('Not all links were saved. Your other data is safe: '+err.message);try{await loadAll()}catch{}}
+ }catch(err){if(historyAffected)await worldLoadoutAfter([world.id]);if(packsAffected)await worldPackAfter([world.id]);showToast('Not all links were saved. Your other data is safe: '+err.message);try{await loadAll()}catch{}}
  finally{S.busy=false;render()}
 }
 function newFromWorld(worldId,defKey){
@@ -5903,7 +6021,7 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
  ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
- ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+worldLoadoutPanel(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsPanel(r):''}
+ ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+packHistorySection(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsPanel(r):''}
 
  ${kitGallery}
  ${tiktokClipGallery}
@@ -6232,7 +6350,7 @@ function wireCreativeSuite(){
  app.querySelector('[data-cs-status]')?.addEventListener('change',ev=>{S.csStatus=ev.target.value;render()});
 }
 
-function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=videoHubPage()+creativeStudioPanel();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
+function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='Packs')body=packsPage();else if(S.page==='PackRecommendations')body=packRecommendationsPage();else if(S.page==='NotesTasks')body=notesTasksPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=videoHubPage()+creativeStudioPanel();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
 function globalSearchPage(){
  const query=S.query.trim().toLowerCase();
  const matches=query?S.records.filter(r=>!r.archived_at && r.kind!=='PageNote' && r.kind!=='FieldConfig' && ([r.kind,title(r),...Object.values(data(r)).filter(v=>typeof v==='string'||typeof v==='number')].join(' ').toLowerCase().includes(query)||relationDefs(r.kind).some(def=>relatedRecords(r.id,def).some(rel=>title(rel).toLowerCase().includes(query))))).sort(defaultSort):[];
@@ -7246,6 +7364,21 @@ function wireApp(){
  app.querySelectorAll('[data-restore-record]').forEach(b=>b.addEventListener('click',()=>restoreArchived(b.dataset.restoreRecord)));
  app.querySelectorAll('[data-purge-record]').forEach(b=>b.addEventListener('click',()=>purgeArchived(b.dataset.purgeRecord)));
  app.querySelector('#jump-to-notes')?.addEventListener('click',()=>app.querySelector('.page-notes')?.scrollIntoView({behavior:'smooth',block:'start'}));app.querySelectorAll('[data-save-page-note]').forEach(b=>b.addEventListener('click',()=>savePageNote(b.dataset.savePageNote)));
+ app.querySelector('#packs-view')?.addEventListener('change',ev=>{S.packsKind=ev.target.value;S.packsShowAll=false;render()});
+ app.querySelectorAll('[data-pack-view]').forEach(b=>b.addEventListener('click',()=>{S.packsKind=b.dataset.packView;S.packsShowAll=false;render()}));
+ app.querySelectorAll('#packs-world').forEach(x=>x.addEventListener('change',ev=>{S.packsWorld=ev.target.value;S.packPastOpen=false;render()}));
+ app.querySelector('#packs-search')?.addEventListener('change',ev=>{S.packsSearch=ev.target.value;S.packsShowAll=false;render()});
+ app.querySelector('[data-pack-show-all]')?.addEventListener('click',()=>{S.packsShowAll=true;render()});
+ app.querySelectorAll('[data-pack-manage]').forEach(b=>b.addEventListener('click',()=>openWorldLinkPicker(b.dataset.worldId,b.dataset.packManage)));
+ app.querySelectorAll('[data-pack-past-toggle]').forEach(b=>b.addEventListener('click',()=>{S.packPastOpen=!S.packPastOpen;render()}));
+ app.querySelectorAll('[data-pack-status]').forEach(form=>form.addEventListener('submit',ev=>{ev.preventDefault();packSaveStatus(form)}));
+ app.querySelector('#packs-past-form')?.addEventListener('submit',ev=>{ev.preventDefault();packSavePast(ev.target)});
+ app.querySelectorAll('[data-pack-recommend-kind]').forEach(b=>b.addEventListener('click',()=>{S.packsKind=b.dataset.packRecommendKind;nav('Packs')}));
+ app.querySelectorAll('[data-open-pack-world]').forEach(b=>b.addEventListener('click',()=>{S.packsWorld=b.dataset.openPackWorld;nav('Packs')}));
+ app.querySelector('#notes-tasks-filter')?.addEventListener('change',ev=>{S.notesTasksFilter=ev.target.value;render()});
+ app.querySelector('#notes-tasks-search')?.addEventListener('change',ev=>{S.notesTasksSearch=ev.target.value;render()});
+ app.querySelectorAll('[data-note-task-status]').forEach(x=>x.addEventListener('change',ev=>markTaskStatus(x.dataset.noteTaskStatus,ev.target.value)));
+ app.querySelectorAll('[data-note-make-task]').forEach(b=>b.addEventListener('click',()=>createTaskFromSavedNote(b.dataset.noteMakeTask)));
  app.querySelector('#page-notes-editor')?.addEventListener('input',ev=>{const key=ev.target.dataset.noteKey;const drafts=key.startsWith('record:')?S.recordNoteDrafts:S.pageNoteDrafts;drafts.set(key,ev.target.value);const btn=app.querySelector('[data-save-page-note]');if(btn)btn.disabled=false;const status=app.querySelector('.note-status');if(status)status.textContent='Unsaved changes';});app.querySelectorAll('[data-toggle-group]').forEach(b=>b.addEventListener('click',()=>toggleNavGroup(b.dataset.toggleGroup)));app.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));app.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>openForm(b.dataset.add)));app.querySelectorAll('[data-quick-add]').forEach(b=>b.addEventListener('click',()=>{S.modal={type:'quick'};render()}));
  app.querySelectorAll('[data-gen-category]').forEach(b=>b.addEventListener('click',()=>{S.generatorChoice=b.dataset.genCategory;S.generatorDrawn=null;S.generatorQuery='';S.generatorFavoritesOnly=false;render();app.querySelector('#generator-drawer')?.scrollIntoView({block:'nearest',behavior:'smooth'})}));
  app.querySelector('#gen-world')?.addEventListener('change',ev=>{S.generatorWorld=ev.target.value;S.generatorDrawn=null;render()});
@@ -7568,7 +7701,7 @@ function csvCell(str){const x=String(str??'');return /[",\n\r]/.test(x)?'"'+x.re
 function exportCSV(){const kind=document.getElementById('export-kind').value,rr=all(kind),columns=unique(['name',...rr.flatMap(r=>Object.keys(r.data))]);const text=[columns.map(csvCell).join(','),...rr.map(r=>columns.map(k=>csvCell(r.data[k])).join(','))].join('\r\n');download(`CTRL_HQ_${kind}_${dateOnly()}.csv`,new Blob([text],{type:'text/csv;charset=utf-8'}));showToast(`Exported ${rr.length} ${label(kind).toLowerCase()}`)}
 function parseCSV(txt){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(c==='"'){if(quoted&&txt[i+1]==='"'){cell+='"';i++}else quoted=!quoted}else if(c===','&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows}
 function importNameKey(r){return `${r.kind}|${String(r.data?.name||'').trim().toLowerCase()}`;}
-const BACKUP_INTERNAL_KINDS=new Set(['WorldAddonSnapshot','MediaBackup']);
+const BACKUP_INTERNAL_KINDS=new Set(['WorldAddonSnapshot','WorldPackSnapshot','MediaBackup']);
 function importAllowed(r){return !!r&&!!r.data&&typeof r.data==='object'&&!Array.isArray(r.data)&&!!String(r.data.name||'').trim()&&(!!KINDS[r.kind]||(r.kind==='FieldConfig'&&!!KINDS[r.data.targetKind])||BACKUP_INTERNAL_KINDS.has(r.kind));}
 function importSameIdentity(a,b){
  if(a.kind!==b.kind||importNameKey(a)!==importNameKey(b))return false;
