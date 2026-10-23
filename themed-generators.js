@@ -119,7 +119,10 @@
       case 'Random Fun': title=`Surprise project: ${subject} — ${label}`;description=`RANDOM FUN — Turn ${subject} into a quick ${t.toLowerCase()} surprise in ${w}. Flip a coin to choose miniature or giant scale; then ${verb.toLowerCase()} and finish with ${detail}.`;break;
       default:title=`${subject} — ${label}`;description=lead;
     }
-    return {key:`preset-${context.theme}-${category.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${index}`,title,description,theme:context.theme,sourceType:'250 world-themed results',builtin:true};
+    // Preserve actual blocks in the result so Save as Palette never takes a
+    // different palette from the six-block shuffle tool.
+    const blocks=category==='Palette'?(()=>{const source=THEME_BLOCKS[context.theme]||DEFAULT_BLOCKS;return source.map((_,j)=>source[(j+index%6)%6]);})():null;
+    return {key:`preset-${context.theme}-${category.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${index}`,title,description,theme:context.theme,blocks,sourceType:'250 world-themed results',builtin:true};
   }
 
   function pool(category, context) {
