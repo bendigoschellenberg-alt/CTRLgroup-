@@ -584,16 +584,23 @@ a{color:#c95f92}.eyebrow{color:#FF5B9A}.brand-mark{background:linear-gradient(13
 .gen-count{font-size:10px;font-weight:800;color:#935d25;white-space:nowrap;background:#fff1c8;padding:4px 6px;border-radius:50px}
 .gen-count.gen-remix{background:#ffe4f0;color:#665D5F;font-size:9px}
 .gen-desc{font-size:11px;line-height:1.45;color:#665D5F}
-.gen-selected{padding:18px;background:#FFF8EF;border:1px solid #eabbcf;border-radius:18px;scroll-margin-top:100px}
+.gen-selected{padding:18px;background:#FFFFFF;border:1px solid #eabbcf;border-radius:18px;scroll-margin-top:100px}
 .gen-section-title h2{margin:2px 0 6px;display:flex;align-items:center;gap:9px;color:#B72F65;font-size:21px}
 .gen-section-title h2 .pink-icon{width:28px;height:28px}
-.gen-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:19px 0 13px}
+.gen-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:19px 0 13px}
 .gen-field{display:flex;flex-direction:column;gap:5px;color:#665D5F;font-size:11px;font-weight:850}
 .gen-field select,.gen-field input{width:100%;min-width:0;font:inherit;color:#665D5F;font-size:13px;background:white;border:1px solid #FFBDD5;border-radius:11px;padding:11px 10px;min-height:44px}
 .gen-roll-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.gen-favourites{font-size:12px;font-weight:700;color:#665D5F;display:flex;align-items:center;gap:6px}
 .gen-favourites input{accent-color:#db237d;width:16px;height:16px}.gen-available{font-size:12px;color:#665D5F;margin-right:auto}
 .gen-roll{min-width:145px;min-height:44px}.gen-output{margin-top:18px}.gen-output h2{line-height:1.3}
 .gen-result-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.gen-empty{border:1px dashed #e9b3cb;border-radius:13px;padding:19px;margin-top:15px;color:#665D5F;background:white;font-size:13px}
+.gen-theme-note{padding:11px 13px;border:1px solid #f3c3d4;background:#fff2f7;border-radius:11px;font-size:12px;color:#784659;line-height:1.5;margin-bottom:12px}
+.gen-browse{margin-top:16px;border:1px solid #ffd0df;background:#fff;border-radius:13px;overflow:hidden}
+.gen-browse summary{cursor:pointer;padding:14px;color:#ae2667;background:#ffe7a3;font-weight:850;font-size:13px}
+.gen-browse-results{max-height:340px;overflow:auto;padding:8px;display:grid;gap:5px;overscroll-behavior:contain}
+.gen-browse-item{display:flex;gap:10px;align-items:center;text-align:left;width:100%;border:1px solid #f4d9e5;border-radius:8px;padding:10px;background:#fff;color:#503943;cursor:pointer;font:inherit;font-size:12px;min-height:43px}
+.gen-browse-item span{min-width:24px;color:#a94f76;font-weight:800}.gen-browse-item strong{flex:1}.gen-browse-item small{color:#a94f76}
+.gen-browse-item:hover,.gen-browse-item.active{border-color:#ff5b9a;background:#fff0f6}
 @media(max-width:970px){.gen-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:740px){.gen-hub{padding:14px}.gen-hub .section-line{flex-direction:column}.gen-category-grid{gap:7px;margin:16px 0 18px}.gen-category{padding:12px 9px;min-height:90px;border-radius:13px}.gen-category-head{flex-direction:column;gap:4px}.gen-category-head strong{font-size:12px}.gen-count{font-size:9px}.gen-desc{font-size:10px}.gen-selected{padding:14px}.gen-controls{grid-template-columns:1fr;gap:11px}.gen-roll-row{gap:10px}.gen-available{width:100%;margin-right:0}.gen-roll{width:100%}.gen-result-actions .btn{width:100%}}
 @media(max-width:360px){.gen-category-grid{grid-template-columns:1fr}.gen-category{min-height:67px}.gen-category-head{flex-direction:row}}
@@ -4062,6 +4069,7 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .note-task-row select{padding:7px;border-radius:8px;border:1px solid #f0bad0;background:#fff}
 @media(max-width:600px){#app .pack-summary{grid-template-columns:repeat(2,minmax(0,1fr))}#app .pack-picks{grid-template-columns:1fr}#app .pack-list-row,#app .note-task-row{align-items:flex-start;flex-direction:column}#app .pack-list-row .actions,#app .note-task-row .actions{justify-content:start;width:100%}}
 </style>
+<script src="./themed-generators.js"></script>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
 'use strict';
@@ -6748,10 +6756,17 @@ function generatorRemixPool(name){
  return [];
 }
 function generatorMatch(item,q){return !q||[item.title,item.description,item.theme,item.sourceType,item.source].some(v=>String(v||'').toLowerCase().includes(q))}
+function generatorThemeContext(){
+ const world=all('World').find(r=>r.id===S.generatorWorld);
+ return CTRL_THEMES.resolve(world?title(world):'',world?data(world):{},S.generatorTheme);
+}
 function generatorAvailable(){
  const choice=generatorCategory(S.generatorChoice||'Build Idea'),term=String(S.generatorQuery||'').trim().toLowerCase();
- const built=generatorBuiltInPool(choice),saved=choice[1]?generatorSavedPool(choice).map(r=>({...data(r),key:r.id,sourceId:r.id,sourceKind:'GeneratorPrompt',title:data(r).title||title(r)})):[];const pool=[...built,...saved];
- return pool.filter(item=>generatorMatch(item,term)&&(!S.generatorFavoritesOnly|| (choice[1]&&!!item.favorite)));
+ const built=CTRL_THEMES.pool(choice[0],generatorThemeContext());
+ const includeSaved=S.generatorIncludeSaved===true||(S.generatorIncludeSaved!==false&&!S.generatorWorld);
+ const saved=includeSaved&&choice[1]?generatorSavedPool(choice).map(r=>({...data(r),key:r.id,sourceId:r.id,sourceKind:'GeneratorPrompt',title:data(r).title||title(r)})):[];
+ const pool=S.generatorFavoritesOnly?saved.filter(item=>!!item.favorite):[...built,...saved];
+ return pool.filter(item=>generatorMatch(item,term));
 }
 function generatorRemixText(key,item,world){
  const n=item.title,w=world||'your world';
@@ -6770,14 +6785,18 @@ function generatorRemixText(key,item,world){
 function generatorWithWorld(input,world){let t=String(input||'');const worldName=world||'your world';return t.replace(/\{\{\s*WORLD_NAME\s*\}\}/gi,worldName).replace(/\{\{\s*BLOCK_ID\s*\}\}/gi,'a city block').replace(/\{\{\s*DISTRICT\s*\}\}/gi,'your district').replace(/\{\{\s*STREET\s*\}\}/gi,'a street').replace(/\{\{\s*AVENUE\s*\}\}/gi,'an avenue');}
 function generatorDraw(advance=false){
  const rows=generatorAvailable();if(!rows.length){S.generatorDrawn=null;render();return}
- const category=generatorCategory(S.generatorChoice||'Build Idea'),key=category[0]+'|'+(S.generatorQuery||'')+'|'+!!S.generatorFavoritesOnly;
+ const category=generatorCategory(S.generatorChoice||'Build Idea'),key=[category[0],S.generatorWorld||'any',generatorThemeContext().theme,S.generatorQuery||'',!!S.generatorFavoritesOnly,!!S.generatorIncludeSaved].join('|');
  if(!S.generatorCursors)S.generatorCursors={};
  let index;
  if(S.generatorMode==='next'){index=(S.generatorCursors[key]||0)%rows.length;S.generatorCursors[key]=index+1}
  else {index=Math.floor(Math.random()*rows.length);if(rows.length>1&&rows[index].key===S.generatorDrawn?.key)index=(index+1)%rows.length}
- const item=rows[index],world=all('World').find(r=>r.id===S.generatorWorld),worldName=world?title(world):'';
+ generatorSelectResult(rows[index]);
+}
+function generatorSelectResult(item){
+ if(!item)return;
+ const category=generatorCategory(S.generatorChoice||'Build Idea'),world=all('World').find(r=>r.id===S.generatorWorld),worldName=world?title(world):'';
  const description=item.builtin?[item.description,item.instructions].filter(Boolean).join('\n\n'):category[1]?[item.description,item.instructions].filter(Boolean).join('\n\n'):generatorRemixText(category[0],item,worldName);
- S.generatorDrawn={key:item.key,category:category[0],sourceId:item.sourceId||null,sourceKind:item.sourceKind||null,title:generatorWithWorld(item.title,worldName),description:generatorWithWorld(description,worldName),remix:!category[1]&&!item.builtin};
+ S.generatorDrawn={key:item.key,category:category[0],sourceId:item.sourceId||null,sourceKind:item.sourceKind||null,title:generatorWithWorld(item.title,worldName),description:generatorWithWorld(description,worldName),remix:!category[1]&&!item.builtin,builtin:!!item.builtin,theme:generatorThemeContext().theme};
  render();
 }
 function generatorSaveIdea(){
@@ -6802,16 +6821,19 @@ function generatorSaveIdea(){
 function generatorPage(){
  const selected=S.generatorChoice||'Build Idea',choice=generatorCategory(selected),saved=all('GeneratorPrompt'),pool=generatorAvailable(),picked=S.generatorDrawn;
  const worlds=all('World').slice().sort((a,b)=>title(a).localeCompare(title(b)));
+ const context=generatorThemeContext(),themeOptions=CTRL_THEMES.options,includeSaved=S.generatorIncludeSaved===true||(S.generatorIncludeSaved!==false&&!S.generatorWorld);
  const stock=fullCubeNames();
  return `${header('Creative Generators','Choose one of your 27 original generator types. Your ideas stay private and tucked away until you roll the generator.',`<button class="btn btn-soft" data-nav="Palette">Six-Block Library</button><button class="btn btn-soft" data-nav="GeneratorPrompt">Saved prompt library</button>`)}
  <section class="panel gen-hub">
- <div class="section-line"><div><div class="eyebrow">SAVED-LIST GENERATORS ✦</div><h2>What shall we dream up?</h2><p class="subcopy">Pick a generator, then roll an idea. Each generator has 200 built-in themed prompts, plus your existing saved ideas.</p></div><span class="pill yellow">${saved.length} saved prompts · 27 choices</span></div>
- <div class="gen-category-grid" role="group" aria-label="Choose a generator">${GENERATOR_CATEGORIES.map(c=>{const n=200+(c[1]?generatorSavedPool(c).length:0);return `<button type="button" class="gen-category ${c[0]===selected?'chosen':''}" data-gen-category="${e(c[0])}" aria-pressed="${c[0]===selected?'true':'false'}"><span class="gen-category-head"><strong>${e(c[0])}</strong><span class="gen-count ${n===null?'gen-remix':''}">${n+' ideas'}</span></span><span class="gen-desc">${e(c[2])}</span></button>`}).join('')}</div>
+ <div class="section-line"><div><div class="eyebrow">WORLD-THEMED GENERATORS ✦</div><h2>What shall we dream up?</h2><p class="subcopy">Choose a world to match its theme, then draw or browse 250 preset results for every generator. No AI or credits needed.</p></div><span class="pill yellow">${saved.length} original prompts preserved · 27 choices</span></div>
+ <div class="gen-category-grid" role="group" aria-label="Choose a generator">${GENERATOR_CATEGORIES.map(c=>`<button type="button" class="gen-category ${c[0]===selected?'chosen':''}" data-gen-category="${e(c[0])}" aria-pressed="${c[0]===selected?'true':'false'}"><span class="gen-category-head"><strong>${e(c[0])}</strong><span class="gen-count">250 themed</span></span><span class="gen-desc">${e(c[2])}</span></button>`).join('')}</div>
  <div class="gen-selected" id="generator-drawer">
- <div class="gen-section-title"><div><span class="eyebrow">YOUR SELECTED GENERATOR</span><h2>${pinkIcon('wand')} ${e(selected)}</h2><p class="subcopy">${e(choice[2])}${choice[1]?` · ${generatorSavedPool(choice).length} original prompts saved.`:' · 200 built-in themed prompts, with your existing library preserved.'}</p></div></div>
- <div class="gen-controls"><label class="gen-field">World (optional)<select id="gen-world"><option value="">Any world</option>${worlds.map(w=>`<option value="${e(w.id)}" ${S.generatorWorld===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label><label class="gen-field">How to roll<select id="gen-mode"><option value="random" ${S.generatorMode!=='next'?'selected':''}>Surprise me (random)</option><option value="next" ${S.generatorMode==='next'?'selected':''}>Next in order</option></select></label><label class="gen-field">Find an idea<input id="gen-search" type="search" value="${e(S.generatorQuery||'')}" placeholder="Search saved prompts…"></label></div>
- <div class="gen-roll-row"><label class="gen-favourites"><input type="checkbox" id="gen-favorites" ${S.generatorFavoritesOnly?'checked':''}> Favourites only ${choice[1]?'':'(saved prompts only)'}</label><span class="gen-available">${pool.length} ${choice[1]?'matching saved prompts':'available ideas'}</span><button class="btn btn-primary gen-roll" data-gen-draw ${pool.length?'':'disabled'}>✦ ${S.generatorMode==='next'?'Next idea':'Surprise me'}</button></div>
- ${picked&&picked.category===selected?`<div class="generator-pick gen-output" aria-live="polite"><div class="eyebrow">${picked.remix?'CREATIVE REMIX':'FROM YOUR SAVED LIBRARY'}</div><h2>${e(picked.title)}</h2><p>${e(picked.description)}</p><div class="gen-result-actions"><button class="btn btn-primary" data-gen-save>＋ Save as ${e(generatorSaveLabel(selected))}</button>${picked.sourceId?`<button class="btn btn-soft" data-detail="${e(picked.sourceId)}">Open source</button>`:''}<button class="btn" data-gen-copy>Copy idea</button></div></div>`:`<div class="gen-empty">${pool.length?'Choose “Surprise me” to draw from this generator.':'No matches for these filters. Clear the search or turn off Favourites only.'}</div>`}
+ <div class="gen-section-title"><div><span class="eyebrow">YOUR SELECTED GENERATOR</span><h2>${pinkIcon('wand')} ${e(selected)}</h2><p class="subcopy">${e(choice[2])} · 250 world-matched preset results.${choice[1]?` Your ${generatorSavedPool(choice).length} original saved prompts are kept separately.`:''}</p></div></div>
+ <div class="gen-controls"><label class="gen-field">World (optional)<select id="gen-world"><option value="">Any world</option>${worlds.map(w=>`<option value="${e(w.id)}" ${S.generatorWorld===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select></label><label class="gen-field">Generator theme<select id="gen-theme"><option value="">Follow selected world</option>${themeOptions.map(o=>`<option value="${e(o.value)}" ${S.generatorTheme===o.value?'selected':''}>${e(o.label)}</option>`).join('')}</select></label><label class="gen-field">How to roll<select id="gen-mode"><option value="random" ${S.generatorMode!=='next'?'selected':''}>Surprise me (random)</option><option value="next" ${S.generatorMode==='next'?'selected':''}>Next in order</option></select></label><label class="gen-field">Find an idea<input id="gen-search" type="search" value="${e(S.generatorQuery||'')}" placeholder="Search these 250 options…"></label></div>
+ <div class="gen-theme-note">✦ <strong>${e(context.label)}</strong> theme for <strong>${e(context.name)}</strong>. All 27 generators use matching topics; world names are unchanged.</div>
+ <div class="gen-roll-row"><label class="gen-favourites"><input type="checkbox" id="gen-favorites" ${S.generatorFavoritesOnly?'checked':''}> Saved favourites only</label><label class="gen-favourites"><input type="checkbox" id="gen-include-saved" ${includeSaved?'checked':''}> Include old saved prompts ${S.generatorWorld?'(may be off-theme)':''}</label><span class="gen-available">${pool.length} results available</span><button class="btn btn-primary gen-roll" data-gen-draw ${pool.length?'':'disabled'}>✦ ${S.generatorMode==='next'?'Next idea':'Surprise me'}</button></div>
+ ${picked&&picked.category===selected?`<div class="generator-pick gen-output" aria-live="polite"><div class="eyebrow">${picked.builtin?'WORLD-THEMED PRESET':picked.remix?'CREATIVE REMIX':'YOUR ORIGINAL SAVED PROMPT'}</div><h2>${e(picked.title)}</h2><p>${e(picked.description)}</p><div class="gen-result-actions"><button class="btn btn-primary" data-gen-save>＋ Save as ${e(generatorSaveLabel(selected))}</button>${picked.sourceId?`<button class="btn btn-soft" data-detail="${e(picked.sourceId)}">Open source</button>`:''}<button class="btn" data-gen-copy>Copy idea</button></div></div>`:`<div class="gen-empty">${pool.length?'Choose “Surprise me” or browse the result options below.':'No matches for these filters. Clear the search or turn off Favourites only.'}</div>`}
+ <details class="gen-browse" ${S.generatorBrowseOpen?'open':''}><summary>Browse ${pool.length} result options · select any idea</summary><div class="gen-browse-results">${pool.map((item,i)=>`<button type="button" class="gen-browse-item ${picked?.key===item.key?'active':''}" data-gen-choose="${e(item.key)}"><span>${i+1}</span><strong>${e(item.title)}</strong>${item.builtin?'':'<small>Saved</small>'}</button>`).join('')}</div></details>
  </div></section>
  <section class="panel" id="six-block-tool"><div class="section-line"><h2>${pinkIcon('Palette')} Six-Block Palette Generator</h2><span class="pill yellow">Kept exactly as before</span></div><p class="subcopy">Shuffle six FULL building blocks. Accent slots use real coloured blocks, never loose colours or items. Lock anything you love before reshuffling.</p><div class="record-toolbar"><label for="color-count">Coloured block accents</label><select id="color-count">${[0,1,2].map(n=>`<option value="${n}" ${n===S.paletteColorCount?'selected':''}>${n}</option>`).join('')}</select><button class="btn btn-primary" data-generate-palette>⤨ Shuffle unlocked</button><button class="btn" data-use-palette>Save palette</button></div><div class="palette-slots">${S.paletteDraft.map((v,i)=>`<div class="slot"><strong>BLOCK ${i+1}</strong><input data-block-slot="${i}" value="${e(v)}" list="palette-full-cube-options" placeholder="Full block name"><label style="font-size:10px"><input type="checkbox" data-lock-slot="${i}" ${S.paletteLocks[i]?'checked':''}> ${pinkIcon('lock')} Lock</label></div>`).join('')}</div><datalist id="palette-full-cube-options">${stock.map(x=>`<option value="${e(x)}"></option>`).join('')}</datalist><div class="footnote">Using ${stock.length} approved full blocks. Items, lanterns, slabs, and loose colour names aren't generated.</div></section>
  <section class="panel"><h2>${pinkIcon('World')} Quick World Idea</h2><p class="subcopy">Your original little world-seed surprise is still here.</p><button class="btn btn-yellow" data-generate-world>✧ Surprise me</button><div id="world-idea" class="notice">${S.generatedWorld?`<b>${e(S.generatedWorld.name)}</b><br>${e(S.generatedWorld.description)}`:'Tap Surprise me to generate a world seed idea.'}</div><button class="btn btn-soft btn-small" id="save-world-idea" ${S.generatedWorld?'':'style="display:none"'}>Save as World →</button></section>`;
@@ -7497,11 +7519,15 @@ function wireApp(){
  app.querySelectorAll('[data-note-make-task]').forEach(b=>b.addEventListener('click',()=>createTaskFromSavedNote(b.dataset.noteMakeTask)));
  app.querySelector('#page-notes-editor')?.addEventListener('input',ev=>{const key=ev.target.dataset.noteKey;const drafts=key.startsWith('record:')?S.recordNoteDrafts:S.pageNoteDrafts;drafts.set(key,ev.target.value);const btn=app.querySelector('[data-save-page-note]');if(btn)btn.disabled=false;const status=app.querySelector('.note-status');if(status)status.textContent='Unsaved changes';});app.querySelectorAll('[data-toggle-group]').forEach(b=>b.addEventListener('click',()=>toggleNavGroup(b.dataset.toggleGroup)));app.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));app.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>openForm(b.dataset.add)));app.querySelectorAll('[data-quick-add]').forEach(b=>b.addEventListener('click',()=>{S.modal={type:'quick'};render()}));
  app.querySelectorAll('[data-gen-category]').forEach(b=>b.addEventListener('click',()=>{S.generatorChoice=b.dataset.genCategory;S.generatorDrawn=null;S.generatorQuery='';S.generatorFavoritesOnly=false;render();app.querySelector('#generator-drawer')?.scrollIntoView({block:'nearest',behavior:'smooth'})}));
- app.querySelector('#gen-world')?.addEventListener('change',ev=>{S.generatorWorld=ev.target.value;S.generatorDrawn=null;render()});
+ app.querySelector('#gen-world')?.addEventListener('change',ev=>{S.generatorWorld=ev.target.value;S.generatorTheme='';S.generatorIncludeSaved=!S.generatorWorld;S.generatorFavoritesOnly=false;S.generatorDrawn=null;render()});
+ app.querySelector('#gen-theme')?.addEventListener('change',ev=>{S.generatorTheme=ev.target.value;S.generatorDrawn=null;render()});
  app.querySelector('#gen-mode')?.addEventListener('change',ev=>{S.generatorMode=ev.target.value;render()});
- app.querySelector('#gen-favorites')?.addEventListener('change',ev=>{S.generatorFavoritesOnly=!!ev.target.checked;S.generatorDrawn=null;render()});
+ app.querySelector('#gen-include-saved')?.addEventListener('change',ev=>{S.generatorIncludeSaved=!!ev.target.checked;S.generatorFavoritesOnly=false;S.generatorDrawn=null;render()});
+ app.querySelector('#gen-favorites')?.addEventListener('change',ev=>{S.generatorFavoritesOnly=!!ev.target.checked;if(S.generatorFavoritesOnly)S.generatorIncludeSaved=true;S.generatorDrawn=null;render()});
  app.querySelector('#gen-search')?.addEventListener('input',ev=>{const cursor=ev.target.selectionStart;S.generatorQuery=ev.target.value;S.generatorDrawn=null;render();const inp=app.querySelector('#gen-search');if(inp){inp.focus();try{inp.setSelectionRange(cursor,cursor)}catch{}}});
  app.querySelector('[data-gen-draw]')?.addEventListener('click',()=>generatorDraw(true));
+ app.querySelector('.gen-browse')?.addEventListener('toggle',ev=>{S.generatorBrowseOpen=ev.target.open});
+ app.querySelectorAll('[data-gen-choose]').forEach(b=>b.addEventListener('click',()=>generatorSelectResult(generatorAvailable().find(row=>row.key===b.dataset.genChoose))));
  app.querySelector('[data-gen-save]')?.addEventListener('click',generatorSaveIdea);
  app.querySelector('[data-gen-copy]')?.addEventListener('click',async()=>{if(!S.generatorDrawn)return;const message=S.generatorDrawn.title+'\n\n'+S.generatorDrawn.description;try{await navigator.clipboard.writeText(message);showToast('Idea copied ♡')}catch{showToast('Copy is unavailable in this browser. Select the text above to copy it.')}});
  app.querySelector('#prompt-type')?.addEventListener('change',ev=>{S.promptType=ev.target.value;S.promptPage=0;S.promptPicked=null;render()});
