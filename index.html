@@ -5351,7 +5351,7 @@ function homePage(){
  const recent=S.records.filter(r=>!r.archived_at&&['Build','World','TikTok','AddOn','Craftable','Texture','Photo','Lore'].includes(r.kind)).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0)).slice(0,3);
  const dateLabel=new Date().toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
  const worldTheme=(name)=>/pink|wink|barbie/i.test(name)?'rose':/garden|nature|forest/i.test(name)?'garden':/penguin|snow|ice/i.test(name)?'frost':/city|group|block/i.test(name)?'city':'sunny';
- return `<div class="hq3-home hq-home"><div class="cs-row" style="margin-bottom:12px"><button class="cs-btn" data-cs-new>＋ Create Content</button><button class="cs-btn cs-soft" data-nav="ContentPlanner">Content Planner</button><button class="cs-btn cs-soft" data-nav="Video">TikTok Studio</button></div>
+ return `<div class="hq3-home hq-home">
  <header class="hq3-hero" aria-label="My creative home"><div class="hq3-hero-copy">
   <div class="hq3-meta"><span class="hq3-wordmark">CTRL + CRFT <span aria-hidden="true">${pinkIcon('star')}</span></span><span class="hq3-datestamp">${e(dateLabel)}</span></div>
   <span class="hq3-hello">THE HOME OF HALF-FINISHED MASTERPIECES</span><h1>My HQ<span class="hq3-title-star" aria-hidden="true">${pinkIcon('star')}</span></h1>
@@ -5367,6 +5367,7 @@ function homePage(){
  <div class="hq3-bottom-grid"><section class="hq3-builds" aria-label="Current builds"><div class="hq3-section-head"><div><span class="hq3-section-kicker">CURRENTLY UNDER CONSTRUCTION</span><h2>On my workbench</h2></div><button type="button" data-nav="Build" class="hq3-text-link">See my builds <span aria-hidden="true">↗</span></button></div>
  ${builds.length?`<div class="hq3-build-list">${builds.map((b,i)=>{const raw=data(b).progress;const progress=raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw))?Math.max(0,Math.min(100,Number(raw))):null;return `<button type="button" data-detail="${e(b.id)}" class="hq3-build-item"><span class="hq3-build-icon" aria-hidden="true">${pinkIcon('Build')}</span><span class="hq3-build-body"><strong>${e(title(b))}</strong><small>${e(String(data(b).status||'In progress'))}${progress!==null?' · '+Math.round(progress)+'%':''}</small>${progress!==null?`<span class="hq3-progress-track"><span style="width:${progress}%"></span></span>`:''}</span><span class="hq3-item-arrow" aria-hidden="true">↗</span></button>`}).join('')}</div>`:`<div class="hq3-small-empty">Nothing in progress yet. Time to dream something up. <button type="button" data-add="Build">Start something ↗</button></div>`}</section>
  <section class="hq3-library" aria-label="Creative library shortcuts"><div class="hq3-section-head"><div><span class="hq3-section-kicker">THE GOOD STUFF</span><h2>My creative stash</h2></div></div><div class="hq3-shelf-grid">${[['AddOn','Add-ons'],['Craftable','Craftables'],['Palette','Palettes'],['TikTok','TikToks']].map(([kind,txt],i)=>`<button type="button" data-nav="${kind}" class="hq3-shelf-link hq3-shelf-${i+1}"><span class="hq3-shelf-icon">${pinkIcon(kind)}</span><span>${e(txt)} <small class="hq-shelf-count">${count(kind)}</small></span><span aria-hidden="true" class="hq3-shelf-arrow">↗</span></button>`).join('')}</div></section></div>
+ <details class="hq-studio-drawer"><summary>${pinkIcon('Video')} Video & content studio <span>Open tools ＋</span></summary><div class="cs-row"><button class="cs-btn" data-cs-new>＋ Create Content</button><button class="cs-btn cs-soft" data-nav="ContentPlanner">Content Planner</button><button class="cs-btn cs-soft" data-nav="Video">TikTok Studio</button></div></details>
  ${recent.length?`<details class="hq3-history"><summary>Fresh from the notebook <span>your last 3 updates <span aria-hidden="true">⌄</span></span></summary><div class="hq3-history-items">${recent.map(r=>`<button type="button" data-detail="${e(r.id)}"><span>${e(title(r))}</span><small>${e(label(r.kind))} · ${e(dateStr(r.updated_at))}</small></button>`).join('')}</div></details>`:''}
  </div>`;
 }
@@ -5387,8 +5388,8 @@ async function executePermanentDelete(id){const r=get(id);if(!r||S.busy)return;c
  if(!Array.isArray(rows)||rows.length!==1)throw Error('Deletion not confirmed. Refresh and inspect your list before retrying.');
  S.modal=null;S.detail=null;await loadAll();showToast('Deleted '+name+'. All connected records were kept.');
  }catch(err){S.modal=null;try{await loadAll()}catch{}showToast('Deletion stopped: '+err.message)}finally{S.busy=false;render()}}
-function managementActions(r){if(r.archived_at)return `<button class="btn btn-small" data-restore-record="${e(r.id)}">Restore</button><button class="btn btn-danger btn-small" data-delete="${e(r.id)}">Delete</button>`;return `<button class="btn btn-small" data-edit="${e(r.id)}" aria-label="Edit ${e(title(r))}">Edit</button><button class="btn btn-small btn-soft" data-archive="${e(r.id)}" aria-label="Archive ${e(title(r))}">Archive</button><button class="btn btn-small btn-danger-soft" data-delete="${e(r.id)}" aria-label="Delete ${e(title(r))}">Delete</button>`}
-function compactRow(r){const d=data(r),shop=CREATOR_KINDS.has(r.kind),creator=shop?creatorDetails(r).name:'',subtitle=[creator&&creator!=='Creator not assigned'?creator:'',d.category,d.theme,d.status,((r.kind==='Build'&&d.progress!=null)?d.progress+'%':'')].filter(Boolean).slice(0,3).join(' · ');
+function managementActions(r){const more=`<details class="row-more-actions"><summary aria-label="More actions for ${e(title(r))}" title="More actions">•••</summary><div class="row-more-menu">${r.archived_at?'':`<button type="button" class="btn btn-small btn-soft" data-archive="${e(r.id)}">Archive</button>`}<button type="button" class="btn btn-small btn-danger-soft" data-delete="${e(r.id)}">Delete</button></div></details>`;if(r.archived_at)return `<button class="btn btn-small" data-restore-record="${e(r.id)}">Restore</button>${more}`;return `<button class="btn btn-small" data-edit="${e(r.id)}" aria-label="Edit ${e(title(r))}">Edit</button>${more}`}
+function compactRow(r){const d=data(r),shop=CREATOR_KINDS.has(r.kind),creator=shop?creatorDetails(r).name:'',size=d.sizeMB!==undefined&&d.sizeMB!==null&&d.sizeMB!==''?`${d.sizeMB} MB`:'',subtitle=[creator&&creator!=='Creator not assigned'?creator:'',size,d.category,d.theme,d.status,((r.kind==='Build'&&d.progress!=null)?d.progress+'%':'')].filter(Boolean).slice(0,3).join(' · ');
  const world=r.kind==='Build'?relatedRecords(r.id,relationDefs('Build').find(x=>x[0]==='world')).map(title).join(', '):'';
  const groupNames=r.kind==='World'?relatedRecords(r.id,relationDefs('World')[0]).map(title).join(' · '):'';
  return `<div class="compact-row ${r.archived_at?'archived-row':''}"><button type="button" class="compact-open" data-detail="${e(r.id)}" ${r.archived_at?'disabled':''}><span class="compact-symbol">${pinkIcon(r.kind)}</span><span class="compact-copy"><strong>${e(title(r))}</strong><small>${e(groupNames||subtitle||world||(r.kind==='World'?'No World Group yet':d.date||''))}</small></span></button><div class="compact-actions">${managementActions(r)}</div></div>`;
@@ -9328,6 +9329,134 @@ boot();
  #app .modal-content{padding:16px}
 }
 
+</style>
+<style id="ctrl-cohesive-journal-refresh">
+/* One calm reading surface, with pink and yellow used as highlighter accents. */
+#app{--scrap-body:system-ui,-apple-system,"Segoe UI",sans-serif;--body-font:system-ui,-apple-system,"Segoe UI",sans-serif;color:#40343c}
+body,#app,#app .main,#app main.content,.guest-hq-page,.guest-hq-page .content{background:#fff!important}
+#app .content{max-width:1180px!important;padding:22px clamp(15px,3vw,32px) 105px!important;line-height:1.55}
+#app .topbar{background:#fff!important;border-bottom:1px solid #efd9e2!important;box-shadow:none!important}
+#app .sidebar.sidebar-v4{background:#fff!important;border-right:1px solid #eed9e4!important;box-shadow:none!important}
+#app .sidebar.sidebar-v4 .sidebar-v4-pins{background:#fff!important;border:0!important;border-bottom:1px solid #f1d9e4!important;border-radius:0!important;padding:9px 1px 14px!important}
+#app .sidebar.sidebar-v4 .sidebar-v4-library{background:#fff!important;border:0!important;border-radius:0!important;padding:3px!important}
+#app .sidebar.sidebar-v4 .sidebar-v4-pin-grid .nav-item{background:#fff!important;border:0!important;border-radius:8px!important;min-height:46px!important;padding:10px!important;font-size:14px!important}
+#app .sidebar.sidebar-v4 .sidebar-v4-pin-grid .nav-item.active,#app .sidebar.sidebar-v4 .sidebar-v4-group .nav-item.active{background:#ffe4ed!important;box-shadow:inset 3px 0 #ff5b9a!important}
+#app .sidebar-v4-all-toggle{background:#fff!important;color:#803957!important;border:1px solid #f0d6e2!important;border-radius:10px!important;min-height:46px}
+#app .sidebar.sidebar-v4 .sidebar-v4-group .nav-item{min-height:44px!important;font-size:14px!important}
+#app .sidebar.sidebar-v4 .sidebar-v4-group .nav-item .nav-label{font-size:14px!important}
+#app .sidebar-v4-search input,#app .top-search input{background:#fff!important;min-height:44px!important;font-size:15px!important}
+#app .page-head{margin:0 0 18px!important;padding:4px 0 15px!important;border-bottom:2px solid #ffe7a3!important;gap:12px}
+#app .page-head h1{font-size:clamp(31px,3.5vw,46px)!important;line-height:1.12!important;color:#693a50!important;margin:3px 0 6px!important}
+#app .page-head .subcopy{font-size:15px!important;line-height:1.55!important;color:#655662!important}
+#app .page-head>.actions{display:flex;flex-wrap:wrap;gap:8px!important;align-items:center}
+#app .btn,#app button.btn,#app .btn-small{min-height:44px!important;padding:10px 13px!important;border-radius:10px!important;font-size:14px!important;font-weight:700!important;line-height:1.25!important;box-shadow:none!important;transform:none!important}
+#app .btn-primary{background:#b52e70!important;color:#fff!important;border-color:#b52e70!important}
+#app .btn-primary:hover,#app .btn-primary:focus-visible{background:#922253!important;border-color:#922253!important}
+#app .btn-soft{background:#fff!important;border:1px solid #f1c8d9!important;color:#8f4167!important}
+#app :is(input,select,textarea){font-family:var(--scrap-body)!important}
+#app :is(.record-toolbar input,.record-toolbar select,.select-control,.search-input){min-height:46px!important;font-size:16px!important;border-radius:10px!important;background:#fff!important;border:1px solid #e5d4dc!important}
+#app .record-toolbar{gap:8px!important}
+#app .collector-desk{border:0!important;border-top:1px solid #efd9e3!important;border-radius:0!important;box-shadow:none!important;padding:13px 0!important}
+#app .collector-dock{top:70px!important;background:#fff!important;border:0!important;border-bottom:2px solid #ffe7a3!important;border-radius:0!important;padding:10px 2px!important;box-shadow:0 4px 10px #ffffffdf!important}
+#app .compact-library-panel>.record-toolbar{padding:7px 0 14px!important;margin:0 0 2px!important}
+#app .compact-library-panel>.compact-library-bar{padding:10px 3px!important}
+#app .compact-list{overflow:visible!important}
+#app .compact-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;padding:7px 1px!important;min-height:68px!important;border-bottom:1px solid #f1e1e7!important;background:#fff!important}
+#app .compact-row:has(.row-more-actions[open]){position:relative;z-index:35}
+#app .compact-row:nth-child(even){background:#fff!important}
+#app .compact-open{min-width:0;min-height:54px!important}
+#app .compact-copy strong{font-size:15px!important;line-height:1.35!important;color:#463841!important}
+#app .compact-copy small{font-size:13px!important;line-height:1.4!important;color:#76616d!important}
+#app .compact-symbol{flex-shrink:0}
+#app .compact-actions{position:relative!important;display:flex!important;gap:6px!important;padding:0!important;flex-wrap:nowrap!important;align-items:center;justify-content:flex-end}
+#app .compact-actions>.btn{min-height:42px!important;padding:9px 12px!important;font-size:13px!important}
+#app .row-more-actions{position:relative;flex:none}
+#app .row-more-actions>summary{display:grid;place-items:center;min-width:44px;min-height:44px;list-style:none;cursor:pointer;border-radius:9px;background:#fff;border:1px solid #f0d9e3;color:#9b4d70;font-weight:850;letter-spacing:2px;line-height:1}
+#app .row-more-actions>summary::-webkit-details-marker{display:none}
+#app .row-more-actions[open]>summary{background:#ffe4ed}
+#app .row-more-menu{position:absolute;right:0;top:calc(100% + 5px);width:168px;display:grid;gap:6px;z-index:32;padding:10px;background:#fff;border:1px solid #edc8d8;border-radius:12px;box-shadow:0 12px 26px #50344621}
+#app .row-more-menu .btn{width:100%;min-height:43px!important;text-align:left;justify-content:flex-start}
+#app .readable-table-panel{padding:10px 0!important;margin:8px 0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+#app .readable-table-head{border-bottom:1px solid #edd5df!important;padding:9px 0 12px!important}
+#app .readable-table-head h2{font-size:21px!important;color:#6f3d56!important}
+#app .readable-table-head p{font-size:13px!important;color:#7a6470!important}
+#app .readable-table-tools{gap:6px!important}
+#app .readable-table-tools button{min-height:41px!important;font-size:13px!important}
+#app .editable-field-caption{color:#7e5065!important}
+#app .editable-field-row{padding:13px 2px!important}
+#app .editable-field-row .inline-field-value{font-size:16px!important;line-height:1.45!important}
+#app .more-fields-drawer>summary,#app .quick-data-drawer>summary{min-height:44px;font-size:14px!important;color:#974873!important}
+/* The home reads as a flowing notebook, not a stack of widgets. */
+#app .hq3-home .hq3-hero{min-height:170px!important;padding:18px 22px!important;background:linear-gradient(105deg,#ffe4ed 0%,#fff 77%)!important;border:0!important;border-left:6px solid #ffe7a3!important;border-radius:14px!important;box-shadow:none!important}
+#app .hq3-hero h1{font-size:clamp(44px,4.4vw,61px)!important}
+#app .hq3-hero p{font-size:15px!important;margin-bottom:11px!important}
+#app .hq3-hero-art{height:145px!important;transform:rotate(3deg) scale(.88)!important}
+#app .hq3-worlds,#app .hq3-builds,#app .hq3-library,#app .hq-daily-focus,#app .hq3-history,#app .hq-home-capture .capture-panel{border:0!important;border-top:1px solid #efdae4!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;padding:16px 0!important;margin:11px 0!important}
+#app .hq3-bottom-grid{gap:22px!important}
+#app .hq3-worlds{margin-top:4px!important}
+#app .hq3-section-head{margin-bottom:12px!important}
+#app .hq3-section-head h2{color:#6f3d56!important}
+#app .hq3-home .hq3-world-card{background:#fff!important;border:1px solid #f0dce5!important;border-radius:12px!important;box-shadow:none!important}
+#app .hq3-home .hq3-world-card:hover{box-shadow:0 4px 14px #9a4e7717!important;transform:none!important}
+#app .hq3-home .hq3-world-name{font-size:18px!important;line-height:1.25!important}
+#app .hq3-home .hq3-build-item{min-height:64px!important}
+#app .hq3-home .hq3-build-body strong{font-size:15px!important}
+#app .hq3-home .hq3-build-body small{font-size:13px!important}
+#app .hq-daily-focus .hq-focus-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0!important}
+#app .hq-daily-focus .hq-focus-card{background:#fff!important;border:0!important;border-bottom:1px solid #f0dce5!important;border-radius:0!important;box-shadow:none!important;padding:12px 10px!important}
+#app .hq-daily-focus .hq-focus-label{font-size:12px!important}
+#app .hq-daily-focus .hq-focus-link strong{font-size:15px!important}
+#app .hq-daily-focus .hq-focus-link span{font-size:13px!important}
+#app .hq-home-capture .capture-panel{padding:17px 0!important}
+#app .hq-home-capture #capture-text{background:#fff!important;font-size:16px!important;min-height:94px!important}
+#app .hq-home-launch{margin:9px 0!important}
+#app .hq-home-shortcuts button{background:#fff!important;border:0!important;border-bottom:1px solid #f0dce5!important;border-radius:0!important;min-height:56px!important;box-shadow:none!important}
+#app .hq-home-shortcuts button:hover{background:#fff0f5!important}
+#app .hq-studio-drawer{border-top:1px solid #f0dce5;border-bottom:1px solid #f0dce5;margin:18px 0;padding:0}
+#app .hq-studio-drawer>summary{display:flex;gap:10px;align-items:center;min-height:54px;padding:8px 2px;list-style:none;cursor:pointer;font-weight:750;font-size:15px;color:#8d3e67}
+#app .hq-studio-drawer>summary::-webkit-details-marker{display:none}
+#app .hq-studio-drawer>summary .pink-icon{width:24px;height:24px}
+#app .hq-studio-drawer>summary span{margin-left:auto;font-size:13px;color:#ac7190}
+#app .hq-studio-drawer .cs-row{display:flex;gap:9px;flex-wrap:wrap;padding:5px 0 14px}
+#app .hq-studio-drawer .cs-btn{min-height:44px;border-radius:10px}
+/* The guest preview should show the same visual language. */
+.guest-hq-page{background:#fff!important}
+.guest-hq-page .content{background:#fff!important}
+.guest-hq-top{background:#fff!important}
+.guest-hq-note{border:0!important;border-left:4px solid #ffbdd5!important;border-radius:0!important;box-shadow:none!important;padding:18px 15px!important}
+.guest-hq-card{border:0!important;border-bottom:1px solid #efdae4!important;border-radius:0!important;box-shadow:none!important;background:#fff!important;min-height:110px!important}
+.guest-hq-card:nth-child(2),.guest-hq-card:nth-child(3){background:#fff!important}
+.guest-hq-card strong{font-size:23px!important}
+.guest-hq-card small{font-size:14px!important;color:#6e5965!important}
+@media(max-width:740px){
+ #app .content{padding:13px 14px 112px!important}
+ #app .page-head{align-items:flex-start!important}
+ #app .page-head h1{font-size:33px!important}
+ #app .page-head>.actions{gap:7px!important}
+ #app .page-head>.actions .btn{min-height:44px!important}
+ #app .compact-row{grid-template-columns:minmax(0,1fr) auto!important;gap:5px!important;padding:8px 1px!important}
+ #app .compact-symbol{width:30px!important;min-width:30px!important}
+ #app .compact-copy strong{font-size:15px!important}
+ #app .compact-copy small{font-size:12px!important}
+ #app .compact-actions>.btn{min-height:42px!important;padding:9px!important;font-size:12px!important}
+ #app .row-more-actions>summary{min-width:42px;min-height:42px}
+ #app .record-toolbar{display:flex;flex-wrap:wrap}
+ #app .collector-dock{top:59px!important}
+ #app .record-toolbar .search-input{flex:1 1 100%;width:100%!important}
+ #app .hq3-home .hq3-hero{grid-template-columns:minmax(0,1fr) 94px!important;padding:16px 12px 16px 16px!important;min-height:150px!important}
+ #app .hq3-hero h1{font-size:43px!important}
+ #app .hq3-hero p{font-size:13px!important;max-width:220px}
+ #app .hq3-hero-art{width:94px!important;height:112px!important}
+ #app .hq3-hero-footer{gap:7px}
+ #app .hq3-hero-count{font-size:12px!important}
+ #app .hq3-bottom-grid{grid-template-columns:1fr!important;gap:0!important}
+ #app .hq-daily-focus .hq-focus-grid{grid-template-columns:1fr!important}
+ #app .hq-daily-focus .hq-focus-card{padding:10px 2px!important}
+ #app .hq3-world-card{min-width:0!important}
+ #app .guest-hq-cards{grid-template-columns:1fr!important;gap:0!important}
+ #app .guest-hq-card{grid-column:auto!important;min-height:90px!important}
+}
+@media(prefers-reduced-motion:reduce){#app *,#app *:before,#app *:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </body>
 </html>
