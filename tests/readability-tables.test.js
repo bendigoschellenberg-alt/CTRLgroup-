@@ -47,7 +47,9 @@ test('all defined text fields, including blank notes, are editable on record det
  assert.match(markup,/data-inline-key="description"/);
  assert.match(markup,/data-inline-key="notes"/);
  assert.match(markup,/＋ Add/);
- assert.match(markup,/editable-field-card/);
+ assert.match(markup,/editable-field-list/);
+ assert.match(markup,/editable-field-row/);
+ assert.doesNotMatch(markup,/editable-field-card/);
  assert.match(markup,/Edit everything/);
 });
 

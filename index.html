@@ -4232,6 +4232,46 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 }
 @media(max-width:580px){#app .tv-heading{padding:16px}#app .tv-heading h1{font-size:24px}#app .tv-row{grid-template-columns:26px 54px minmax(0,1fr);gap:8px;padding:12px 10px}#app .tv-row-number{min-width:25px;height:27px;font-size:11px}#app .tv-row-cover{width:54px;height:72px}#app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{flex:1 1 auto}#app .tv-row .vd-entry-detail{padding:12px}}
 @media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
+/* CONTINUOUS JOURNAL: fewer separate boxes, one calm reading surface. */
+#app .main{background:#fff}
+#app main.content{background:#fff;line-height:1.6}
+#app main.content>.panel,#app .compact-library-panel,#app .dashboard-flow>.panel,#app .dashboard-flow-bottom>.panel,#app .columns-2>.panel{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:15px 0!important;margin-bottom:6px!important}
+#app main.content>.panel+.panel,#app .dashboard-flow>.panel+.panel,#app .columns-2>.panel+.panel{border-top:1px solid #f2d7e1!important}
+#app .compact-library-panel>.record-toolbar{margin:8px 0 4px;background:#fff!important;border:0!important;border-bottom:1px solid #ecd2df!important;border-radius:0!important;box-shadow:none!important;padding:10px 1px!important}
+#app .compact-library-panel>.compact-library-bar{border:0!important;border-bottom:1px solid #f2d7e1!important;border-radius:0!important;background:transparent!important;margin:0!important;padding:10px 3px!important}
+#app .compact-list{border:0!important;border-radius:0!important;background:#fff!important}
+#app .compact-row{background:transparent!important;border:0!important;border-bottom:1px solid #f0dae4!important;border-radius:0!important;box-shadow:none!important;margin:0!important;padding:8px 3px!important}
+#app .compact-row:last-child{border-bottom:0!important}
+#app .compact-row .compact-open{min-height:54px}
+#app .readable-table-panel{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;padding:10px 0!important;margin:7px 0!important}
+#app .readable-table-head{border-bottom:1px solid #ebccda!important;margin-bottom:5px!important;padding:4px 0 9px!important}
+#app .readable-table-head h2{font-size:19px!important}
+#app .readable-table-head p{line-height:1.45!important}
+#app .readable-table-panel .compact-list{margin-top:0!important}
+#app .detail-editor-panel{margin-top:6px!important}
+#app .editable-field-list{display:block;border-top:1px solid #f0dce5}
+#app .editable-field-row{display:grid;grid-template-columns:minmax(105px,170px) minmax(0,1fr);align-items:start;gap:14px;padding:12px 3px;border-bottom:1px solid #f0dce5;background:transparent}
+#app .editable-field-row .editable-field-caption{font-size:13px;font-weight:800;margin:5px 0;color:#774c60;justify-content:flex-start;gap:10px}
+#app .editable-field-row .editable-field-control{min-width:0}
+#app .editable-field-row .inline-field-value{font-size:15px!important;font-weight:650!important;min-height:40px!important;padding:5px 9px!important;background:transparent!important;border:0!important;border-radius:7px!important;text-align:left;color:#45363e!important}
+#app .editable-field-row .inline-field-value.is-empty{color:#a24576!important}
+#app .editable-field-row .inline-field-value:hover,#app .editable-field-row .inline-field-value:focus-visible{background:#ffe4ed!important;outline:2px solid #ffbdd5!important}
+#app .more-fields-drawer{border-top:0!important;padding-top:4px!important;margin-top:0!important}
+#app .more-fields-drawer>summary{border:0!important;border-radius:0!important;background:transparent!important;border-bottom:1px solid #efcadb!important;padding:14px 3px!important}
+#app .more-fields-drawer>.editable-field-list{margin-top:0}
+#app .quick-data-drawer{border:0!important;border-radius:0!important;border-top:1px dashed #efc4d5!important;border-bottom:1px solid #efc4d5!important;padding:0!important;margin:12px 0 23px!important;background:transparent!important}
+#app .quick-data-drawer>summary{padding:13px 3px!important}
+#app .quick-data-drawer .readable-table-panel{margin:0!important}
+#app .relation-panel,#app .world-hub-tile,#app .world-optional-choice{background:transparent!important;border:0!important;border-bottom:1px solid #efdae4!important;border-radius:0!important;box-shadow:none!important}
+#app .relation-panel{padding:12px 3px!important}
+#app .relation-grid{gap:0!important}
+#app .tv-heading{border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,#ffe4ed,#fff 65%)!important;border-bottom:2px solid #ffe7a3!important;margin-bottom:8px!important}
+#app .tv-counts{border-bottom:1px solid #eecbd9;padding-bottom:10px;margin-bottom:6px!important}
+#app .tv-counts span{border:0!important;border-radius:0!important;background:transparent!important;padding:5px 12px 5px 0!important}
+#app .tv-rows{gap:0!important}
+#app .tv-row,#app .tv-row.tv-needs,#app .tv-row.tv-ready,#app .tv-row.tv-review-needed{border:0!important;border-bottom:1px solid #f0d2df!important;border-left:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important;margin:0!important;padding:14px 3px!important}
+#app .tv-row:last-child{border-bottom:0!important}
+@media(max-width:740px){#app .editable-field-row{grid-template-columns:1fr;gap:2px;padding:10px 1px}#app .editable-field-row .editable-field-caption{margin:0 0 2px}#app .readable-table-panel{margin:6px 0!important}#app .tv-row,#app .tv-row.tv-needs{padding:13px 1px!important}#app main.content>.panel,#app .compact-library-panel{padding:12px 0!important}}
 </style>
 <script src="./tiktok-catalog.js"></script>
 <script src="./themed-generators.js"></script>
@@ -5224,6 +5264,16 @@ function hqDailyFocus(){
 }
 
 
+/* Lore pictures live only with their Lore entries, never in the general Photos
+   library or World snapshot galleries. Nothing is deleted or unlinked. */
+function lorePhotoIds(){
+  const loreRecords=new Set(S.records.filter(r=>r.kind==='Lore').map(r=>r.id));
+  return new Set(S.links.filter(link=>link.link_type==='has_photo'&&loreRecords.has(link.from_record_id)).map(link=>link.to_record_id));
+}
+function generalPhotos(photos){
+  const linkedToLore=lorePhotoIds();
+  return photos.filter(photo=>photo.kind==='Photo'&&!data(photo).buildKitSource&&!linkedToLore.has(photo.id));
+}
 /* 2026-10-19: Safe world-photo presentation; all links stay in their existing private Supabase records. */
 const worldPhotoPending=new Set();
 function worldPhotoCollection(world){
@@ -5237,11 +5287,11 @@ function worldPhotoCollection(world){
     }
   }
   gather(world);
-  for(const relation of ['builds','lore']){
+  for(const relation of ['builds']){
     const def=relationDefs('World').find(x=>x[0]===relation);
     if(def)for(const item of relatedRecords(world.id,def))gather(item);
   }
-  return [...selected.values()].sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
+  return generalPhotos([...selected.values()]).sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
 }
 
 function worldPhotoUrl(pic){
@@ -5281,7 +5331,7 @@ function worldDetailPhotoSection(world){
   if(!photos.length)return `<section class="panel hq-world-album-empty" aria-label="World photo album"><div><span class="eyebrow">YOUR WORLD IN PICTURES</span><h2>Make this world yours ♡</h2><p>Photos you link to this world and its builds will show up here, on your world cards, and on your home screen.</p></div><button type="button" class="btn btn-primary" data-add-photo="${e(world.id)}">＋ Add first photo</button></section>`;
   const previews=photos.slice(0,7);
   return `<section class="panel hq-world-album" aria-label="Photo album for ${e(title(world))}">
-    <div class="hq-world-album-head"><div><span class="eyebrow">YOUR WORLD IN PICTURES ✦</span><h2>Snapshots of ${e(title(world))}</h2><p>Real photos from this world, its builds and story.</p></div><div class="hq-world-album-actions"><span class="hq-world-album-count">${photos.length} photo${photos.length===1?'':'s'}</span><button type="button" class="btn btn-primary btn-small" data-add-photo="${e(world.id)}">＋ Add photo</button></div></div>
+    <div class="hq-world-album-head"><div><span class="eyebrow">YOUR WORLD IN PICTURES ✦</span><h2>Snapshots of ${e(title(world))}</h2><p>Photos from this world and its builds. Lore images stay in the Lore Book.</p></div><div class="hq-world-album-actions"><span class="hq-world-album-count">${photos.length} photo${photos.length===1?'':'s'}</span><button type="button" class="btn btn-primary btn-small" data-add-photo="${e(world.id)}">＋ Add photo</button></div></div>
     <div class="hq-world-photo-mosaic">${previews.map((p,i)=>{const photoUrl=worldPhotoUrl(p);return `<button class="hq-world-photo-tile ${i===0?'is-featured':''}" type="button" data-detail="${e(p.id)}" aria-label="Open photo ${e(title(p))}">${photoUrl?`<img src="${e(photoUrl)}" loading="${i===0?'eager':'lazy'}" alt="${e(title(p))}">`:`<span class="hq-photo-await" aria-hidden="true">✿</span>`}<span class="hq-world-photo-label">${e(title(p))}</span></button>`}).join('')}</div>
   </section>`;
 }
@@ -5291,7 +5341,7 @@ function homeQuickLaunch(){
     <button type="button" data-nav="World"><span class="hq-shortcut-icon">${pinkIcon('World')}</span><span class="hq-shortcut-text"><strong>My Worlds</strong><small>${count('World')} universes</small></span><span aria-hidden="true">↗</span></button>
     <button type="button" data-nav="today"><span class="hq-shortcut-icon">${pinkIcon('today')}</span><span class="hq-shortcut-text"><strong>Today</strong><small>Notes & plans</small></span><span aria-hidden="true">↗</span></button>
     <button type="button" data-nav="generator"><span class="hq-shortcut-icon">${pinkIcon('star')}</span><span class="hq-shortcut-text"><strong>Surprise Me</strong><small>Creative ideas</small></span><span aria-hidden="true">↗</span></button>
-    <button type="button" data-nav="Photo"><span class="hq-shortcut-icon">${pinkIcon('Photo')}</span><span class="hq-shortcut-text"><strong>My Photos</strong><small>${count('Photo')} snapshots</small></span><span aria-hidden="true">↗</span></button>
+    <button type="button" data-nav="Photo"><span class="hq-shortcut-icon">${pinkIcon('Photo')}</span><span class="hq-shortcut-text"><strong>My Photos</strong><small>${generalPhotos(all('Photo')).length} snapshots</small></span><span aria-hidden="true">↗</span></button>
   </div></section>`;
 }
 
@@ -5654,7 +5704,7 @@ function readableTable(kind,records,options={}){const cfg=KINDS[kind];if(!cfg)re
  ${mode==='list'&&showCards?`<div class="compact-list">${records.length?records.map(compactRow).join(''):'<p>No saved entries yet.</p>'}</div>`:`<div class="readable-table-scroll" role="region" tabindex="0" aria-label="Swipe to see more ${e(cfg.label)} columns"><table class="readable-table"><thead><tr><th scope="col">${e(cfg.singular)}</th>${fields.map(f=>`<th scope="col">${e(f.label)}</th>`).join('')}<th scope="col">Actions</th></tr></thead><tbody>${shown.map(r=>`<tr><td data-label="${e(cfg.singular)}">${inlineFieldMarkup(r,{key:'name',label:fieldDefs(kind).find(f=>f.key==='name')?.label||'Name',type:'text',required:true})}</td>${fields.map(f=>`<td data-label="${e(f.label)}">${inlineFieldMarkup(r,f)}</td>`).join('')}<td class="table-row-actions" data-label="Actions"><button type="button" data-detail="${e(r.id)}">Open</button><button type="button" data-edit="${e(r.id)}">All fields</button></td></tr>`).join('')||`<tr><td colspan="${fields.length+2}">No matching records yet.</td></tr>`}</tbody></table></div>`}
  ${pages>1&&isTable?`<div class="table-pager"><button type="button" data-table-page="${e(kind)}" data-table-delta="-1" ${page===0?'disabled':''}>← Previous</button><span>${page*pageSize+1}–${Math.min(records.length,(page+1)*pageSize)} of ${records.length}</span><button type="button" data-table-page="${e(kind)}" data-table-delta="1" ${page===pages-1?'disabled':''}>Next →</button></div>`:''}</section>`;
 }
-function detailEditableTable(record){const fields=fieldDefs(record.kind).filter(f=>!['filePath','clips'].includes(f.key)),frontKeys=['name','description','status','category','theme','notes'],primary=fields.filter(f=>frontKeys.includes(f.key)),extra=fields.filter(f=>!frontKeys.includes(f.key));const tiles=items=>items.map(f=>`<div class="editable-field-card"><span class="editable-field-caption">${e(f.label)} <span aria-hidden="true">✎</span></span>${inlineFieldMarkup(record,f)}</div>`).join('');return `<section class="readable-table-panel detail-editor-panel" aria-label="Editable record fields"><div class="readable-table-head"><div><h2>My details ♡</h2><p>Tap any pink-pencil field to change it, then Save.</p></div><button type="button" class="btn btn-soft btn-small" data-edit="${e(record.id)}">Edit everything</button></div><div class="editable-field-grid">${tiles(primary)}</div>${extra.length?`<details class="more-fields-drawer" data-record-more="${e(record.id)}" ${S.recordMoreOpen?.[record.id]?'open':''}><summary>✦ More details (${extra.length})</summary><div class="editable-field-grid">${tiles(extra)}</div></details>`:''}</section>`}
+function detailEditableTable(record){const fields=fieldDefs(record.kind).filter(f=>!['filePath','clips'].includes(f.key)),frontKeys=['name','description','status','category','theme','notes'],primary=fields.filter(f=>frontKeys.includes(f.key)),extra=fields.filter(f=>!frontKeys.includes(f.key));const lines=items=>items.map(f=>`<div class="editable-field-row"><span class="editable-field-caption">${e(f.label)} <span aria-hidden="true">✎</span></span><div class="editable-field-control">${inlineFieldMarkup(record,f)}</div></div>`).join('');return `<section class="readable-table-panel detail-editor-panel" aria-label="Editable record fields"><div class="readable-table-head"><div><h2>My details ♡</h2><p>Tap a line to edit it. Save only what you change.</p></div><button type="button" class="btn btn-soft btn-small" data-edit="${e(record.id)}">Edit everything</button></div><div class="editable-field-list">${lines(primary)}</div>${extra.length?`<details class="more-fields-drawer" data-record-more="${e(record.id)}" ${S.recordMoreOpen?.[record.id]?'open':''}><summary>✦ More details (${extra.length})</summary><div class="editable-field-list">${lines(extra)}</div></details>`:''}</section>`}
 function contentPlanReferenceTable(){const rows=all('ContentPlan').slice().sort((a,b)=>String(data(a).publishDate||'').localeCompare(String(data(b).publishDate||''))).slice(0,40);
  return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>Content planning table</h2><p>${all('ContentPlan').length} saved plans · Edit a row to change its title, caption, date or other fields</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Title</th><th>Platform</th><th>Project</th><th>Publish date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(r=>{const d=data(r);return `<tr><td data-label="Title">${e(d.title||'(Untitled)')}</td><td data-label="Platform">${e(d.platform||'')}</td><td data-label="Project">${e(d.project||'')}</td><td data-label="Publish date">${e(d.publishDate||'')}</td><td data-label="Status">${e(d.status||'Idea')}</td><td data-label="Actions" class="table-row-actions"><button data-cs-edit="${e(r.id)}" type="button">Edit all text</button></td></tr>`}).join('')||'<tr><td colspan="6">No content plans saved yet.</td></tr>'}</tbody></table></div></section>`;
 }
@@ -5673,12 +5723,13 @@ function relevantPageTable(page){
  return `<details class="quick-data-drawer" ${open}><summary>♡ ${e(KINDS[kind].label)} data <span>${records.length} records · tap to open</span></summary>${readableTable(kind,records,{heading:`${KINDS[kind].label} · quick reference`,cards:false,pageSize:20})}</details>`;
 }
 
-function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" style="text-align:center;padding:35px 18px"><div class="eyebrow">IDEAS STAY TUCKED AWAY ♡</div><h2>Build Idea Generator</h2><p class="subcopy">Your saved build ideas are safely kept behind the generator. Roll an idea to reveal one at a time.</p><button class="btn btn-primary" data-nav="generator">✦ Open Build Idea Generator</button></section>`;if(kind==='WorldGroup')return worldGroupsPage();if(kind==='WorldTemplate')return worldTemplateRecoveryPage();if(kind==='CraftablePlacement')return craftableLocationsPage();if(CREATOR_KINDS.has(kind))return creatorLibraryPage(kind);if(kind==='GeneratorPrompt')return promptLibraryPage();if(kind==='CityBlock')return cityGridPage();if(kind==='Palette')return palettePage();const cfg=KINDS[kind],records=filterRecords(kind),base=all(kind),st=unique(base.map(r=>data(r).status).filter(Boolean)).sort(),categories=unique(base.map(categoryOf).filter(Boolean)).sort((a,b)=>a.localeCompare(b)),worldDefs=relationDefs(kind).filter(d=>d[4]==='World'),hasWorld=worldDefs.length>0;
+function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" style="text-align:center;padding:35px 18px"><div class="eyebrow">IDEAS STAY TUCKED AWAY ♡</div><h2>Build Idea Generator</h2><p class="subcopy">Your saved build ideas are safely kept behind the generator. Roll an idea to reveal one at a time.</p><button class="btn btn-primary" data-nav="generator">✦ Open Build Idea Generator</button></section>`;if(kind==='WorldGroup')return worldGroupsPage();if(kind==='WorldTemplate')return worldTemplateRecoveryPage();if(kind==='CraftablePlacement')return craftableLocationsPage();if(CREATOR_KINDS.has(kind))return creatorLibraryPage(kind);if(kind==='GeneratorPrompt')return promptLibraryPage();if(kind==='CityBlock')return cityGridPage();if(kind==='Palette')return palettePage();const cfg=KINDS[kind],records=kind==='Photo'?generalPhotos(filterRecords(kind)):filterRecords(kind),base=kind==='Photo'?generalPhotos(all(kind)):all(kind),st=unique(base.map(r=>data(r).status).filter(Boolean)).sort(),categories=unique(base.map(categoryOf).filter(Boolean)).sort((a,b)=>a.localeCompare(b)),worldDefs=relationDefs(kind).filter(d=>d[4]==='World'),hasWorld=worldDefs.length>0;
  const ideasOnly=kind==='BuildIdea',ideaPageSize=60,ideaPageCount=ideasOnly?Math.max(1,Math.ceil(records.length/ideaPageSize)):1;
  if(ideasOnly)S.buildIdeasPage=Math.min(ideaPageCount-1,Math.max(0,Number(S.buildIdeasPage)||0));
  const displayed=ideasOnly?records.slice(S.buildIdeasPage*ideaPageSize,(S.buildIdeasPage+1)*ideaPageSize):records;
  const pageControls=ideasOnly&&records.length>ideaPageSize?`<div class="compact-library-bar" style="flex-wrap:wrap;gap:8px"><span>Showing ${S.buildIdeasPage*ideaPageSize+1}–${Math.min(records.length,(S.buildIdeasPage+1)*ideaPageSize)} of ${records.length} ideas</span><div class="actions"><button class="btn btn-soft btn-small" data-ideas-page="-1" ${S.buildIdeasPage===0?'disabled':''}>← Earlier</button><strong>Page ${S.buildIdeasPage+1}/${ideaPageCount}</strong><button class="btn btn-soft btn-small" data-ideas-page="1" ${S.buildIdeasPage>=ideaPageCount-1?'disabled':''}>More →</button></div></div>`:'';
- const extras=kind==='World'?`<button class="btn btn-soft btn-small" data-nav="WorldGroup">World Groups</button>`:kind==='Build'?`<button class="btn btn-soft btn-small" data-nav="BuildIdea">Build Ideas</button>`:kind==='BuildIdea'?`<button class="btn btn-soft btn-small" id="preview-2000-ideas">${pinkIcon('star')} Preview 2,000 Idea Pack</button>`:kind==='Lore'?`<button class="btn btn-soft btn-small" data-nav="settings">Import 100-Day Pictures</button>`:'';
+ const loreCover=kind==='Lore'?all('Photo').find(p=>data(p).buildKitSource&&data(p).buildKitRole==='cover'):null;
+ const extras=kind==='World'?`<button class="btn btn-soft btn-small" data-nav="WorldGroup">World Groups</button>`:kind==='Build'?`<button class="btn btn-soft btn-small" data-nav="BuildIdea">Build Ideas</button>`:kind==='BuildIdea'?`<button class="btn btn-soft btn-small" id="preview-2000-ideas">${pinkIcon('star')} Preview 2,000 Idea Pack</button>`:kind==='Lore'?`${loreCover?`<button class="btn btn-soft btn-small" data-detail="${e(loreCover.id)}">Build Kit cover</button>`:''}<button class="btn btn-soft btn-small" data-nav="settings">Import 100-Day Pictures</button>`:'';
  return `${header(cfg.label,'Your saved '+cfg.label.toLowerCase()+' — simple, searchable and connected.',`${extras}<button class="btn btn-soft btn-small" data-manage-fields="${kind}">Fields</button><button class="btn btn-primary" data-add="${kind}">＋ Add ${e(cfg.singular)}</button>`)}${SHOP_KINDS.includes(kind)?collectionDesk(kind):''}
  ${kind==='World'?worldCollectionScopeNotice():''}
  <section class="panel compact-library-panel"><div class="record-toolbar compact-toolbar"><input type="search" class="search-input" id="local-search" placeholder="Search ${e(cfg.label.toLowerCase())}…" value="${e(S.query)}" aria-label="Search ${e(cfg.label)}" />
@@ -5687,6 +5738,7 @@ function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" sty
  ${hasWorld?`<select id="world-filter" aria-label="Filter World"><option value="all">All Worlds</option>${all('World').sort((a,b)=>title(a).localeCompare(title(b))).map(w=>`<option value="${e(w.id)}" ${S.worldFilter===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select>`:''}
  <select id="sort-select" aria-label="Sort records"><option value="name" ${S.sort==='name'?'selected':''}>Name A–Z</option><option value="newest" ${S.sort==='newest'?'selected':''}>Recently updated</option><option value="oldest" ${S.sort==='oldest'?'selected':''}>Oldest first</option></select></div>
  <div class="compact-library-bar"><strong>${records.length} ${e(records.length===1?cfg.singular:cfg.label.toLowerCase())}</strong><label class="archive-toggle"><input type="checkbox" id="show-archived" ${S.showArchived?'checked':''}> Show archived</label></div>
+ ${kind==='Photo'?'<p class="hint">Lore pictures stay in the Lore Book, under their own entries. They are hidden here, not deleted.</p>':''}
  ${readableTable(kind,displayed,{heading:`${cfg.label} · editable table`})}${kind==='Photo'?`<details><summary>Show photo thumbnails</summary><div class="record-grid photo-visual-grid">${records.map(recordCard).join('')}</div></details>`:''}
  ${pageControls}${kind==='Build'?'<p class="hint">Subprojects stay inside their Build profiles. Build Ideas remain separate until you convert one.</p>':''}</section>`}
 
