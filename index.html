@@ -4069,6 +4069,28 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .note-task-row select{padding:7px;border-radius:8px;border:1px solid #f0bad0;background:#fff}
 @media(max-width:600px){#app .pack-summary{grid-template-columns:repeat(2,minmax(0,1fr))}#app .pack-picks{grid-template-columns:1fr}#app .pack-list-row,#app .note-task-row{align-items:flex-start;flex-direction:column}#app .pack-list-row .actions,#app .note-task-row .actions{justify-content:start;width:100%}}
 </style>
+<style id="tiktok-catalog-import-styles">
+#app .tk-catalog{border:1.5px solid #f1b9ce;border-radius:17px;background:#fff;padding:16px;margin:0 0 17px;box-shadow:3px 4px 0 rgba(255,231,163,.6)}
+#app .tk-catalog-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+#app .tk-catalog h2{font-size:21px;color:#a7376d;margin:4px 0 7px}
+#app .tk-catalog p{font-size:13px;color:#66545d;line-height:1.5;margin:5px 0}
+#app .tk-catalog-actions{display:flex;gap:8px;flex-wrap:wrap}
+#app .tk-catalog-actions button{background:#ffe7a3;color:#623f50;border:1px solid #edc665;border-radius:10px;min-height:42px;padding:9px 14px;font-weight:800;cursor:pointer}
+#app .tk-catalog-actions .tk-catalog-save{background:#ff5b9a;color:white;border-color:#ff5b9a}
+#app .tk-catalog-actions button:disabled{opacity:.55;cursor:wait}
+#app .tk-catalog-stats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#app .tk-catalog-stats span{border-radius:8px;background:#fff1c9;padding:6px 9px;font-size:12px;font-weight:800;color:#7e4964}
+#app .tk-catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
+#app .tk-catalog-card{border:1px solid #f5cfdd;border-radius:12px;overflow:hidden;background:#fffdfd}
+#app .tk-catalog-card img{width:100%;height:132px;object-fit:contain;background:#fbe2ed;display:block}
+#app .tk-catalog-card .tk-catalog-placeholder{height:132px;background:linear-gradient(135deg,#ffe4ed,#ffe7a3);display:grid;place-items:center;padding:14px;text-align:center;color:#a7376d;font-weight:900;font-size:14px}
+#app .tk-catalog-card div{padding:9px;display:grid;gap:4px}
+#app .tk-catalog-card b{font-size:13px;color:#593c49;line-height:1.4}
+#app .tk-catalog-card small{font-size:11px;color:#74616b}
+#app .tk-catalog-card a{font-size:12px;font-weight:800;color:#b43a78}
+@media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
+</style>
+<script src="./tiktok-catalog.js"></script>
 <script src="./themed-generators.js"></script>
 <script data-original="assets/app.js">
 /* CTRL GROUP HQ 2.0 — private Supabase-backed, dependency-free client. */
@@ -4180,6 +4202,7 @@ S.captureBuilderOpen=false;S.captureBuilderKind='AddOn';S.captureBuilderRecord='
 S.creatorCatalog=null;
 S.mediaTitleReview=false;
 S.tkEdit=null;S.tkAdd=false;S.tkSearch="";S.tkPage=0;S.tkSaving=false;
+S.tkCatalogReview=false;S.tkCatalogSaving=false;S.tkCatalogMessage='';
 
 S.creatorPrefs=(()=>{try{const p=JSON.parse(localStorage.getItem('ctrlhq.creatorPrefs')||'{}');return p&&typeof p==='object'&&!Array.isArray(p)?p:{}}catch{return {}}})();
 S.paletteBrowse='all';S.paletteSearch='';S.paletteUnassignedSearch='';S.paletteUnassignedPage=0;
@@ -5465,6 +5488,71 @@ function tkPostUrl(record){const d=data(record),samples=[d.postUrl,d.tiktokUrl,d
  const part=String(raw||'').match(/https:\/\/(?:www\.|m\.)?tiktok\.com\/@[a-zA-Z0-9._-]+\/video\/\d{15,22}/i);
  if(part&&tkPostId(part[0]))return `https://www.tiktok.com/@missistephi/video/${tkPostId(part[0])}`;
  }return ''}
+/* Optional, additive import of the 38 public posts from the user's supplied
+   October 2026 catalog. Never remove records, links, clips or edited metadata. */
+function tkCatalogRows(){return window.CTRL_TIKTOK_CATALOG||[]}
+function tkCatalogKey(raw){return String(raw||'').toLowerCase().replace(/#[\p{L}\p{N}_]+/gu,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim()}
+function tkCatalogHasValue(v){return v!==undefined&&v!==null&&String(v).trim()!==''}
+function tkCatalogFields(entry){return {
+ name:cleanCaptionTitle(entry.caption)||TK_SUGGESTED_TITLES[entry.id]?.title||'Minecraft TikTok',
+ caption:entry.caption,song:entry.song,date:entry.date,postDate:entry.date,
+ hashtags:[...new Set(entry.caption.match(/#[\p{L}\p{N}_]+/gu)||[])].join(' '),
+ status:'Posted',postUrl:entry.url,tiktokUrl:entry.url,catalogSourceId:entry.id
+}}
+function tkCatalogPlan(){
+ const posts=S.records.filter(r=>r.kind==='TikTok'),plan={create:[],update:[],unchanged:[],review:[]};
+ for(const entry of tkCatalogRows()){
+  const byId=posts.filter(r=>tkPostId(tkPostUrl(r))===entry.id||data(r).catalogSourceId===entry.id);
+  let matches=byId;
+  if(!matches.length){const key=tkCatalogKey(entry.caption),date=entry.date;
+   if(key.length>=20)matches=posts.filter(r=>{
+    const d=data(r),savedDate=String(d.postDate||d.date||'').slice(0,10),text=tkCatalogKey(d.caption||d.name||'');
+    return savedDate===date&&text.length>=20&&(key===text||key.startsWith(text)&&text.length>=32||text.startsWith(key)&&key.length>=32);
+   });
+  }
+  if(matches.length>1||matches.some(r=>r.archived_at)){plan.review.push({entry,reason:matches.length>1?'Several possible saved matches':'Previously archived'});continue}
+  const existing=matches[0],incoming=tkCatalogFields(entry);
+  if(!existing){plan.create.push({entry,value:incoming});continue}
+  const current=data(existing),value={...current};
+  for(const [key,newValue] of Object.entries(incoming))if(!tkCatalogHasValue(current[key])&&tkCatalogHasValue(newValue))value[key]=newValue;
+  if(Object.keys(value).some(key=>value[key]!==current[key]))plan.update.push({entry,existing,value});
+  else plan.unchanged.push({entry,existing});
+ }
+ return plan;
+}
+function tkCatalogPanel(){
+ const rows=tkCatalogRows();if(!rows.length)return '';
+ const plan=tkCatalogPlan(),pending=plan.create.length+plan.update.length;
+ const stats=[`${rows.length} posts from @missistephi`,`${plan.create.length} new`,`${plan.update.length} missing details`,`${plan.unchanged.length} already complete`];
+ if(plan.review.length)stats.push(`${plan.review.length} need review`);
+ return `<section class="tk-catalog" aria-label="TikTok catalog update">
+  <div class="tk-catalog-head"><div><small class="vd-overline">YOUR OCTOBER 2026 DOCUMENT</small><h2>${rows.length}-post TikTok catalog ♡</h2><p>Captions, dates, songs and direct links, plus 33 supplied screenshots. Your older notes, drafts, clips and World links stay untouched.</p></div>
+   <div class="tk-catalog-actions"><button type="button" data-tk-catalog-toggle>${S.tkCatalogReview?'Hide preview':'Review catalog'}</button>${S.tkCatalogReview?`<button type="button" class="tk-catalog-save" data-tk-catalog-save ${!pending||S.tkCatalogSaving?'disabled':''}>${S.tkCatalogSaving?'Saving…':`Save ${pending} changes`}</button>`:''}</div>
+  </div><div class="tk-catalog-stats">${stats.map(x=>`<span>${e(x)}</span>`).join('')}</div>
+  ${S.tkCatalogMessage?`<p role="status">${e(S.tkCatalogMessage)}</p>`:''}
+  ${S.tkCatalogReview?`<p>New posts are added. Existing entries receive only blank metadata fields; your edits and attachments are never replaced. Archived or ambiguous matches are skipped for manual review.</p>
+   <div class="tk-catalog-grid">${rows.map(entry=>{const state=plan.create.some(x=>x.entry.id===entry.id)?'New':plan.update.some(x=>x.entry.id===entry.id)?'Fill blanks':plan.review.some(x=>x.entry.id===entry.id)?'Review manually':'Saved';return `<article class="tk-catalog-card">${entry.thumbnail?`<img src="${e(entry.thumbnail)}" alt="Minecraft preview for ${e(cleanCaptionTitle(entry.caption)||'TikTok post')}" loading="lazy">`:'<div class="tk-catalog-placeholder" aria-label="Screenshot not supplied">✦ Screenshot not supplied</div>'}<div><small>${e(niceDate(entry.date))} · ${e(state)}</small><b>${e(entry.caption)}</b><small>♫ ${e(entry.song)}</small><a href="${e(entry.url)}" target="_blank" rel="noopener noreferrer">Open TikTok ↗</a></div></article>`}).join('')}</div>`:''}
+ </section>`;
+}
+async function tkCatalogSync(){
+ if(S.tkCatalogSaving||!sessionValid())return;
+ const plan=tkCatalogPlan(),pending=plan.create.length+plan.update.length;
+ if(!pending)return showToast('All catalog entries are already saved or held for review.');
+ if(!confirm(`Save ${plan.create.length} NEW TikToks and fill empty details in ${plan.update.length} saved TikToks?\n\nExisting captions, custom titles, notes, clips, links, and archived records will not be removed or overwritten.`))return;
+ S.tkCatalogSaving=true;let added=0,updated=0;
+ try{
+  for(const item of [...plan.update,...plan.create]){
+   const saved=await saveRecord('TikTok',item.value,item.existing?.id);
+   S.records=[...S.records.filter(r=>r.id!==saved.id),saved];
+   if(item.existing)updated++;else added++;
+   S.tkCatalogMessage=`Saving: ${added} new, ${updated} enriched of ${pending} changes`;
+   const progress=app.querySelector('.tk-catalog [role="status"]');if(progress)progress.textContent=S.tkCatalogMessage;
+  }
+  S.tkCatalogMessage=`Saved ${added} new posts and enriched ${updated} existing posts. ${plan.review.length} held for review.`;
+  showToast('TikTok catalog saved ♡');
+ }catch(err){S.tkCatalogMessage=`Stopped after ${added} new and ${updated} enriched: ${err.message}. Saved changes remain; retry safely.`;showToast('Catalog paused; existing records are safe.');}
+ finally{S.tkCatalogSaving=false;S.tkPage=0;render();}
+}
 function tkCurated(){
  const seen=new Map();
  for(const r of all('TikTok')){const url=tkPostUrl(r);if(!url)continue;const id=tkPostId(url),prior=seen.get(id);
@@ -5509,6 +5597,7 @@ const TK_SUGGESTED_TITLES={
 function tkTitle(r){
  const d=data(r),manuallyNamed=cleanCaptionTitle(d.name||'');
  if(d.manualTitle&&manuallyNamed&&manuallyNamed!=='(Untitled)')return manuallyNamed;
+ if(d.catalogSourceId&&d.caption){const fromCaption=cleanCaptionTitle(d.caption);if(fromCaption)return fromCaption}
  const rec=TK_SUGGESTED_TITLES[tkPostId(tkPostUrl(r))];
  if(rec)return rec.title;
  return manuallyNamed&&manuallyNamed!=='(Untitled)'?manuallyNamed:'Needs a title — open this TikTok';
@@ -5595,11 +5684,14 @@ function videoDeskItem(r){
   </div>`:''}
  </article>`;
 }
-function studioThumb(r){const d=data(r),clip=r.kind==='Video'?d.filePath:tkClips(r).find(c=>c.manualVideoHub===true)?.filePath;const cached=clip?mediaCachedUrl(clip):'';if(clip&&!cached)signedMedia({data:{filePath:clip}}).catch(()=>{});return cached?'<video class="studio-thumb-video" muted playsinline preload="metadata" src="'+e(cached)+'#t=0.1" aria-label="Video thumbnail"></video>':'<span class="studio-thumb-empty">▸<small>'+(clip?'Preparing preview':'No footage yet')+'</small></span>';}
+function studioThumb(r){const d=data(r),clip=r.kind==='Video'?d.filePath:tkClips(r).find(c=>c.manualVideoHub===true)?.filePath;const cached=clip?mediaCachedUrl(clip):'';if(clip&&!cached)signedMedia({data:{filePath:clip}}).catch(()=>{});if(cached)return '<video class="studio-thumb-video" muted playsinline preload="metadata" src="'+e(cached)+'#t=0.1" aria-label="Video thumbnail"></video>';
+ const catalog=r.kind==='TikTok'?tkCatalogRows().find(x=>x.id===tkPostId(tkPostUrl(r))||x.id===d.catalogSourceId):null;
+ return catalog?`<img src="${e(catalog.thumbnail)}" loading="lazy" alt="Minecraft TikTok preview" style="width:100%;height:100%;object-fit:contain">`:'<span class="studio-thumb-empty">▸<small>'+(clip?'Preparing preview':'No footage yet')+'</small></span>';}
 function videoHubPage(){
  const allNotes=all('TikTok'),allUploads=vlManualRecords(),filter=S.videoFilter||'all',term=String(S.tkSearch||'').toLowerCase().trim();
  const olderVideos=all('Video').filter(r=>data(r).manualVideoHub!==true);
- const records=[...allNotes,...allUploads].sort((a,b)=>String(b.created_at||data(b).uploadedAt||'').localeCompare(String(a.created_at||data(a).uploadedAt||'')));
+ const videoOrder=r=>r.kind==='TikTok'?String(data(r).postDate||data(r).date||r.created_at||''):String(data(r).date||data(r).uploadedAt||r.created_at||'');
+ const records=[...allNotes,...allUploads].sort((a,b)=>videoOrder(b).localeCompare(videoOrder(a))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
  const posted=r=>r.kind==='TikTok'&&(!!tkPostUrl(r)||String(data(r).status||'').toLowerCase()==='posted');
  const shown=records.filter(r=>{
   if(filter==='notes'&&r.kind!=='TikTok'||filter==='uploads'&&r.kind!=='Video')return false;
@@ -5616,6 +5708,7 @@ function videoHubPage(){
   ${records.length?`<button type="button" class="studio-feature-cover" data-video-expand="${e(records[0].id)}">${studioThumb(records[0])}<span class="studio-feature-play">▶</span></button><h2>${e(records[0].kind==='TikTok'?tkTitle(records[0]):title(records[0]))}</h2><p>${e(data(records[0]).status||'Draft')}</p>`:'<div class="studio-feature-cover">♡ Start your first project</div>'}
   <div class="studio-tools"><button type="button" data-video-new>✎ Caption &amp; hashtags</button><button type="button" data-video-new>♫ Sound &amp; music</button><button type="button" data-video-upload>▸ Clips &amp; footage</button><button type="button" data-video-new>☑ Filming checklist</button></div></section>
   <div class="studio-quick"><button type="button" data-video-new>＋ New project</button><button type="button" data-video-upload>↑ Upload clips</button></div>
+  ${tkCatalogPanel()}
   ${S.tkAdd?`<section class="vd-form-shell v4-new-panel"><div class="vd-compose-heading"><h2>New TikTok note</h2><button type="button" data-tk29-add aria-label="Close">×</button></div>
   <form id="tk29-add-form" class="video-v3-editor vd-editor">
    <div class="video-v3-core-fields"><label>Title<input name="title" placeholder="What is this TikTok about?" required maxlength="200"></label>
@@ -7535,6 +7628,8 @@ function wireApp(){
  app.querySelectorAll('[data-video-tab]').forEach(b=>b.addEventListener('click',()=>{S.videoTab=b.dataset.videoTab;S.tkAdd=false;S.tkEdit=null;S.tkPage=0;render()}));
  app.querySelectorAll('[data-video-upload-close]').forEach(b=>b.addEventListener('click',()=>{if(VL.uploading)return;VL.uploadOpen=false;VL.queue=[];render()}));
   app.querySelectorAll('[data-video-filter]').forEach(b=>b.addEventListener('click',()=>{S.videoFilter=b.dataset.videoFilter;S.tkPage=0;S.tkEdit=null;render()}));
+ app.querySelector('[data-tk-catalog-toggle]')?.addEventListener('click',()=>{S.tkCatalogReview=!S.tkCatalogReview;render();app.querySelector('.tk-catalog')?.scrollIntoView({block:'start',behavior:'smooth'})});
+ app.querySelector('[data-tk-catalog-save]')?.addEventListener('click',tkCatalogSync);
  app.querySelectorAll('[data-video-expand]').forEach(b=>b.addEventListener('click',()=>{S.videoExpanded=S.videoExpanded===b.dataset.videoExpand?'':b.dataset.videoExpand;S.tkEdit=null;render()}));
  app.querySelector('[data-video-new]')?.addEventListener('click',()=>{S.videoTab='tiktoks';S.tkAdd=true;S.tkEdit=null;render();app.querySelector('.v4-new-panel')?.scrollIntoView({block:'start',behavior:'smooth'})});
  app.querySelector('[data-video-upload]')?.addEventListener('click',()=>{S.tkAdd=false;S.tkEdit=null;VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({block:'center',behavior:'smooth'});});
