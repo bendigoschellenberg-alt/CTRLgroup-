@@ -42,6 +42,88 @@ test('the main app script parses after the additive import', () => {
   assert.match(html, /latest=rows\.slice\(0,5\)/);
   assert.match(html, /class="tk-catalog-upload" data-video-upload/);
   assert.match(html, /querySelectorAll\('\[data-video-upload\]'\)/);
+  assert.match(html, /body=tkOneListPage\(\)/);
+  assert.match(html, /data-tv-file/);
+  assert.match(html, /data-tv-preview/);
+});
+
+test('the one-tab video list includes unsaved catalog entries and places missing videos first', () => {
+  const section=html.slice(html.indexOf('function tkListFiles('),html.indexOf('async function tkOneListUpload('));
+  const saved={id:'already-saved',kind:'TikTok',data:{tiktokUrl:catalog[0].url,clips:[{filePath:'private.mov'}]}};
+  const context={
+    S:{links:[]},data:r=>r?.data||{},title:r=>r?.data?.name||'',tkClips:r=>r.data.clips||[],get:()=>null,
+    all:kind=>kind==='TikTok'?[saved]:[],tkCatalogRows:()=>catalog.slice(0,3),
+    tkCatalogPlan:()=>({create:catalog.slice(1,3).map(entry=>({entry})),update:[],unchanged:[{entry:catalog[0],existing:saved}],review:[]})
+  };
+  const rows=vm.runInNewContext(section+'\ntkOneListRows()',context);
+  assert.equal(rows.length,3);
+  assert.equal(rows[0].entry.id,catalog[1].id);
+  assert.equal(rows[1].entry.id,catalog[2].id);
+  assert.equal(rows[2].record.id,'already-saved');
+  assert.equal(rows[2].files.length,1);
+});
+
+test('all 38 catalog posts render as regular rows with their own upload control', () => {
+  const section=html.slice(html.indexOf('function tkListFiles('),html.indexOf('async function tkOneListUpload('));
+  const context={
+    S:{links:[],videoFilter:'all',tkSearch:'',tkDirectUploadBusy:'',tkDirectUploadMessage:'',tkAdd:false,tvToolsOpen:false,tkCatalogReview:false},
+    VL:{uploadOpen:false},all:()=>[],data:r=>r?.data||{},tkClips:()=>[],
+    tkCatalogRows:()=>catalog,tkCatalogPlan:()=>({create:[...catalog].map(entry=>({entry})),update:[],unchanged:[],review:[]}),
+    cleanCaptionTitle:x=>String(x||'').split('#')[0].trim(),e:x=>String(x??''),niceDate:x=>x,
+    tkCatalogPanel:()=>'',vlUnifiedUploads:()=>'',vlRecoveryPanel:()=>'',creativeStudioPanel:()=>''
+  };
+  const markup=vm.runInNewContext(section+'\ntkOneListPage()',context);
+  assert.equal((markup.match(/data-tv-file=/g)||[]).length,38);
+  assert.match(markup,/38<\/strong> need a video/);
+  assert.ok(markup.indexOf(catalog[0].url)<markup.indexOf(catalog[5].url),'Newest TikTok appears before older entries');
+});
+
+test('direct upload creates only the missing TikTok record and attaches footage to that record', async () => {
+  const section=html.slice(html.indexOf('async function tkOneListUpload('),html.indexOf('function tkCheckIds('));
+  const row={key:'catalog-'+catalog[0].id,entry:catalog[0],record:null,review:false};
+  const actions=[];
+  const context={
+    S:{tkDirectUploadBusy:'',tkDirectUploadMessage:'',records:[]},
+    tkOneListRows:()=>[row],tkCatalogPlan:()=>({create:[{entry:catalog[0]}],unchanged:[],update:[],review:[]}),
+    mediaMime:()=> 'video/quicktime',cleanCaptionTitle:()=> 'New Minecraft Post',
+    tkCatalogFields:entry=>({name:'New Minecraft Post',postUrl:entry.url}),
+    saveRecord:async (kind,data)=>{actions.push(['save',kind]);return {id:'new-tiktok',kind,data}},
+    tkAttachVideo:async(id,file)=>actions.push(['attach',id,file.name]),
+    tkTitle:()=> 'New Minecraft Post',confirm:()=>true,render:()=>{},showToast:()=>{}
+  };
+  const upload=vm.runInNewContext(section+'\ntkOneListUpload',context);
+  await upload(row.key,{name:'my-build.mov',type:'video/quicktime',size:500000});
+  assert.deepEqual(actions,[['save','TikTok'],['attach','new-tiktok','my-build.mov']]);
+  assert.equal(context.S.records.length,1);
+  assert.equal(context.S.records[0].kind,'TikTok');
+  assert.match(context.S.tkDirectUploadMessage,/attached/);
+});
+
+test('direct upload reuses saved TikTok and rejects over-limit files before writing', async () => {
+  const section=html.slice(html.indexOf('async function tkOneListUpload('),html.indexOf('function tkCheckIds('));
+  const saved={id:'existing-tiktok',kind:'TikTok',data:{notes:'Keep my notes'}};
+  const row={key:'saved-existing-tiktok',record:saved,entry:null,review:false};
+  const actions=[];
+  const context={
+    S:{tkDirectUploadBusy:'',tkDirectUploadMessage:'',records:[saved]},
+    tkOneListRows:()=>[row],mediaMime:()=> 'video/mp4',tkTitle:()=> 'Saved title',
+    tkAttachVideo:async(id)=>actions.push(['attach',id]),
+    saveRecord:async()=>{throw Error('Must not create another record')},
+    confirm:()=>true,render:()=>{},showToast:()=>{}
+  };
+  const upload=vm.runInNewContext(section+'\ntkOneListUpload',context);
+  await upload(row.key,{name:'too-big.mp4',size:26*1024*1024});
+  assert.equal(actions.length,0);
+  await upload(row.key,{name:'my-video.mp4',size:1024});
+  assert.deepEqual(actions,[['attach','existing-tiktok']]);
+  assert.equal(context.S.records[0].data.notes,'Keep my notes');
+});
+
+test('iPhone Files uploads with a generic MIME type are recognized by video extension', () => {
+  const start=html.indexOf('function mediaMime('),end=html.indexOf('async function uploadMedia(',start);
+  const mediaMime=vm.runInNewContext(html.slice(start,end)+'\nmediaMime');
+  assert.equal(mediaMime({name:'my-video.MOV',type:'application/octet-stream'}),'video/quicktime');
+  assert.equal(mediaMime({name:'my-video.mp4',type:''}),'video/mp4');
 });
 
 test('catalog preview fills missing fields without overwriting or resurrecting records', () => {
