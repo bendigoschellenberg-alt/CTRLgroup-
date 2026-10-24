@@ -4180,7 +4180,56 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .content{color:#3e343a;line-height:1.55}
 #app .subcopy,#app .hint,#app .compact-copy small{color:#65515d!important;line-height:1.55}
 #app .form-grid input:not([type="checkbox"]),#app .form-grid textarea,#app .form-grid select,#app .page-notes-editor{font-size:16px!important;line-height:1.5!important}
+/* Lighter scrapbook treatment: the list stays first, tables are optional. */
+#app .readable-table-panel{background:#fff;border:1px solid #f0cbdc;border-radius:18px;padding:15px;box-shadow:0 3px 12px rgba(139,65,96,.05)}
+#app .readable-table-head{padding:0 2px 11px;margin-bottom:7px;border-bottom:2px solid #ffe7a3}
+#app .readable-table-head h2{color:#973f6a;font-size:19px;letter-spacing:-.02em}
+#app .readable-table-head p{color:#6b5862;font-size:12px}
+#app .readable-table-tools{padding:3px;border-radius:999px;background:#ffe4ed}
+#app .readable-table-tools button{border:0;background:transparent;border-radius:999px;color:#8f3f6b;min-height:40px;padding:8px 14px}
+#app .readable-table-tools button[aria-pressed="true"]{background:#fff;color:#a22d68;box-shadow:0 1px 5px rgba(139,65,96,.13)}
+#app .readable-table-scroll{border:0;border-radius:12px}
+#app .readable-table th{background:#ffe4ed;color:#80415d;border-bottom:1px solid #f0c8d7;font-size:12px}
+#app .readable-table td{border-bottom:1px solid #f4dfe8}
+#app .readable-table tr:nth-child(even) td,#app .readable-table tr:nth-child(even) td:first-child{background:#fff}
+#app .readable-table td:first-child{background:#fff;box-shadow:none;position:static;min-width:120px}
+#app .inline-field-value{border-radius:9px;line-height:1.5;min-height:36px}
+#app .inline-field-value.is-empty{background:#fff0f6;color:#a33f71}
+#app .table-row-actions button{border-radius:999px!important;background:#ffe4ed!important}
+#app .detail-editor-panel{margin-top:16px;padding:15px}
+#app .editable-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#app .editable-field-card{min-width:0;background:#fff;border:1px solid #f0d8e2;border-radius:13px;padding:12px 13px}
+#app .editable-field-card:nth-child(4n+1){border-left:4px solid #ff5b9a}
+#app .editable-field-card:nth-child(4n+2){border-left:4px solid #ffe7a3}
+#app .editable-field-caption{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:12px;font-weight:850;color:#795363;margin-bottom:6px}
+#app .editable-field-caption span{color:#d75c91}
+#app .editable-field-card .inline-field-value{font-size:15px;font-weight:650;padding:7px 5px;min-height:43px}
+#app .more-fields-drawer{margin-top:14px;border-top:1px dashed #e9b7cc;padding-top:10px}
+#app .more-fields-drawer>summary{cursor:pointer;color:#993e71;font-size:14px;font-weight:850;padding:11px;background:#ffe4ed;border-radius:10px;list-style-position:inside}
+#app .more-fields-drawer>.editable-field-grid{margin-top:12px}
+#app .quick-data-drawer{margin:14px 0 23px;border:1px dashed #e8afc7;border-radius:13px;background:#fff;padding:0 11px}
+#app .quick-data-drawer>summary{cursor:pointer;list-style-position:inside;padding:14px 5px;font-size:14px;font-weight:850;color:#97416d}
+#app .quick-data-drawer>summary span{float:right;font-size:11px;font-weight:650;color:#79616c;margin:3px 0 0 8px}
+#app .quick-data-drawer[open]{background:#fff}
+#app .quick-data-drawer .readable-table-panel{margin:0 0 12px;border:0;box-shadow:none;padding:6px 3px}
 @media(max-width:740px){#app .readable-table-panel{padding:10px;margin:12px 0}#app .readable-table th,#app .readable-table td{padding:9px}#app .readable-table td:first-child{min-width:125px}#app .readable-table-head h2{font-size:17px}#app .readable-table .table-row-actions{min-width:110px}#app .readable-table .table-row-actions button{min-height:44px}}
+@media(max-width:740px){
+ #app .editable-field-grid{grid-template-columns:1fr;gap:8px}
+ #app .editable-field-card{padding:12px}
+ #app .readable-table-head{align-items:center}
+ #app .readable-table-scroll{overflow:visible;border:0}
+ #app .readable-table{display:block;min-width:0;width:100%}
+ #app .readable-table thead{display:none}
+ #app .readable-table tbody{display:grid;gap:9px}
+ #app .readable-table tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 9px;padding:12px;border:1px solid #efd1df;border-radius:12px;background:#fff;box-shadow:0 2px 6px rgba(139,65,96,.04)}
+ #app .readable-table td,#app .readable-table td:first-child{display:block;position:static;min-width:0;max-width:none;padding:6px 3px;border:0;background:transparent!important;font-weight:500;box-shadow:none}
+ #app .readable-table td:before{content:attr(data-label);display:block;color:#975171;font-size:11px;font-weight:800;margin-bottom:4px}
+ #app .readable-table td:first-child{grid-column:1/-1;border-bottom:1px solid #f6e2e9;padding-bottom:9px}
+ #app .readable-table td:first-child .inline-field-value{font-size:16px;font-weight:850;color:#6d3d57}
+ #app .readable-table .table-row-actions{grid-column:1/-1;display:flex;gap:7px;white-space:normal}
+ #app .readable-table .table-row-actions button{flex:1}
+ #app .quick-data-drawer>summary span{float:none;display:block;margin:3px 0 0 24px}
+}
 @media(max-width:580px){#app .tv-heading{padding:16px}#app .tv-heading h1{font-size:24px}#app .tv-row{grid-template-columns:26px 54px minmax(0,1fr);gap:8px;padding:12px 10px}#app .tv-row-number{min-width:25px;height:27px;font-size:11px}#app .tv-row-cover{width:54px;height:72px}#app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{flex:1 1 auto}#app .tv-row .vd-entry-detail{padding:12px}}
 @media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
 </style>
@@ -5599,28 +5648,29 @@ async function saveInlineField(form){if(S.inlineSaving)return;const id=form.data
  }catch(err){S.inlineEdit={id,key,error:`Could not save: ${err.message}`};S.inlineSaving=false;render();return}
  S.inlineSaving=false;
 }
-function readableTable(kind,records,options={}){const cfg=KINDS[kind];if(!cfg)return '';const fields=readableColumns(kind),mode=S.tableModes?.[kind]||'table',pageSize=options.pageSize||35,requested=S.tablePages?.[kind]||0,pages=Math.max(1,Math.ceil(records.length/pageSize)),page=Math.min(Math.max(0,requested),pages-1),shown=records.slice(page*pageSize,(page+1)*pageSize);
+function readableTable(kind,records,options={}){const cfg=KINDS[kind];if(!cfg)return '';const fields=readableColumns(kind),mode=S.tableModes?.[kind]||'list',pageSize=options.pageSize||35,requested=S.tablePages?.[kind]||0,pages=Math.max(1,Math.ceil(records.length/pageSize)),page=Math.min(Math.max(0,requested),pages-1),shown=records.slice(page*pageSize,(page+1)*pageSize);
  const heading=options.heading||`${cfg.label} at a glance`,showCards=options.cards!==false,isTable=mode!=='list'||!showCards;
- return `<section class="readable-table-panel" aria-label="${e(cfg.label)} data table"><div class="readable-table-head"><div><h2>${e(heading)}</h2><p>${records.length} saved ${e(cfg.label.toLowerCase())} · Tap a value to edit it</p></div>${showCards?`<div class="readable-table-tools"><button type="button" data-table-mode="${e(kind)}" data-table-view="table" aria-pressed="${mode==='table'}">Table</button><button type="button" data-table-mode="${e(kind)}" data-table-view="list" aria-pressed="${mode==='list'}">List</button></div>`:''}</div>
- ${mode==='list'&&showCards?`<div class="compact-list">${records.length?records.slice(0,150).map(compactRow).join(''):'<p>No saved entries yet.</p>'}</div>`:`<div class="readable-table-scroll" role="region" tabindex="0" aria-label="Swipe to see more ${e(cfg.label)} columns"><table class="readable-table"><thead><tr><th scope="col">${e(cfg.singular)}</th>${fields.map(f=>`<th scope="col">${e(f.label)}</th>`).join('')}<th scope="col">Actions</th></tr></thead><tbody>${shown.map(r=>`<tr><td>${inlineFieldMarkup(r,{key:'name',label:fieldDefs(kind).find(f=>f.key==='name')?.label||'Name',type:'text',required:true})}</td>${fields.map(f=>`<td>${inlineFieldMarkup(r,f)}</td>`).join('')}<td class="table-row-actions"><button type="button" data-detail="${e(r.id)}">Open</button><button type="button" data-edit="${e(r.id)}">All fields</button></td></tr>`).join('')||`<tr><td colspan="${fields.length+2}">No matching records yet.</td></tr>`}</tbody></table></div>`}
+ return `<section class="readable-table-panel" aria-label="${e(cfg.label)} data table"><div class="readable-table-head"><div><h2>${e(heading)}</h2><p>${records.length} ${e(cfg.label.toLowerCase())} · choose a view</p></div>${showCards?`<div class="readable-table-tools"><button type="button" data-table-mode="${e(kind)}" data-table-view="list" aria-pressed="${mode==='list'}">☰ List</button><button type="button" data-table-mode="${e(kind)}" data-table-view="table" aria-pressed="${mode==='table'}">▦ Table</button></div>`:''}</div>
+ ${mode==='list'&&showCards?`<div class="compact-list">${records.length?records.map(compactRow).join(''):'<p>No saved entries yet.</p>'}</div>`:`<div class="readable-table-scroll" role="region" tabindex="0" aria-label="Swipe to see more ${e(cfg.label)} columns"><table class="readable-table"><thead><tr><th scope="col">${e(cfg.singular)}</th>${fields.map(f=>`<th scope="col">${e(f.label)}</th>`).join('')}<th scope="col">Actions</th></tr></thead><tbody>${shown.map(r=>`<tr><td data-label="${e(cfg.singular)}">${inlineFieldMarkup(r,{key:'name',label:fieldDefs(kind).find(f=>f.key==='name')?.label||'Name',type:'text',required:true})}</td>${fields.map(f=>`<td data-label="${e(f.label)}">${inlineFieldMarkup(r,f)}</td>`).join('')}<td class="table-row-actions" data-label="Actions"><button type="button" data-detail="${e(r.id)}">Open</button><button type="button" data-edit="${e(r.id)}">All fields</button></td></tr>`).join('')||`<tr><td colspan="${fields.length+2}">No matching records yet.</td></tr>`}</tbody></table></div>`}
  ${pages>1&&isTable?`<div class="table-pager"><button type="button" data-table-page="${e(kind)}" data-table-delta="-1" ${page===0?'disabled':''}>← Previous</button><span>${page*pageSize+1}–${Math.min(records.length,(page+1)*pageSize)} of ${records.length}</span><button type="button" data-table-page="${e(kind)}" data-table-delta="1" ${page===pages-1?'disabled':''}>Next →</button></div>`:''}</section>`;
 }
-function detailEditableTable(record){const fields=fieldDefs(record.kind).filter(f=>!['filePath','clips'].includes(f.key));return `<section class="readable-table-panel" aria-label="Editable record fields"><div class="readable-table-head"><div><h2>All details · tap to edit</h2><p>Every saved text field can be changed individually, including empty fields. Tap Save to keep a change.</p></div><button type="button" class="btn btn-soft btn-small" data-edit="${e(record.id)}">Full editor / linked records</button></div><div class="readable-table-scroll"><table class="readable-table record-fields-table"><tbody>${fields.map(f=>`<tr><th scope="row">${e(f.label)}</th><td>${inlineFieldMarkup(record,f)}</td></tr>`).join('')}</tbody></table></div></section>`}
+function detailEditableTable(record){const fields=fieldDefs(record.kind).filter(f=>!['filePath','clips'].includes(f.key)),frontKeys=['name','description','status','category','theme','notes'],primary=fields.filter(f=>frontKeys.includes(f.key)),extra=fields.filter(f=>!frontKeys.includes(f.key));const tiles=items=>items.map(f=>`<div class="editable-field-card"><span class="editable-field-caption">${e(f.label)} <span aria-hidden="true">✎</span></span>${inlineFieldMarkup(record,f)}</div>`).join('');return `<section class="readable-table-panel detail-editor-panel" aria-label="Editable record fields"><div class="readable-table-head"><div><h2>My details ♡</h2><p>Tap any pink-pencil field to change it, then Save.</p></div><button type="button" class="btn btn-soft btn-small" data-edit="${e(record.id)}">Edit everything</button></div><div class="editable-field-grid">${tiles(primary)}</div>${extra.length?`<details class="more-fields-drawer" data-record-more="${e(record.id)}" ${S.recordMoreOpen?.[record.id]?'open':''}><summary>✦ More details (${extra.length})</summary><div class="editable-field-grid">${tiles(extra)}</div></details>`:''}</section>`}
 function contentPlanReferenceTable(){const rows=all('ContentPlan').slice().sort((a,b)=>String(data(a).publishDate||'').localeCompare(String(data(b).publishDate||''))).slice(0,40);
- return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>Content planning table</h2><p>${all('ContentPlan').length} saved plans · Edit a row to change its title, caption, date or other fields</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Title</th><th>Platform</th><th>Project</th><th>Publish date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(r=>{const d=data(r);return `<tr><td>${e(d.title||'(Untitled)')}</td><td>${e(d.platform||'')}</td><td>${e(d.project||'')}</td><td>${e(d.publishDate||'')}</td><td>${e(d.status||'Idea')}</td><td class="table-row-actions"><button data-cs-edit="${e(r.id)}" type="button">Edit all text</button></td></tr>`}).join('')||'<tr><td colspan="6">No content plans saved yet.</td></tr>'}</tbody></table></div></section>`;
+ return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>Content planning table</h2><p>${all('ContentPlan').length} saved plans · Edit a row to change its title, caption, date or other fields</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Title</th><th>Platform</th><th>Project</th><th>Publish date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(r=>{const d=data(r);return `<tr><td data-label="Title">${e(d.title||'(Untitled)')}</td><td data-label="Platform">${e(d.platform||'')}</td><td data-label="Project">${e(d.project||'')}</td><td data-label="Publish date">${e(d.publishDate||'')}</td><td data-label="Status">${e(d.status||'Idea')}</td><td data-label="Actions" class="table-row-actions"><button data-cs-edit="${e(r.id)}" type="button">Edit all text</button></td></tr>`}).join('')||'<tr><td colspan="6">No content plans saved yet.</td></tr>'}</tbody></table></div></section>`;
 }
-function inventoryReferenceTable(){const kinds=['World','AddOn','Craftable','WorldTemplate','Texture','Build','Material','Palette','Task','TikTok','Photo'];return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>My saved data · overview</h2><p>Live totals from your private collection. Open a library to edit its records.</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Library</th><th>Saved records</th><th>Actions</th></tr></thead><tbody>${kinds.map(kind=>`<tr><td>${e(KINDS[kind].label)}</td><td>${all(kind).length}</td><td class="table-row-actions"><button type="button" data-nav="${kind==='TikTok'?'Video':kind}">Open library</button></td></tr>`).join('')}</tbody></table></div></section>`}
+function inventoryReferenceTable(){const kinds=['World','AddOn','Craftable','WorldTemplate','Texture','Build','Material','Palette','Task','TikTok','Photo'];return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>My saved data · overview</h2><p>Live totals from your private collection. Open a library to edit its records.</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Library</th><th>Saved records</th><th>Actions</th></tr></thead><tbody>${kinds.map(kind=>`<tr><td data-label="Library">${e(KINDS[kind].label)}</td><td data-label="Records">${all(kind).length}</td><td class="table-row-actions" data-label="Actions"><button type="button" data-nav="${kind==='TikTok'?'Video':kind}">Open library</button></td></tr>`).join('')}</tbody></table></div></section>`}
 function relevantPageTable(page){
  // Standard libraries draw their own data table. Special pages have one too,
  // while the user's streamlined Videos upload list keeps its single-list UI.
  const special=new Set(['WorldGroup','WorldTemplate','CraftablePlacement','GeneratorPrompt','CityBlock','Palette',...CREATOR_KINDS]);
- if(page==='ContentPlanner')return contentPlanReferenceTable();
- if(page==='settings')return inventoryReferenceTable();
+ const open=S.quickDataOpen?.[page]?'open':'';
+ if(page==='ContentPlanner')return `<details class="quick-data-drawer" ${open}><summary>♡ Content planning data <span>Tap to open</span></summary>${contentPlanReferenceTable()}</details>`;
+ if(page==='settings')return `<details class="quick-data-drawer" ${open}><summary>♡ My saved collection counts <span>Tap to open</span></summary>${inventoryReferenceTable()}</details>`;
  const context={home:'World',today:'Task',NotesTasks:'Task',Packs:S.packsKind||'AddOn',PackRecommendations:'AddOn',shop:'WishlistItem',generator:'World',Event:'Event',reconcile:'RecoveryReview'};
  const kind=special.has(page)?page:context[page];
  if(!kind||!KINDS[kind]||page==='Video'||page==='TikTok')return '';
  const records=filterRecords(kind);
- return readableTable(kind,records,{heading:`${KINDS[kind].label} · quick reference`,cards:false,pageSize:20});
+ return `<details class="quick-data-drawer" ${open}><summary>♡ ${e(KINDS[kind].label)} data <span>${records.length} records · tap to open</span></summary>${readableTable(kind,records,{heading:`${KINDS[kind].label} · quick reference`,cards:false,pageSize:20})}</details>`;
 }
 
 function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" style="text-align:center;padding:35px 18px"><div class="eyebrow">IDEAS STAY TUCKED AWAY ♡</div><h2>Build Idea Generator</h2><p class="subcopy">Your saved build ideas are safely kept behind the generator. Roll an idea to reveal one at a time.</p><button class="btn btn-primary" data-nav="generator">✦ Open Build Idea Generator</button></section>`;if(kind==='WorldGroup')return worldGroupsPage();if(kind==='WorldTemplate')return worldTemplateRecoveryPage();if(kind==='CraftablePlacement')return craftableLocationsPage();if(CREATOR_KINDS.has(kind))return creatorLibraryPage(kind);if(kind==='GeneratorPrompt')return promptLibraryPage();if(kind==='CityBlock')return cityGridPage();if(kind==='Palette')return palettePage();const cfg=KINDS[kind],records=filterRecords(kind),base=all(kind),st=unique(base.map(r=>data(r).status).filter(Boolean)).sort(),categories=unique(base.map(categoryOf).filter(Boolean)).sort((a,b)=>a.localeCompare(b)),worldDefs=relationDefs(kind).filter(d=>d[4]==='World'),hasWorld=worldDefs.length>0;
@@ -7824,6 +7874,8 @@ async function preview2000BuildIdeas(){
  }catch(err){showToast('Could not preview ideas: '+err.message);if(opener){opener.disabled=false;opener.innerHTML='Preview 2,000 Idea Pack'}}
 }
 function wireApp(){
+ app.querySelector('.quick-data-drawer')?.addEventListener('toggle',event=>{S.quickDataOpen={...(S.quickDataOpen||{}),[S.page]:event.target.open}});
+ app.querySelectorAll('[data-record-more]').forEach(item=>item.addEventListener('toggle',event=>{const id=item.dataset.recordMore;S.recordMoreOpen={...(S.recordMoreOpen||{}),[id]:event.target.open}}));
  app.querySelectorAll('[data-table-mode]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.tableMode;if(!KINDS[kind])return;S.tableModes={...(S.tableModes||{}),[kind]:button.dataset.tableView==='list'?'list':'table'};S.inlineEdit=null;render()}));
  app.querySelectorAll('[data-table-page]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.tablePage,delta=Number(button.dataset.tableDelta)||0;if(!KINDS[kind])return;S.tablePages={...(S.tablePages||{}),[kind]:Math.max(0,(S.tablePages?.[kind]||0)+delta)};S.inlineEdit=null;render();app.querySelector('.readable-table-panel')?.scrollIntoView({block:'start',behavior:'smooth'})}));
  app.querySelectorAll('[data-inline-open]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.inlineOpen,key=button.dataset.inlineKey,r=get(id);if(!r||r.archived_at||!fieldDefs(r.kind).some(f=>f.key===key)){showToast('Open the active record to edit this field.');return}S.inlineEdit={id,key};render();const form=[...app.querySelectorAll('[data-inline-form]')].find(f=>f.dataset.inlineId===id&&f.dataset.inlineKey===key);form?.querySelector('input,textarea,select')?.focus({preventScroll:true});form?.scrollIntoView({block:'nearest',behavior:'smooth'})}));

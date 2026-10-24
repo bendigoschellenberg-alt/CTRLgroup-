@@ -16,6 +16,7 @@ function context(overrides={}){
  return {
   S:{records:[],links:[],...overrides.S},
   KINDS:{AddOn:{label:'Add-Ons',singular:'Add-On'},World:{label:'Worlds',singular:'World'}},
+  CREATOR_KINDS:new Set(['AddOn']),
   fieldDefs:kind=>defs[kind],data:r=>r?.data||{},get:id=>overrides.S?.records?.find(r=>r.id===id)||null,
   title:r=>r?.data?.name||'',e:safe,compactRow:r=>`<p>${safe(r.data.name)}</p>`,
   filterRecords:kind=>(overrides.S?.records||[]).filter(r=>r.kind===kind),
@@ -24,10 +25,13 @@ function context(overrides={}){
  };
 }
 
-test('readable table includes relevant columns, page controls, and safe inline buttons',()=>{
+test('table is available on request while the uncluttered list is the default',()=>{
  const records=Array.from({length:41},(_,i)=>({id:`addon-${i}`,kind:'AddOn',data:{name:`Add-on ${i}`,creatorName:'Studio',sizeMB:0.54,category:'Building'}}));
  const cx=context({S:{records}});
- const markup=vm.runInNewContext(helpers+'\nreadableTable("AddOn", S.records)',cx);
+ const {list,markup}=vm.runInNewContext(helpers+'\nconst list=readableTable("AddOn", S.records);S.tableModes={AddOn:"table"};({list,markup:readableTable("AddOn", S.records)})',cx);
+ assert.match(list,/data-table-view="list" aria-pressed="true"/);
+ assert.match(list,/Add-on 40/);
+ assert.doesNotMatch(list,/readable-table-scroll/);
  assert.match(markup,/Size \(MB\)/);
  assert.match(markup,/data-inline-open="addon-0"/);
  assert.match(markup,/data-table-page="AddOn"/);
@@ -43,7 +47,18 @@ test('all defined text fields, including blank notes, are editable on record det
  assert.match(markup,/data-inline-key="description"/);
  assert.match(markup,/data-inline-key="notes"/);
  assert.match(markup,/＋ Add/);
- assert.match(markup,/Full editor \/ linked records/);
+ assert.match(markup,/editable-field-card/);
+ assert.match(markup,/Edit everything/);
+});
+
+test('extra fields and contextual tables stay tucked away but can remain expanded',()=>{
+ const record={id:'addon-extra',kind:'AddOn',data:{name:'Furniture',sizeMB:30.6,category:'Decoration'}};
+ const cx=context({S:{records:[record],recordMoreOpen:{'addon-extra':true},quickDataOpen:{home:true}}});
+ const {detail,home}=vm.runInNewContext(helpers+'\n({detail:detailEditableTable(S.records[0]),home:relevantPageTable("home")})',cx);
+ assert.match(detail,/more-fields-drawer" data-record-more="addon-extra" open/);
+ assert.match(detail,/data-inline-key="sizeMB"/);
+ assert.match(home,/quick-data-drawer" open/);
+ assert.match(home,/quick reference/);
 });
 
 test('editing one text cell preserves all other fields, attached clips, and record identity',async()=>{
