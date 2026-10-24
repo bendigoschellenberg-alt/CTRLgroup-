@@ -4623,18 +4623,47 @@ function pinkifyDecorations(){ /* Native emoji in user-authored text stay untouc
 function label(kind){return KINDS[kind]?.label||cap(kind)}
 const SIDEBAR_FAVOURITES=[['home','Home'],['World','My Worlds'],['Build','Builds'],['Packs','My Collections'],['NotesTasks','Notes & Tasks'],['Video','Videos & TikTok']];
 const SIDEBAR_FAV_KEYS=new Set(SIDEBAR_FAVOURITES.map(([key])=>key));
+const NAV_GROUP_NOTES={
+ 'MY HQ':'Home, today, tasks and planning',
+ 'WORLDS & BUILDS':'Your worlds, builds and locations',
+ 'CTRL GROUP MAIN · CITY':'City blocks, avenues and streets',
+ 'CTRL GROUP GARDEN':'Garden themes and features',
+ 'ASSETS':'Add-ons, craftables, materials and collections',
+ 'GENERATORS':'Ideas and saved prompts',
+ 'MEDIA & STORY':'Photos, videos and Lore',
+ 'EXTRAS':'Structure tools, settings and recovery'
+};
+function navPlace(page=S.page){
+ if(page==='allpages')return {group:'MY HQ',title:'All My Pages'};
+ const section=GROUPS.find(([,items])=>items.some(([key])=>key===page));
+ const entry=section?.[1].find(([key])=>key===page);
+ return {group:section?.[0]||'MY HQ',title:entry?.[1]||SIDEBAR_FAVOURITES.find(([key])=>key===page)?.[1]||label(page)};
+}
 function sidebarLink(key,txt,extra=''){
  return `<button class="nav-item ${extra} ${S.page===key?'active':''}" data-nav="${key}" data-side-label="${e(txt.toLowerCase())}" ${S.page===key?'aria-current="page"':''}><span class="nav-emoji" aria-hidden="true">${pinkIcon(key)}</span><span class="nav-label">${e(txt)}</span>${KINDS[key]&&!extra.includes('nav-fav')?`<span class="nav-badge">${key==='Video'?count('TikTok'):count(key)}</span>`:''}</button>`;
 }
-function sidebar(){if(S.allPagesOpen===undefined){try{S.allPagesOpen=localStorage.getItem('ctrlhq.allPagesOpen')==='1'}catch{S.allPagesOpen=false}}return `<aside class="sidebar sidebar-v4" aria-label="Main navigation"><div class="brand"><div class="brand-mark" aria-hidden="true">${pinkIcon('bow')}</div><div><strong class="brand-wordmark"><span class="brand-ctrl">CTRL</span><span class="brand-plus"> + </span><span class="brand-crft">CRFT</span></strong><small class="brand-byline">by Control Group</small></div><button class="sidebar-close-v4" type="button" id="sidebar-close-v4" aria-label="Close navigation">×</button></div>
- <div class="sidebar-v4-intro"><span class="sidebar-v4-doodle" aria-hidden="true">${pinkIcon('star')}</span> My handmade HQ <span class="sidebar-v4-swash" aria-hidden="true"></span></div>
+function sidebar(){if(S.allPagesOpen===undefined){try{S.allPagesOpen=localStorage.getItem('ctrlhq.allPagesOpen')==='1'}catch{S.allPagesOpen=false}}const place=navPlace();return `<aside class="sidebar sidebar-v4" aria-label="Main navigation"><div class="brand"><div class="brand-mark" aria-hidden="true">${pinkIcon('bow')}</div><div><strong class="brand-wordmark"><span class="brand-ctrl">CTRL</span><span class="brand-plus"> + </span><span class="brand-crft">CRFT</span></strong><small class="brand-byline">by Control Group</small></div><button class="sidebar-close-v4" type="button" id="sidebar-close-v4" aria-label="Close navigation">×</button></div>
+ <div class="sidebar-v4-intro"><span class="sidebar-v4-doodle" aria-hidden="true">${pinkIcon('star')}</span> My handmade HQ <span class="sidebar-v4-swash" aria-hidden="true"></span></div><div class="sidebar-current-place" aria-label="Current page"><span>YOU'RE HERE</span><strong>${e(place.title)}</strong><small>${e(place.group)}</small></div>
  <div class="sidebar-v4-search"><label for="sidebar-filter-v4">Find a page</label><div class="sidebar-v4-search-inner"><span aria-hidden="true">${pinkIcon('search')}</span><input id="sidebar-filter-v4" type="search" placeholder="Worlds, palettes, journals…" autocomplete="off" aria-label="Find a page in the menu" value="${e(S.sidebarQuery||'')}"><button id="sidebar-clear-v4" aria-label="Clear page search" type="button" ${!S.sidebarQuery?'hidden':''}>×</button></div><small id="sidebar-search-status-v4" aria-live="polite"></small></div>
  <nav class="sidebar-v4-nav" aria-label="Pages in your HQ"><section class="sidebar-v4-pins" data-side-group><h2><span aria-hidden="true">♡</span> Everyday essentials</h2><p class="nav-help-copy">The pages you use most, right at the top.</p><div class="sidebar-v4-pin-grid">${SIDEBAR_FAVOURITES.map(([key,txt])=>sidebarLink(key,txt,'nav-fav')).join('')}</div></section>
- <section class="sidebar-v4-library" data-side-group><button type="button" class="sidebar-v4-all-toggle" data-all-pages-toggle aria-expanded="${!!S.allPagesOpen}" aria-controls="sidebar-all-pages"><span>☰ All my original pages</span><span class="sidebar-v4-group-count">${GROUPS.reduce((n,[,items])=>n+items.length,0)}</span><span aria-hidden="true">${S.allPagesOpen?'−':'＋'}</span></button><p class="nav-help-copy">Every original tab, kept in its own organized menu.</p><div id="sidebar-all-pages" ${S.allPagesOpen?'':'hidden'}>
+ <section class="sidebar-v4-library" data-side-group><button type="button" class="sidebar-v4-all-toggle" data-all-pages-toggle aria-expanded="${!!S.allPagesOpen}" aria-controls="sidebar-all-pages"><span>☰ All my original pages</span><span class="sidebar-v4-group-count">${GROUPS.reduce((n,[,items])=>n+items.length,0)}</span><span aria-hidden="true">${S.allPagesOpen?'−':'＋'}</span></button><p class="nav-help-copy">Every original tab, kept in its own organized menu.</p><button type="button" class="sidebar-directory-link ${S.page==='allpages'?'active':''}" data-nav="allpages" data-side-label="all pages directory">${pinkIcon('book')} Open the complete page directory <span aria-hidden="true">↗</span></button><div id="sidebar-all-pages" ${S.allPagesOpen?'':'hidden'}>
  ${GROUPS.map(([name,items])=>{const closed=S.navClosed.has(name);return `<section class="side-group sidebar-v4-group" data-side-group><button class="group-heading group-toggle" data-toggle-group="${e(name)}" aria-expanded="${!closed}"><span>${e(name)}</span><span class="sidebar-v4-group-count">${items.length}</span><span class="group-chevron" aria-hidden="true">${closed?'＋':'−'}</span></button><div class="group-items ${closed?'is-collapsed':''}">${items.map(([key,txt])=>sidebarLink(key,txt)).join('')}</div></section>`}).join('')}
  </div></section></nav><div class="sidebar-v4-footer"><span aria-hidden="true">${pinkIcon('heart')}</span> all your little ideas, safely in one place </div></aside>`}
 function filterSidebarV4(){const allMenu=app.querySelector('#sidebar-all-pages');if(allMenu){allMenu.hidden=!(S.allPagesOpen||String(S.sidebarQuery||'').trim());}const term=String(S.sidebarQuery||'').trim().toLocaleLowerCase();const side=app.querySelector('.sidebar-v4');if(!side)return;let total=0;for(const group of side.querySelectorAll('[data-side-group]')){let hits=0;for(const b of group.querySelectorAll('[data-side-label]')){const hit=!term||b.dataset.sideLabel.includes(term);b.hidden=!hit;if(hit)hits++;}group.hidden=hits===0;total+=hits;const items=group.querySelector('.group-items');const toggle=group.querySelector('[data-toggle-group]');if(items&&toggle){if(term){items.classList.remove('is-collapsed');toggle.setAttribute('aria-expanded','true');}else{const isClosed=S.navClosed.has(toggle.dataset.toggleGroup);items.classList.toggle('is-collapsed',isClosed);toggle.setAttribute('aria-expanded',String(!isClosed))}}}const status=side.querySelector('#sidebar-search-status-v4');if(status)status.textContent=term?total+' page'+(total===1?'':'s')+' found':'';const clear=side.querySelector('#sidebar-clear-v4');if(clear)clear.hidden=!term;}
-function topbar(){return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs"><span class="crumb-heart">${pinkIcon("star")}</span> CTRL + CRFT <span class="crumb-divider">/</span> ${e(S.page==='home'?'My HQ':S.page==='today'?'Today':label(S.page))}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${(S.page==='home'&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
+function topbar(){const place=navPlace(),trail=S.page==='home'?`<strong class="crumb-current" aria-current="page">My HQ</strong>`:`<button type="button" class="crumb-home" data-nav="home">My HQ</button>${place.group==='MY HQ'?'':`<span class="crumb-divider">/</span><span class="crumb-section">${e(place.group)}</span>`}<span class="crumb-divider">/</span><strong class="crumb-current" aria-current="page">${e(place.title)}</strong>`;return `<header class="topbar"><button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="${S.sidebar}">☰</button><span class="breadcrumbs">${trail}</span><span class="grow"></span><div class="top-search"><span class="search-icon">⌕</span><input id="global-search" placeholder="Search everything…" aria-label="Search everything" value="${e(S.query)}" /></div>${(S.page==='home'&&!S.detail)?'':`<button class="btn btn-soft btn-small notes-shortcut" id="jump-to-notes" title="Notes for this page">${pinkIcon("note")} <span>Notes</span></button>`}<button class="btn btn-primary add-main" data-quick-add><span class="add-main-full">＋ Add Something ${pinkIcon('star')}</span><span class="add-main-small">＋</span></button></header>`}
+function allPagesPage(){
+ const total=GROUPS.reduce((sum,[,items])=>sum+items.length,0);
+ return `${header('All My Pages','One clear directory for every original tab. Your sidebar stays exactly where it is.',`<button type="button" class="btn btn-soft" data-nav="home">← Back to My HQ</button>`)}
+ <section class="page-directory" aria-label="All original HQ pages">
+  <div class="page-directory-tools"><label for="page-directory-search">Find any page</label><input type="search" id="page-directory-search" placeholder="Try garden, add-ons, videos, notes…" autocomplete="off" aria-label="Search all original pages"><p id="page-directory-status" role="status">${total} pages · ${GROUPS.length} sections · nothing hidden or removed</p></div>
+  <div class="page-directory-groups">${GROUPS.map(([name,items])=>`<section class="page-directory-group" data-page-directory-group><div class="page-directory-group-head"><h2>${e(name)}</h2><p>${e(NAV_GROUP_NOTES[name]||'Your original HQ pages')}</p></div><div class="page-directory-items">${items.map(([key,txt])=>`<button type="button" class="page-directory-item" data-nav="${e(key)}" data-page-directory-item data-page-name="${e((txt+' '+name).toLowerCase())}"><span class="page-directory-item-icon">${pinkIcon(key)}</span><span>${e(txt)}</span><span class="page-directory-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></section>`).join('')}</div>
+ </section>`;
+}
+function filterPageDirectory(input){
+ const query=String(input?.value||'').trim().toLowerCase(),groups=app.querySelectorAll('[data-page-directory-group]');let shown=0;
+ for(const group of groups){let matches=0;for(const item of group.querySelectorAll('[data-page-directory-item]')){const visible=!query||item.dataset.pageName.includes(query);item.hidden=!visible;if(visible)matches++;}group.hidden=matches===0;shown+=matches;}
+ const status=app.querySelector('#page-directory-status');if(status)status.textContent=query?`${shown} matching page${shown===1?'':'s'} · choose one to open`:`${shown} pages · ${GROUPS.length} sections · nothing hidden or removed`;
+}
 
 /* A presentation-only context picker: it uses existing World Group links and never edits records. */
 function hubContextChoices(){
@@ -6957,7 +6986,7 @@ function wireCreativeSuite(){
  app.querySelector('[data-cs-status]')?.addEventListener('change',ev=>{S.csStatus=ev.target.value;render()});
 }
 
-function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='Packs')body=packsPage();else if(S.page==='PackRecommendations')body=packRecommendationsPage()+comboSuggestedPanel();else if(S.page==='NotesTasks')body=notesTasksPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=tkOneListPage();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;body+=relevantPageTable(S.page);shell(body)}
+function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='allpages')body=allPagesPage();else if(S.page==='today')body=todayPage();else if(S.page==='Packs')body=packsPage();else if(S.page==='PackRecommendations')body=packRecommendationsPage()+comboSuggestedPanel();else if(S.page==='NotesTasks')body=notesTasksPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=tkOneListPage();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;body+=relevantPageTable(S.page);shell(body)}
 // Same-page selections should not throw the user back to the top of a long
 // mobile form or collapse the history cards they were reviewing.
 function renderKeepingPlace(){
@@ -7927,6 +7956,7 @@ async function preview2000BuildIdeas(){
  }catch(err){showToast('Could not preview ideas: '+err.message);if(opener){opener.disabled=false;opener.innerHTML='Preview 2,000 Idea Pack'}}
 }
 function wireApp(){
+ app.querySelector('#page-directory-search')?.addEventListener('input',ev=>filterPageDirectory(ev.target));
  app.querySelector('.quick-data-drawer')?.addEventListener('toggle',event=>{S.quickDataOpen={...(S.quickDataOpen||{}),[S.page]:event.target.open}});
  app.querySelectorAll('[data-record-more]').forEach(item=>item.addEventListener('toggle',event=>{const id=item.dataset.recordMore;S.recordMoreOpen={...(S.recordMoreOpen||{}),[id]:event.target.open}}));
  app.querySelectorAll('[data-table-mode]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.tableMode;if(!KINDS[kind])return;S.tableModes={...(S.tableModes||{}),[kind]:button.dataset.tableView==='list'?'list':'table'};S.inlineEdit=null;render()}));
@@ -9457,6 +9487,48 @@ body,#app,#app .main,#app main.content,.guest-hq-page,.guest-hq-page .content{ba
  #app .guest-hq-card{grid-column:auto!important;min-height:90px!important}
 }
 @media(prefers-reduced-motion:reduce){#app *,#app *:before,#app *:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Navigation stays intact: one everyday menu, plus a complete searchable directory. */
+#app .sidebar-current-place{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px;margin:4px 7px 13px;padding:0 1px 12px;border-bottom:1px solid #f0e0e6;min-width:0}
+#app .sidebar-current-place span{font:750 10px/1.3 var(--scrap-body)!important;letter-spacing:.6px;color:#ad617f}
+#app .sidebar-current-place strong{font:750 14px/1.3 var(--scrap-body)!important;color:#633d51;overflow-wrap:anywhere}
+#app .sidebar-current-place small{font:550 11px/1.3 var(--scrap-body)!important;color:#8b7882;width:100%}
+#app .sidebar-directory-link{display:flex;gap:9px;align-items:center;text-align:left;width:100%;min-height:47px;background:#ffe4ed;border:0;border-left:3px solid #ff5b9a;border-radius:6px;padding:11px 9px;margin:8px 0 11px;color:#833e60;font:740 13px/1.35 var(--scrap-body)!important;cursor:pointer}
+#app .sidebar-v4-all-toggle .sidebar-v4-group-count{display:inline-flex!important;align-items:center;justify-content:center;min-width:25px;padding:3px 7px;border-radius:999px;background:#ffe7a3!important;color:#724351!important;font-size:12px!important}
+#app .sidebar-directory-link.active{background:#ffe7a3}
+#app .sidebar-directory-link .pink-icon{width:24px;height:24px;flex-shrink:0}
+#app .sidebar-directory-link span{margin-left:auto}
+#app .breadcrumbs{display:flex;align-items:center;min-width:0;max-width:500px;gap:7px;overflow:hidden;white-space:nowrap}
+#app .crumb-home{border:0;background:transparent;box-shadow:none;color:#9c3e6b;font:750 13px/1.3 var(--scrap-body)!important;cursor:pointer;min-height:36px;padding:5px 1px;flex-shrink:0}
+#app .crumb-home:hover,#app .crumb-home:focus-visible{text-decoration:underline}
+#app .crumb-section{font:650 11px/1.3 var(--scrap-body)!important;color:#997d8a;white-space:nowrap}
+#app .crumb-current{font:750 13px/1.3 var(--scrap-body)!important;color:#574251;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .page-directory{margin:0 0 25px;padding:0}
+#app .page-directory-tools{padding:5px 0 19px;border-bottom:1px solid #f0dce5}
+#app .page-directory-tools label{display:block;font:750 14px/1.4 var(--scrap-body)!important;color:#684052;margin-bottom:8px}
+#app .page-directory-tools input{display:block;width:100%;max-width:650px;min-height:50px;border:1px solid #e6ccd8;border-radius:10px;background:#fff;padding:12px 14px;font-size:16px!important;color:#40343c}
+#app .page-directory-tools input:focus-visible{outline:3px solid #ffbdd5;outline-offset:2px}
+#app #page-directory-status{font:600 13px/1.5 var(--scrap-body)!important;color:#826675;margin:9px 0 0}
+#app .page-directory-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;align-items:start}
+#app .page-directory-group{padding:17px 0 15px;border-bottom:1px solid #efdce4;min-width:0}
+#app .page-directory-group-head{margin-bottom:7px}
+#app .page-directory-group h2{font:750 19px/1.2 var(--scrap-hand)!important;color:#793957;margin:0 0 3px}
+#app .page-directory-group p{font:540 12px/1.4 var(--scrap-body)!important;color:#8b7481;margin:0}
+#app .page-directory-items{display:grid;grid-template-columns:1fr;gap:0}
+#app .page-directory-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;min-height:52px;padding:8px 5px;border:0;border-bottom:1px solid #f7edf1;background:transparent;color:#493b44;font:650 15px/1.4 var(--scrap-body)!important;cursor:pointer}
+#app .page-directory-item:hover,#app .page-directory-item:focus-visible{background:#fff0f6;outline-offset:-2px}
+#app .page-directory-item-icon{flex-shrink:0;display:grid;place-items:center;width:29px;height:29px;background:#ffe4ed;border-radius:8px}
+#app .page-directory-item-icon .pink-icon{width:20px;height:20px}
+#app .page-directory-arrow{margin-left:auto;font-size:19px;color:#b0698b}
+#app [data-page-directory-group][hidden],#app [data-page-directory-item][hidden]{display:none!important}
+@media(max-width:740px){
+ #app .breadcrumbs{max-width:min(48vw,265px);gap:5px}
+ #app .crumb-section{display:none}
+ #app .breadcrumbs .crumb-divider{display:none}
+ #app .crumb-current{font-size:12px!important}
+ #app .page-directory-groups{grid-template-columns:1fr}
+ #app .page-directory-group{padding:15px 0 13px}
+ #app .page-directory-item{min-height:53px;font-size:15px!important}
+}
 </style>
 </body>
 </html>
