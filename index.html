@@ -4113,14 +4113,20 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .tv-filters button{background:#fff;border:1px solid #edc5d7;color:#8c4268;border-radius:999px;padding:10px 14px;min-height:42px;font-size:13px;font-weight:800}
 #app .tv-filters button[aria-pressed="true"]{background:#ff5b9a;color:white;border-color:#ff5b9a}
 #app .tv-rows{display:grid;gap:9px;margin:0 0 20px}
-#app .tv-row{display:grid;grid-template-columns:35px minmax(0,1fr);align-items:start;gap:12px;padding:13px 15px;background:#fff;border:1px solid #f0cadc;border-radius:13px;box-shadow:0 2px 9px rgba(105,66,82,.04)}
+#app .tv-row{display:grid;grid-template-columns:34px 72px minmax(0,1fr);align-items:start;gap:12px;padding:13px 15px;background:#fff;border:1px solid #f0cadc;border-radius:13px;box-shadow:0 2px 9px rgba(105,66,82,.04)}
 #app .tv-row.tv-needs{border-left:5px solid #ff5b9a;background:linear-gradient(90deg,#fff7fb,#fff 34%)}
+#app .tv-row.tv-review-needed{border-left:5px solid #e0aa43}
 #app .tv-row-number{display:grid;place-items:center;background:#ffe7a3;color:#7b5763;font-size:13px;font-weight:900;min-width:34px;height:34px;border-radius:10px}
+#app .tv-row-cover{width:72px;height:88px;overflow:hidden;border-radius:9px;background:#ffe4ed;display:grid;place-items:center;color:#b13c72;font-size:23px;border:1px solid #f4cada}
+#app .tv-row-cover img{display:block;width:100%;height:100%;object-fit:cover}
+#app .tv-row-cover video{display:block;width:100%;height:100%;object-fit:cover}
+#app .tv-row-cover span{display:grid;place-items:center;gap:3px;font-size:20px}
+#app .tv-row-cover span small{font-size:9px;font-weight:800}
 #app .tv-row-main{display:grid;gap:5px;min-width:0}
 #app .tv-row-main>small{color:#896d7c;font-size:11px}
 #app .tv-row-main>small b{color:#bd3c76}
 #app .tv-row-main>strong{font-size:15px;line-height:1.35;color:#48343f;overflow-wrap:anywhere}
-#app .tv-row-main>p{margin:0;color:#806b76;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+#app .tv-row-main>p{margin:0;color:#806b76;font-size:12px;line-height:1.45;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #app .tv-row-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:8px 0 3px}
 #app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;min-height:43px;border:1px solid #efcadb;border-radius:9px;background:#fff;color:#a63c73;font-size:12px;font-weight:850;text-decoration:none;cursor:pointer}
 #app .tv-file-pick{background:#ff5b9a;color:#fff;border-color:#ff5b9a;position:relative;overflow:hidden}
@@ -4136,7 +4142,7 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .tv-more{border:1px solid #efcddd;background:#fff;border-radius:12px;padding:13px;margin:20px 0}
 #app .tv-more>summary{font-size:13px;font-weight:850;color:#9f4673;cursor:pointer;min-height:35px}
 #app .tv-empty{background:#fff;padding:32px;border-radius:12px;text-align:center;color:#876d7a}
-@media(max-width:580px){#app .tv-heading{padding:16px}#app .tv-heading h1{font-size:24px}#app .tv-row{grid-template-columns:26px minmax(0,1fr);gap:9px;padding:12px 10px}#app .tv-row-number{min-width:25px;height:27px;font-size:11px}#app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{flex:1 1 auto}#app .tv-row .vd-entry-detail{padding:12px}}
+@media(max-width:580px){#app .tv-heading{padding:16px}#app .tv-heading h1{font-size:24px}#app .tv-row{grid-template-columns:26px 54px minmax(0,1fr);gap:8px;padding:12px 10px}#app .tv-row-number{min-width:25px;height:27px;font-size:11px}#app .tv-row-cover{width:54px;height:72px}#app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{flex:1 1 auto}#app .tv-row .vd-entry-detail{padding:12px}}
 @media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
 </style>
 <script src="./tiktok-catalog.js"></script>
@@ -5807,9 +5813,12 @@ function tkOneListRows(){
   rows.push({key:'catalog-'+entry.id,entry,record,review:plan.review.some(x=>x.entry.id===entry.id),files:tkListFiles(record),date:entry.date});
  }
  for(const record of all('TikTok'))if(!seen.has(record.id))rows.push({key:'saved-'+record.id,entry:null,record,review:false,files:tkListFiles(record),date:String(data(record).postDate||data(record).date||record.created_at||'').slice(0,10)});
- for(const record of all('Video'))rows.push({key:'video-'+record.id,entry:null,record,review:false,files:tkListFiles(record),date:String(data(record).date||data(record).uploadedAt||record.created_at||'').slice(0,10)});
+ // A Video linked to a TikTok already appears on that TikTok's line. Don't show
+ // a second row for the same uploaded file; preserve unlinked legacy uploads.
+ const linkedVideoIds=new Set(S.links.filter(link=>link.link_type==='video_tiktok'&&get(link.to_record_id)?.kind==='TikTok'&&!get(link.to_record_id)?.archived_at).map(link=>link.from_record_id));
+ for(const record of all('Video'))if(!linkedVideoIds.has(record.id))rows.push({key:'video-'+record.id,entry:null,record,review:false,files:tkListFiles(record),date:String(data(record).date||data(record).uploadedAt||record.created_at||'').slice(0,10)});
  rows.sort((a,b)=>{
-  const priority=r=>r.record?.kind==='Video'?2:r.review?3:r.files.length?1:0;
+  const priority=r=>r.record?.kind==='Video'?3:r.review?2:r.files.length?1:0;
   return priority(a)-priority(b)||b.date.localeCompare(a.date)||a.key.localeCompare(b.key);
  });
  return rows;
@@ -5822,32 +5831,34 @@ function tkOneListPlayer(files){
 function tkOneListRow(row,index){
  const {entry,record,files}=row,video=record?.kind==='Video',date=row.date,titleText=video?title(record):record?tkTitle(record):cleanCaptionTitle(entry?.caption||'')||'Minecraft TikTok';
  const caption=entry?.caption||data(record).caption||'',song=entry?.song||data(record).song||'',url=entry?.url||(!video?tkPostUrl(record):'');
- const needs=!files.length&&!video,canUpload=!video&&!row.review,busy=!!S.tkDirectUploadBusy;
+ const needs=!files.length&&!video&&!row.review,canUpload=!video&&!row.review,busy=!!S.tkDirectUploadBusy;
  const status=row.review?'Review match':video?'Existing upload':needs?'Needs video':`${files.length} video${files.length===1?'':'s'} attached`;
- return `<article class="tv-row ${needs?'tv-needs':'tv-ready'}" data-tv-row="${e(row.key)}">
-  <span class="tv-row-number">${index+1}</span><div class="tv-row-main"><small>${e(niceDate(date)||'Date not set')} · <b>${e(status)}</b></small><strong>${e(titleText)}</strong>
+ const cover=entry?.thumbnail?`<img src="${e(entry.thumbnail)}" alt="" loading="lazy">`:`<span aria-hidden="true">${files.length?'▶':'♡'}<small>${files.length?'Saved':'To film'}</small></span>`;
+ return `<article class="tv-row ${row.review?'tv-review-needed':needs?'tv-needs':'tv-ready'}" data-tv-row="${e(row.key)}">
+  <span class="tv-row-number">${index+1}</span><div class="tv-row-cover">${cover}</div><div class="tv-row-main"><small>${e(niceDate(date)||'Date not set')} · <b>${e(status)}</b></small><strong>${e(titleText)}</strong>
   ${caption?`<p>${e(caption)}</p>`:''}${song?`<small>♫ ${e(song)}</small>`:''}
-  <div class="tv-row-actions">${canUpload?`<label class="tv-file-pick ${busy?'tv-disabled':''}">${S.tkDirectUploadBusy===row.key?'Uploading…':needs?'↑ Add video':'＋ Add another video'}<input type="file" data-tv-file="${e(row.key)}" accept="video/*,.mov,.mp4,.m4v,.webm" ${busy?'disabled':''}></label>`:`<small class="tv-review">${row.review?'Possible duplicate or archived post — review before uploading':''}</small>`}
+  <div class="tv-row-actions">${canUpload?`<label class="tv-file-pick ${busy?'tv-disabled':''}">${S.tkDirectUploadBusy===row.key?'Uploading…':needs?'↑ Add video':'＋ Add another video'}<input type="file" data-tv-file="${e(row.key)}" accept="video/*,.mov,.mp4,.m4v,.webm" ${busy?'disabled':''}></label>`:row.review?'<button type="button" data-tv-review>Review this match</button>':''}
   ${url?`<a href="${e(url)}" target="_blank" rel="noopener noreferrer">TikTok ↗</a>`:''}${record?`<button type="button" data-video-expand="${e(record.id)}">${S.videoExpanded===record.id?'Hide details':'Details / edit'}</button>`:''}</div>
   ${files.length?`<button type="button" class="tv-preview-toggle" data-tv-preview="${e(row.key)}">${S.tvPreviewOpen===row.key?'Hide video':`▶ Watch attached video${files.length===1?'':'s'} (${files.length})`}</button>${S.tvPreviewOpen===row.key?`<div class="tv-preview">${tkOneListPlayer(files)}</div>`:''}`:''}
   ${record&&S.videoExpanded===record.id?videoDeskItem(record):''}</div>
  </article>`;
 }
 function tkOneListPage(){
- const rows=tkOneListRows(),missing=rows.filter(r=>r.record?.kind!=='Video'&&!r.review&&!r.files.length).length,attached=rows.filter(r=>r.record?.kind!=='Video'&&r.files.length).length;
- const filter=S.videoFilter||'all',term=String(S.tkSearch||'').trim().toLowerCase();
+ const rows=tkOneListRows(),missing=rows.filter(r=>r.record?.kind!=='Video'&&!r.review&&!r.files.length).length,attached=rows.filter(r=>r.record?.kind!=='Video'&&r.files.length).length,review=rows.filter(r=>r.review).length;
+ const filter=['all','needs','attached','review'].includes(S.videoFilter)?S.videoFilter:'all',term=String(S.tkSearch||'').trim().toLowerCase();
  const shown=rows.filter(r=>{
   if(filter==='needs'&&(r.record?.kind==='Video'||r.review||r.files.length))return false;
   if(filter==='attached'&&!r.files.length)return false;
+  if(filter==='review'&&!r.review)return false;
   if(!term)return true;
   return [r.entry?.caption,r.entry?.song,r.record?.kind==='Video'?title(r.record):r.record?tkTitle(r.record):cleanCaptionTitle(r.entry?.caption),data(r.record).notes,data(r.record).description].some(x=>String(x||'').toLowerCase().includes(term));
  });
- return `<div class="video-desk tv-single-page"><header class="tv-heading"><div><small>CTRL + CRFT · MY VIDEOS</small><h1>My TikTok video list ♡</h1><p>One place for every post. The ones waiting for a video are at the top; tap Add video on the matching line.</p></div><button type="button" data-video-new>＋ New TikTok note</button></header>
- <div class="tv-counts"><span><strong>${missing}</strong> need a video</span><span><strong>${attached}</strong> have footage</span><span><strong>${rows.length}</strong> total entries</span></div>
+ return `<div class="video-desk tv-single-page"><header class="tv-heading"><div><small>CTRL + CRFT · MY VIDEOS</small><h1>My Videos ♡</h1><p>All your TikToks in one list. Videos still needed are at the top. Add footage on the matching line.</p></div><button type="button" data-video-new>＋ New TikTok note</button></header>
+ <div class="tv-counts"><span><strong>${missing}</strong> need a video</span><span><strong>${attached}</strong> have footage</span><span><strong>${rows.length}</strong> total entries</span>${review?`<span><strong>${review}</strong> need review</span>`:''}</div>
  <p class="tv-limit">Choose videos from iPhone Photos or Files · up to 25 MiB each · files stay private and attach directly to their TikTok.</p>
  ${S.tkDirectUploadMessage?`<p class="tv-upload-status" role="status">${e(S.tkDirectUploadMessage)}</p>`:''}
  <label class="tv-search-label">Search the list<input id="tk29-search" type="search" autocomplete="off" value="${e(S.tkSearch||'')}" placeholder="Search titles, captions or audio"></label>
- <div class="tv-filters" aria-label="Video list filter">${[['all','All'],['needs','Needs a video'],['attached','Has video']].map(([key,label])=>`<button type="button" data-video-filter="${key}" aria-pressed="${filter===key}">${label}</button>`).join('')}</div>
+ <div class="tv-filters" aria-label="Video list filter">${[['all','All'],['needs','Needs a video'],['attached','Has video'],...(review?[['review','Needs review']]:[])].map(([key,label])=>`<button type="button" data-video-filter="${key}" aria-pressed="${filter===key}">${label}</button>`).join('')}</div>
  <section class="tv-rows" aria-label="TikToks and videos awaiting uploads">${shown.map(tkOneListRow).join('')||'<p class="tv-empty">Nothing matches this filter.</p>'}</section>
  ${S.tkAdd?`<section class="vd-form-shell v4-new-panel"><div class="vd-compose-heading"><h2>New TikTok note</h2><button type="button" data-tk29-add>×</button></div><form id="tk29-add-form" class="video-v3-editor vd-editor"><div class="video-v3-core-fields"><label>Title<input name="title" required maxlength="200"></label><label>TikTok link (optional)<input name="url" type="url"></label><label>Notes<textarea name="note" rows="3"></textarea></label></div>${tkMetadataFields(null)}${tkExtraFields(null)}<div class="video-v3-form-actions"><button type="submit" class="video-v3-save">Save note</button><button type="button" class="video-v3-cancel" data-tk29-add>Cancel</button></div></form></section>`:''}
  <details class="tv-more" ${S.tvToolsOpen||VL.uploadOpen||S.tkCatalogReview?'open':''}><summary>Catalog, older uploads & creative tools</summary>${tkCatalogPanel()}${vlUnifiedUploads()}${vlRecoveryPanel()}${creativeStudioPanel()}</details>
@@ -5855,7 +5866,8 @@ function tkOneListPage(){
 }
 async function tkOneListUpload(key,file){
  if(!file||S.tkDirectUploadBusy)return;
- if(!mediaMime(file).startsWith('video/')||file.size<=0||file.size>25*1024*1024){S.tkDirectUploadMessage='Choose an MP4/MOV or other supported video no larger than 25 MiB.';render();return;}
+ if(!mediaMime(file).startsWith('video/')||file.size<=0){S.tkDirectUploadMessage='That file is not a supported video. Choose an MP4 or MOV from Photos or Files.';render();return;}
+ if(file.size>25*1024*1024){S.tkDirectUploadMessage=`“${file.name}” is ${(file.size/1024/1024).toFixed(1)} MiB. Your private storage currently accepts videos up to 25 MiB each. Trim or export a smaller copy on your iPhone, then choose it again. Nothing was changed.`;render();return;}
  const row=tkOneListRows().find(r=>r.key===key);if(!row||row.review||row.record?.kind==='Video'){showToast('This entry needs a manual review before attaching footage.');return;}
  const name=row.record?tkTitle(row.record):cleanCaptionTitle(row.entry.caption)||'Minecraft TikTok';
  if(!confirm(`Attach “${file.name}” to “${name}” in your private CTRL n crft app?\n\nThis will not publish a TikTok or remove existing clips.`))return;
@@ -7768,6 +7780,7 @@ function wireApp(){
  app.querySelectorAll('[data-video-upload-close]').forEach(b=>b.addEventListener('click',()=>{if(VL.uploading)return;VL.uploadOpen=false;VL.queue=[];render()}));
  app.querySelectorAll('[data-tv-file]').forEach(input=>input.addEventListener('change',ev=>{const file=ev.target.files?.[0];ev.target.value='';if(file)tkOneListUpload(input.dataset.tvFile,file)}));
  app.querySelectorAll('[data-tv-preview]').forEach(b=>b.addEventListener('click',()=>{S.tvPreviewOpen=S.tvPreviewOpen===b.dataset.tvPreview?'':b.dataset.tvPreview;render()}));
+ app.querySelectorAll('[data-tv-review]').forEach(b=>b.addEventListener('click',()=>{S.tvToolsOpen=true;S.tkCatalogReview=true;render();app.querySelector('.tk-catalog')?.scrollIntoView({block:'start',behavior:'smooth'})}));
  app.querySelector('.tv-more')?.addEventListener('toggle',ev=>{S.tvToolsOpen=ev.target.open});
   app.querySelectorAll('[data-video-filter]').forEach(b=>b.addEventListener('click',()=>{S.videoFilter=b.dataset.videoFilter;S.tkPage=0;S.tkEdit=null;render()}));
  app.querySelector('[data-tk-catalog-toggle]')?.addEventListener('click',()=>{S.tkCatalogReview=!S.tkCatalogReview;render();app.querySelector('.tk-catalog')?.scrollIntoView({block:'start',behavior:'smooth'})});

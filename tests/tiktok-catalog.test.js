@@ -63,6 +63,25 @@ test('the one-tab video list includes unsaved catalog entries and places missing
   assert.equal(rows[2].files.length,1);
 });
 
+test('linked older Video records appear only under their TikTok, but unlinked uploads stay visible', () => {
+  const section=html.slice(html.indexOf('function tkListFiles('),html.indexOf('async function tkOneListUpload('));
+  const post={id:'post-1',kind:'TikTok',data:{name:'My saved post',clips:[]}};
+  const linked={id:'video-linked',kind:'Video',data:{name:'Already linked',filePath:'linked.mov'}};
+  const loose={id:'video-loose',kind:'Video',data:{name:'My older video',filePath:'loose.mov'}};
+  const context={
+    S:{links:[{from_record_id:linked.id,to_record_id:post.id,link_type:'video_tiktok'}]},
+    data:r=>r?.data||{},title:r=>r?.data?.name||'',tkClips:r=>r.data.clips||[],
+    get:id=>[post,linked,loose].find(r=>r.id===id)||null,
+    all:kind=>kind==='TikTok'?[post]:kind==='Video'?[linked,loose]:[],
+    tkCatalogRows:()=>[],tkCatalogPlan:()=>({create:[],update:[],unchanged:[],review:[]})
+  };
+  const rows=vm.runInNewContext(section+'\ntkOneListRows()',context);
+  assert.equal(rows.length,2);
+  assert.equal(rows[0].record.id,post.id);
+  assert.equal(rows[0].files[0].filePath,'linked.mov');
+  assert.equal(rows[1].record.id,loose.id);
+});
+
 test('all 38 catalog posts render as regular rows with their own upload control', () => {
   const section=html.slice(html.indexOf('function tkListFiles('),html.indexOf('async function tkOneListUpload('));
   const context={
@@ -75,7 +94,25 @@ test('all 38 catalog posts render as regular rows with their own upload control'
   const markup=vm.runInNewContext(section+'\ntkOneListPage()',context);
   assert.equal((markup.match(/data-tv-file=/g)||[]).length,38);
   assert.match(markup,/38<\/strong> need a video/);
+  assert.match(markup,/My Videos ♡/);
+  assert.match(markup,/tv-row-cover/);
   assert.ok(markup.indexOf(catalog[0].url)<markup.indexOf(catalog[5].url),'Newest TikTok appears before older entries');
+});
+
+test('ambiguous catalog matches are shown in a separate review state, not miscounted as missing videos', () => {
+  const section=html.slice(html.indexOf('function tkListFiles('),html.indexOf('async function tkOneListUpload('));
+  const context={
+    S:{links:[],videoFilter:'review',tkSearch:'',tkDirectUploadBusy:'',tkDirectUploadMessage:'',tkAdd:false,tvToolsOpen:false,tkCatalogReview:false},
+    VL:{uploadOpen:false},all:()=>[],data:r=>r?.data||{},tkClips:()=>[],get:()=>null,
+    tkCatalogRows:()=>catalog.slice(0,1),tkCatalogPlan:()=>({create:[],update:[],unchanged:[],review:[{entry:catalog[0],reason:'Previously archived'}]}),
+    cleanCaptionTitle:x=>String(x||'').split('#')[0].trim(),e:x=>String(x??''),niceDate:x=>x,
+    tkCatalogPanel:()=>'',vlUnifiedUploads:()=>'',vlRecoveryPanel:()=>'',creativeStudioPanel:()=>''
+  };
+  const markup=vm.runInNewContext(section+'\ntkOneListPage()',context);
+  assert.match(markup,/0<\/strong> need a video/);
+  assert.match(markup,/1<\/strong> need review/);
+  assert.match(markup,/data-tv-review/);
+  assert.doesNotMatch(markup,/data-tv-file=/);
 });
 
 test('direct upload creates only the missing TikTok record and attaches footage to that record', async () => {
