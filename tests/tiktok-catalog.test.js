@@ -38,6 +38,10 @@ test('the main app script parses after the additive import', () => {
   assert.doesNotThrow(() => new vm.Script(pageScript));
   assert.match(html, /data-tk-catalog-save/);
   assert.match(html, /const catalog=r\.kind==='TikTok'/);
+  assert.match(html, /Your latest five posts/);
+  assert.match(html, /latest=rows\.slice\(0,5\)/);
+  assert.match(html, /class="tk-catalog-upload" data-video-upload/);
+  assert.match(html, /querySelectorAll\('\[data-video-upload\]'\)/);
 });
 
 test('catalog preview fills missing fields without overwriting or resurrecting records', () => {

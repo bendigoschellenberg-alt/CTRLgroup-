@@ -4088,6 +4088,14 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .tk-catalog-card b{font-size:13px;color:#593c49;line-height:1.4}
 #app .tk-catalog-card small{font-size:11px;color:#74616b}
 #app .tk-catalog-card a{font-size:12px;font-weight:800;color:#b43a78}
+#app .tk-latest-heading{font-size:15px;font-weight:900;color:#a7376d;margin:16px 0 9px}
+#app .tk-latest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+#app .tk-latest-card{padding:13px;border:1px solid #f5cfdd;border-radius:13px;background:linear-gradient(130deg,#fff,#fff7d9);min-width:0}
+#app .tk-latest-card small{display:block;font-size:11px;font-weight:800;color:#98667b;margin-bottom:7px}
+#app .tk-latest-card b{display:block;font-size:14px;color:#543944;overflow-wrap:anywhere;margin-bottom:7px}
+#app .tk-latest-card p{font-size:12px;margin:0 0 9px}
+#app .tk-latest-card a{font-size:12px;font-weight:800;color:#ad3271}
+#app .tk-catalog-actions .tk-catalog-upload{background:#fff;color:#a7376d;border-color:#f1b9ce}
 @media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
 </style>
 <script src="./tiktok-catalog.js"></script>
@@ -5523,13 +5531,15 @@ function tkCatalogPlan(){
 function tkCatalogPanel(){
  const rows=tkCatalogRows();if(!rows.length)return '';
  const plan=tkCatalogPlan(),pending=plan.create.length+plan.update.length;
+ const latest=rows.slice(0,5);
  const stats=[`${rows.length} posts from @missistephi`,`${plan.create.length} new`,`${plan.update.length} missing details`,`${plan.unchanged.length} already complete`];
  if(plan.review.length)stats.push(`${plan.review.length} need review`);
  return `<section class="tk-catalog" aria-label="TikTok catalog update">
-  <div class="tk-catalog-head"><div><small class="vd-overline">YOUR OCTOBER 2026 DOCUMENT</small><h2>${rows.length}-post TikTok catalog ♡</h2><p>Captions, dates, songs and direct links, plus 33 supplied screenshots. Your older notes, drafts, clips and World links stay untouched.</p></div>
-   <div class="tk-catalog-actions"><button type="button" data-tk-catalog-toggle>${S.tkCatalogReview?'Hide preview':'Review catalog'}</button>${S.tkCatalogReview?`<button type="button" class="tk-catalog-save" data-tk-catalog-save ${!pending||S.tkCatalogSaving?'disabled':''}>${S.tkCatalogSaving?'Saving…':`Save ${pending} changes`}</button>`:''}</div>
+  <div class="tk-catalog-head"><div><small class="vd-overline">YOUR OCTOBER 2026 DOCUMENT</small><h2>${rows.length}-post TikTok catalog ♡</h2><p>The latest captions, dates, songs and links are ready. No video files were added — you can upload those yourself whenever you're ready. Your existing notes and attachments stay untouched.</p></div>
+   <div class="tk-catalog-actions"><button type="button" data-tk-catalog-toggle>${S.tkCatalogReview?'Hide full catalog':`Review all ${rows.length}`}</button><button type="button" class="tk-catalog-upload" data-video-upload>↑ Upload my videos</button>${S.tkCatalogReview?`<button type="button" class="tk-catalog-save" data-tk-catalog-save ${!pending||S.tkCatalogSaving?'disabled':''}>${S.tkCatalogSaving?'Saving…':`Save ${pending} changes`}</button>`:''}</div>
   </div><div class="tk-catalog-stats">${stats.map(x=>`<span>${e(x)}</span>`).join('')}</div>
   ${S.tkCatalogMessage?`<p role="status">${e(S.tkCatalogMessage)}</p>`:''}
+  ${!S.tkCatalogReview?`<div class="tk-latest-heading">✦ Your latest five posts</div><div class="tk-latest-grid">${latest.map(entry=>`<article class="tk-latest-card"><small>${e(niceDate(entry.date))} · Video to be uploaded</small><b>${e(cleanCaptionTitle(entry.caption)||'Minecraft TikTok')}</b><p>♫ ${e(entry.song)}</p><a href="${e(entry.url)}" target="_blank" rel="noopener noreferrer">View original TikTok ↗</a></article>`).join('')}</div>`:''}
   ${S.tkCatalogReview?`<p>New posts are added. Existing entries receive only blank metadata fields; your edits and attachments are never replaced. Archived or ambiguous matches are skipped for manual review.</p>
    <div class="tk-catalog-grid">${rows.map(entry=>{const state=plan.create.some(x=>x.entry.id===entry.id)?'New':plan.update.some(x=>x.entry.id===entry.id)?'Fill blanks':plan.review.some(x=>x.entry.id===entry.id)?'Review manually':'Saved';return `<article class="tk-catalog-card">${entry.thumbnail?`<img src="${e(entry.thumbnail)}" alt="Minecraft preview for ${e(cleanCaptionTitle(entry.caption)||'TikTok post')}" loading="lazy">`:'<div class="tk-catalog-placeholder" aria-label="Screenshot not supplied">✦ Screenshot not supplied</div>'}<div><small>${e(niceDate(entry.date))} · ${e(state)}</small><b>${e(entry.caption)}</b><small>♫ ${e(entry.song)}</small><a href="${e(entry.url)}" target="_blank" rel="noopener noreferrer">Open TikTok ↗</a></div></article>`}).join('')}</div>`:''}
  </section>`;
@@ -7632,7 +7642,7 @@ function wireApp(){
  app.querySelector('[data-tk-catalog-save]')?.addEventListener('click',tkCatalogSync);
  app.querySelectorAll('[data-video-expand]').forEach(b=>b.addEventListener('click',()=>{S.videoExpanded=S.videoExpanded===b.dataset.videoExpand?'':b.dataset.videoExpand;S.tkEdit=null;render()}));
  app.querySelector('[data-video-new]')?.addEventListener('click',()=>{S.videoTab='tiktoks';S.tkAdd=true;S.tkEdit=null;render();app.querySelector('.v4-new-panel')?.scrollIntoView({block:'start',behavior:'smooth'})});
- app.querySelector('[data-video-upload]')?.addEventListener('click',()=>{S.tkAdd=false;S.tkEdit=null;VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({block:'center',behavior:'smooth'});});
+ app.querySelectorAll('[data-video-upload]').forEach(b=>b.addEventListener('click',()=>{S.tkAdd=false;S.tkEdit=null;VL.uploadOpen=true;render();app.querySelector('#vl-upload-panel')?.scrollIntoView({block:'center',behavior:'smooth'});}));
  app.querySelector('#tk29-search')?.addEventListener('input',ev=>{const input=ev.target,caret=input.selectionStart;S.tkSearch=input.value;S.tkPage=0;render();const next=app.querySelector('#tk29-search');if(next){next.focus();try{next.setSelectionRange(caret,caret)}catch{}}});
  app.querySelectorAll('[data-tk29-page]').forEach(b=>b.addEventListener('click',()=>{S.tkPage=Math.max(0,(Number(S.tkPage)||0)+Number(b.dataset.tk29Page));render();app.querySelector('.v4-list')?.scrollIntoView({block:'start'})}));
  app.querySelectorAll('[data-tk29-edit]').forEach(b=>b.addEventListener('click',()=>{S.tkEdit=S.tkEdit===b.dataset.tk29Edit?null:b.dataset.tk29Edit;S.videoExpanded=b.dataset.tk29Edit;S.tkAdd=false;render()}));
