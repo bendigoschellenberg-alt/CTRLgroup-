@@ -4142,6 +4142,45 @@ function bulkVideoBind(root){root.querySelector('#bulk-video-toggle')?.addEventL
 #app .tv-more{border:1px solid #efcddd;background:#fff;border-radius:12px;padding:13px;margin:20px 0}
 #app .tv-more>summary{font-size:13px;font-weight:850;color:#9f4673;cursor:pointer;min-height:35px}
 #app .tv-empty{background:#fff;padding:32px;border-radius:12px;text-align:center;color:#876d7a}
+/* Readable, touch-friendly record tables and one-field-at-a-time editing. */
+#app .readable-table-panel{margin:16px 0;background:#fff;border:1px solid #efc9d9;border-radius:14px;padding:13px}
+#app .readable-table-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin-bottom:10px}
+#app .readable-table-head h2{font-size:18px;line-height:1.4;color:#78394f;margin:0}
+#app .readable-table-head p{font-size:13px;color:#5d4d54;margin:3px 0 0;line-height:1.5}
+#app .readable-table-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#app .readable-table-tools button,#app .table-pager button{min-height:40px;border-radius:9px;background:#fff;border:1px solid #dbacc1;padding:8px 12px;color:#873b62;font-weight:800}
+#app .readable-table-tools button[aria-pressed="true"]{background:#ff5b9a;color:white;border-color:#ff5b9a}
+#app .readable-table-scroll{width:100%;max-width:100%;overflow-x:auto;border:1px solid #ead1dd;border-radius:10px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+#app .readable-table{border-collapse:separate;border-spacing:0;width:100%;min-width:570px;color:#43363d;font-size:13px;line-height:1.5}
+#app .readable-table th{text-align:left;background:#ffe7a3;color:#623b50;font-size:12px;font-weight:900;padding:12px;white-space:nowrap;border-bottom:1px solid #d9b9c8}
+#app .readable-table td{padding:10px 12px;border-bottom:1px solid #f2dfe7;vertical-align:top;max-width:240px;overflow-wrap:anywhere}
+#app .readable-table tr:nth-child(even) td{background:#fff9fc}
+#app .readable-table tr:last-child td{border-bottom:0}
+#app .readable-table td:first-child{font-weight:850;position:sticky;left:0;background:#fff;min-width:138px;z-index:1;box-shadow:2px 0 5px #e2bed04f}
+#app .readable-table tr:nth-child(even) td:first-child{background:#fff9fc}
+#app .readable-table .table-row-actions{white-space:nowrap;min-width:120px}
+#app .readable-table .table-row-actions button{border:1px solid #ebbfce;background:white;border-radius:8px;padding:7px 9px;margin:1px;color:#924369;min-height:38px;font-weight:800}
+#app .inline-field-value{display:block;text-align:left;width:100%;border:1px dashed transparent;border-radius:7px;padding:5px 6px;background:transparent;color:#43363d;font:inherit;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+#app .inline-field-value:hover,#app .inline-field-value:focus-visible{border-color:#d887ab;background:#fff0f6;outline:0}
+#app .inline-field-value.is-empty{color:#a43c70;font-weight:750}
+#app .inline-field-form{display:grid;gap:7px;min-width:150px}
+#app .inline-field-form input:not([type="checkbox"]),#app .inline-field-form textarea,#app .inline-field-form select{width:100%;font-size:16px;line-height:1.5;padding:9px;background:#fff;border:2px solid #df83aa;border-radius:8px;color:#333}
+#app .inline-field-form textarea{min-height:82px;resize:vertical}
+#app .inline-field-form .inline-actions{display:flex;flex-wrap:wrap;gap:6px}
+#app .inline-field-form .inline-actions button{min-height:38px;border-radius:8px;border:1px solid #df9fbd;background:#fff;padding:7px 11px;font-size:13px;font-weight:850;color:#893d63}
+#app .inline-field-form .inline-actions button[type="submit"]{background:#ff5b9a;border-color:#ff5b9a;color:#fff}
+#app .inline-field-form small{color:#aa3858;font-size:12px}
+#app .table-pager{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:10px;font-size:12px;color:#66515d}
+#app .table-pager button:disabled{opacity:.45}
+#app .record-fields-table{min-width:0}
+#app .record-fields-table th{width:30%;min-width:120px}
+#app .record-fields-table td:first-child{position:static;min-width:0;background:transparent;font-weight:normal;box-shadow:none}
+#app .record-fields-table td{max-width:none}
+#app .readable-table-panel .compact-list{margin-top:12px}
+#app .content{color:#3e343a;line-height:1.55}
+#app .subcopy,#app .hint,#app .compact-copy small{color:#65515d!important;line-height:1.55}
+#app .form-grid input:not([type="checkbox"]),#app .form-grid textarea,#app .form-grid select,#app .page-notes-editor{font-size:16px!important;line-height:1.5!important}
+@media(max-width:740px){#app .readable-table-panel{padding:10px;margin:12px 0}#app .readable-table th,#app .readable-table td{padding:9px}#app .readable-table td:first-child{min-width:125px}#app .readable-table-head h2{font-size:17px}#app .readable-table .table-row-actions{min-width:110px}#app .readable-table .table-row-actions button{min-height:44px}}
 @media(max-width:580px){#app .tv-heading{padding:16px}#app .tv-heading h1{font-size:24px}#app .tv-row{grid-template-columns:26px 54px minmax(0,1fr);gap:8px;padding:12px 10px}#app .tv-row-number{min-width:25px;height:27px;font-size:11px}#app .tv-row-cover{width:54px;height:72px}#app .tv-row-actions button,#app .tv-row-actions a,#app .tv-file-pick{flex:1 1 auto}#app .tv-row .vd-entry-detail{padding:12px}}
 @media(max-width:550px){#app .tk-catalog{padding:13px}#app .tk-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#app .tk-catalog-card img,#app .tk-catalog-card .tk-catalog-placeholder{height:110px}#app .tk-catalog-actions{width:100%}#app .tk-catalog-actions button{flex:1}}
 </style>
@@ -5515,6 +5554,75 @@ function worldTemplateRecoveryPage(){
  <section class="panel compact-library-panel"><div class="record-toolbar compact-toolbar"><input type="search" id="local-search" class="search-input" placeholder="Search world templates or creators…" value="${e(S.query)}" aria-label="Search world templates or creators"></div><div class="compact-library-bar"><strong>${templates.length===total?`${total} templates`:`${templates.length} shown · ${total} templates`}</strong></div><div class="compact-list">${templates.length?templates.map(compactRow).join(''):'<p class="hint">No world templates match your search.</p>'}</div></section>`;
 }
 
+/* Every saved text field is editable in place, with an explicit Save and Cancel.
+   A single-field PATCH merges the latest saved record, retaining unknown keys,
+   other fields, file paths and relationships. */
+const READABLE_COLUMNS={
+ World:['status','theme','description'],WorldGroup:['description','showCraftables','notes'],
+ AddOn:['creatorName','sizeMB','category'],Craftable:['creatorName','sizeMB','category'],
+ Texture:['creatorName','sizeMB','category'],WorldTemplate:['creatorName','sizeMB','category'],
+ Build:['status','progress','category'],Subproject:['status','progress','notes'],
+ Task:['status','dueDate','description'],Event:['date','time','description'],
+ Creator:['website','description','notes'],Palette:['slot','theme','favorite'],
+ Block:['category','color','description'],Material:['category','color','notes'],
+ TikTok:['status','postDate','caption'],Video:['date','status','description'],
+ CraftablePlacement:['rabbitHole','worldName','craftableName'],
+ CityBlock:['slot','status','primaryAssignment'],Avenue:['code','status','avenueName'],
+ Street:['number','status','streetName'],CoordinatePin:['x','y','z'],
+ Location:['x','z','category'],GardenTheme:['color','status','theme'],
+ GardenFeature:['status','description','notes'],WishlistItem:['costMinecoins','status','sizeMB']
+};
+function readableColumns(kind){const defs=fieldDefs(kind),byKey=new Map(defs.map(f=>[f.key,f]));const requested=READABLE_COLUMNS[kind]||[];return [...requested,...defs.map(f=>f.key).filter(k=>k!=='name'&&k!=='description')].filter((key,i,keys)=>key!=='name'&&byKey.has(key)&&keys.indexOf(key)===i).slice(0,3).map(key=>byKey.get(key))}
+function inlineValue(record,field){const raw=data(record)[field.key];if(raw===true)return 'Yes';if(raw===false)return 'No';if(raw===null||raw===undefined||raw==='')return '';return typeof raw==='string'?raw:String(raw)}
+function inlineFieldControl(record,field){const value=data(record)[field.key],type=field.type||'text',key=e(field.key),raw=e(value??'');
+ if(type==='checkbox')return `<label><input name="value" type="checkbox" ${value?'checked':''}> Yes / enabled</label>`;
+ if(type==='textarea')return `<textarea name="value" rows="3" ${field.required?'required':''}>${raw}</textarea>`;
+ if(type==='select'){const choices=[...new Set([...(field.options||[]),...(value&&!field.options?.includes(value)?[String(value)]:[])])];return `<select name="value" ${field.required?'required':''}><option value="">— None —</option>${choices.map(choice=>`<option value="${e(choice)}" ${choice===value?'selected':''}>${e(choice)}</option>`).join('')}</select>`;}
+ return `<input name="value" type="${e(['text','number','date','time','url'].includes(type)?type:'text')}" value="${raw}" ${field.required?'required':''} ${type==='number'?'step="any" inputmode="decimal"':''} ${field.key==='sizeMB'?'min="0"':''}>`;
+}
+function inlineFieldMarkup(record,field){const active=S.inlineEdit?.id===record.id&&S.inlineEdit?.key===field.key;
+ if(active)return `<form class="inline-field-form" data-inline-form data-inline-id="${e(record.id)}" data-inline-key="${e(field.key)}"><label class="sr-only">Edit ${e(field.label)}</label>${inlineFieldControl(record,field)}<div class="inline-actions"><button type="submit" ${S.inlineSaving?'disabled':''}>${S.inlineSaving?'Saving…':'Save'}</button><button type="button" data-inline-cancel>Cancel</button></div><small class="inline-error" role="status">${e(S.inlineEdit.error||'')}</small></form>`;
+ const value=inlineValue(record,field);return `<button type="button" class="inline-field-value ${value?'':'is-empty'}" data-inline-open="${e(record.id)}" data-inline-key="${e(field.key)}" title="Edit ${e(field.label)}" aria-label="Edit ${e(field.label)} for ${e(title(record))}">${value?e(value.length>145?value.slice(0,145)+'…':value):'＋ Add'}</button>`;
+}
+async function saveInlineField(form){if(S.inlineSaving)return;const id=form.dataset.inlineId,key=form.dataset.inlineKey,r=get(id),field=r&&fieldDefs(r.kind).find(f=>f.key===key);
+ if(!r||r.archived_at||!field){showToast('This field is no longer available. Refresh the record.');return;}
+ const fd=new FormData(form),text=String(fd.get('value')||'').trim();let value;
+ if(field.type==='checkbox')value=fd.has('value');
+ else if(field.type==='number'){value=text===''?null:Number(text);if(value!==null&&!Number.isFinite(value)){showToast('Enter a valid number.');return}if(key==='sizeMB'&&value!==null&&value<0){showToast('Size cannot be negative.');return}}
+ else value=text;
+ if(field.required&&(value===''||value===null)){showToast(`${field.label} cannot be empty.`);return}
+ S.inlineSaving=true;const button=form.querySelector('[type="submit"]');if(button){button.disabled=true;button.textContent='Saving…'}
+ try{const fresh=await api(`/rest/v1/hq_records?id=eq.${encodeURIComponent(id)}&select=id,kind,data,archived_at`);const latest=Array.isArray(fresh)?fresh[0]:null;
+  if(!latest||latest.archived_at||latest.kind!==r.kind)throw Error('This record is no longer available.');
+  const next={...data(latest),[key]:value};if(latest.kind==='TikTok'&&key==='name')next.manualTitle=true;
+  const saved=await saveRecord(latest.kind,next,id);S.records=[...S.records.filter(x=>x.id!==id),saved];S.inlineEdit=null;showToast(`${field.label} updated ♡`);render();
+ }catch(err){S.inlineEdit={id,key,error:`Could not save: ${err.message}`};S.inlineSaving=false;render();return}
+ S.inlineSaving=false;
+}
+function readableTable(kind,records,options={}){const cfg=KINDS[kind];if(!cfg)return '';const fields=readableColumns(kind),mode=S.tableModes?.[kind]||'table',pageSize=options.pageSize||35,requested=S.tablePages?.[kind]||0,pages=Math.max(1,Math.ceil(records.length/pageSize)),page=Math.min(Math.max(0,requested),pages-1),shown=records.slice(page*pageSize,(page+1)*pageSize);
+ const heading=options.heading||`${cfg.label} at a glance`,showCards=options.cards!==false,isTable=mode!=='list'||!showCards;
+ return `<section class="readable-table-panel" aria-label="${e(cfg.label)} data table"><div class="readable-table-head"><div><h2>${e(heading)}</h2><p>${records.length} saved ${e(cfg.label.toLowerCase())} · Tap a value to edit it</p></div>${showCards?`<div class="readable-table-tools"><button type="button" data-table-mode="${e(kind)}" data-table-view="table" aria-pressed="${mode==='table'}">Table</button><button type="button" data-table-mode="${e(kind)}" data-table-view="list" aria-pressed="${mode==='list'}">List</button></div>`:''}</div>
+ ${mode==='list'&&showCards?`<div class="compact-list">${records.length?records.slice(0,150).map(compactRow).join(''):'<p>No saved entries yet.</p>'}</div>`:`<div class="readable-table-scroll" role="region" tabindex="0" aria-label="Swipe to see more ${e(cfg.label)} columns"><table class="readable-table"><thead><tr><th scope="col">${e(cfg.singular)}</th>${fields.map(f=>`<th scope="col">${e(f.label)}</th>`).join('')}<th scope="col">Actions</th></tr></thead><tbody>${shown.map(r=>`<tr><td>${inlineFieldMarkup(r,{key:'name',label:fieldDefs(kind).find(f=>f.key==='name')?.label||'Name',type:'text',required:true})}</td>${fields.map(f=>`<td>${inlineFieldMarkup(r,f)}</td>`).join('')}<td class="table-row-actions"><button type="button" data-detail="${e(r.id)}">Open</button><button type="button" data-edit="${e(r.id)}">All fields</button></td></tr>`).join('')||`<tr><td colspan="${fields.length+2}">No matching records yet.</td></tr>`}</tbody></table></div>`}
+ ${pages>1&&isTable?`<div class="table-pager"><button type="button" data-table-page="${e(kind)}" data-table-delta="-1" ${page===0?'disabled':''}>← Previous</button><span>${page*pageSize+1}–${Math.min(records.length,(page+1)*pageSize)} of ${records.length}</span><button type="button" data-table-page="${e(kind)}" data-table-delta="1" ${page===pages-1?'disabled':''}>Next →</button></div>`:''}</section>`;
+}
+function detailEditableTable(record){const fields=fieldDefs(record.kind).filter(f=>!['filePath','clips'].includes(f.key));return `<section class="readable-table-panel" aria-label="Editable record fields"><div class="readable-table-head"><div><h2>All details · tap to edit</h2><p>Every saved text field can be changed individually, including empty fields. Tap Save to keep a change.</p></div><button type="button" class="btn btn-soft btn-small" data-edit="${e(record.id)}">Full editor / linked records</button></div><div class="readable-table-scroll"><table class="readable-table record-fields-table"><tbody>${fields.map(f=>`<tr><th scope="row">${e(f.label)}</th><td>${inlineFieldMarkup(record,f)}</td></tr>`).join('')}</tbody></table></div></section>`}
+function contentPlanReferenceTable(){const rows=all('ContentPlan').slice().sort((a,b)=>String(data(a).publishDate||'').localeCompare(String(data(b).publishDate||''))).slice(0,40);
+ return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>Content planning table</h2><p>${all('ContentPlan').length} saved plans · Edit a row to change its title, caption, date or other fields</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Title</th><th>Platform</th><th>Project</th><th>Publish date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(r=>{const d=data(r);return `<tr><td>${e(d.title||'(Untitled)')}</td><td>${e(d.platform||'')}</td><td>${e(d.project||'')}</td><td>${e(d.publishDate||'')}</td><td>${e(d.status||'Idea')}</td><td class="table-row-actions"><button data-cs-edit="${e(r.id)}" type="button">Edit all text</button></td></tr>`}).join('')||'<tr><td colspan="6">No content plans saved yet.</td></tr>'}</tbody></table></div></section>`;
+}
+function inventoryReferenceTable(){const kinds=['World','AddOn','Craftable','WorldTemplate','Texture','Build','Material','Palette','Task','TikTok','Photo'];return `<section class="readable-table-panel"><div class="readable-table-head"><div><h2>My saved data · overview</h2><p>Live totals from your private collection. Open a library to edit its records.</p></div></div><div class="readable-table-scroll"><table class="readable-table"><thead><tr><th>Library</th><th>Saved records</th><th>Actions</th></tr></thead><tbody>${kinds.map(kind=>`<tr><td>${e(KINDS[kind].label)}</td><td>${all(kind).length}</td><td class="table-row-actions"><button type="button" data-nav="${kind==='TikTok'?'Video':kind}">Open library</button></td></tr>`).join('')}</tbody></table></div></section>`}
+function relevantPageTable(page){
+ // Standard libraries draw their own data table. Special pages have one too,
+ // while the user's streamlined Videos upload list keeps its single-list UI.
+ const special=new Set(['WorldGroup','WorldTemplate','CraftablePlacement','GeneratorPrompt','CityBlock','Palette',...CREATOR_KINDS]);
+ if(page==='ContentPlanner')return contentPlanReferenceTable();
+ if(page==='settings')return inventoryReferenceTable();
+ const context={home:'World',today:'Task',NotesTasks:'Task',Packs:S.packsKind||'AddOn',PackRecommendations:'AddOn',shop:'WishlistItem',generator:'World',Event:'Event',reconcile:'RecoveryReview'};
+ const kind=special.has(page)?page:context[page];
+ if(!kind||!KINDS[kind]||page==='Video'||page==='TikTok')return '';
+ const records=filterRecords(kind);
+ return readableTable(kind,records,{heading:`${KINDS[kind].label} · quick reference`,cards:false,pageSize:20});
+}
+
 function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" style="text-align:center;padding:35px 18px"><div class="eyebrow">IDEAS STAY TUCKED AWAY ♡</div><h2>Build Idea Generator</h2><p class="subcopy">Your saved build ideas are safely kept behind the generator. Roll an idea to reveal one at a time.</p><button class="btn btn-primary" data-nav="generator">✦ Open Build Idea Generator</button></section>`;if(kind==='WorldGroup')return worldGroupsPage();if(kind==='WorldTemplate')return worldTemplateRecoveryPage();if(kind==='CraftablePlacement')return craftableLocationsPage();if(CREATOR_KINDS.has(kind))return creatorLibraryPage(kind);if(kind==='GeneratorPrompt')return promptLibraryPage();if(kind==='CityBlock')return cityGridPage();if(kind==='Palette')return palettePage();const cfg=KINDS[kind],records=filterRecords(kind),base=all(kind),st=unique(base.map(r=>data(r).status).filter(Boolean)).sort(),categories=unique(base.map(categoryOf).filter(Boolean)).sort((a,b)=>a.localeCompare(b)),worldDefs=relationDefs(kind).filter(d=>d[4]==='World'),hasWorld=worldDefs.length>0;
  const ideasOnly=kind==='BuildIdea',ideaPageSize=60,ideaPageCount=ideasOnly?Math.max(1,Math.ceil(records.length/ideaPageSize)):1;
  if(ideasOnly)S.buildIdeasPage=Math.min(ideaPageCount-1,Math.max(0,Number(S.buildIdeasPage)||0));
@@ -5529,7 +5637,7 @@ function listPage(kind){if(kind==='BuildIdea')return `<section class="panel" sty
  ${hasWorld?`<select id="world-filter" aria-label="Filter World"><option value="all">All Worlds</option>${all('World').sort((a,b)=>title(a).localeCompare(title(b))).map(w=>`<option value="${e(w.id)}" ${S.worldFilter===w.id?'selected':''}>${e(title(w))}</option>`).join('')}</select>`:''}
  <select id="sort-select" aria-label="Sort records"><option value="name" ${S.sort==='name'?'selected':''}>Name A–Z</option><option value="newest" ${S.sort==='newest'?'selected':''}>Recently updated</option><option value="oldest" ${S.sort==='oldest'?'selected':''}>Oldest first</option></select></div>
  <div class="compact-library-bar"><strong>${records.length} ${e(records.length===1?cfg.singular:cfg.label.toLowerCase())}</strong><label class="archive-toggle"><input type="checkbox" id="show-archived" ${S.showArchived?'checked':''}> Show archived</label></div>
- <div class="compact-list">${records.length?(kind==='Photo'?`<div class="record-grid photo-visual-grid">${records.map(recordCard).join('')}</div>`:displayed.map(compactRow).join('')):emptyState(kind)}</div>
+ ${readableTable(kind,displayed,{heading:`${cfg.label} · editable table`})}${kind==='Photo'?`<details><summary>Show photo thumbnails</summary><div class="record-grid photo-visual-grid">${records.map(recordCard).join('')}</div></details>`:''}
  ${pageControls}${kind==='Build'?'<p class="hint">Subprojects stay inside their Build profiles. Build Ideas remain separate until you convert one.</p>':''}</section>`}
 
 // TikTok Keepsake Book — 29 unique linked posts, no destructive changes to Supabase.
@@ -6414,9 +6522,9 @@ function detailPage(){const r=findDetail();if(!r||r.archived_at||!KINDS[r.kind])
  for(const clip of tiktokClips){if(!mediaCachedUrl(clip.filePath))signedMedia({data:{filePath:clip.filePath}}).catch(()=>{});}
  const tiktokClipGallery=tiktokClips.length?`<section class="panel video-clip-gallery"><div class="section-line"><h2>${pinkIcon('TikTok')} Footage attached to this TikTok</h2><span class="pill yellow">${tiktokClips.length} private clip${tiktokClips.length===1?'':'s'}</span></div>${tiktokClips.map(clip=>`<div class="video-clip-tile"><strong>${e(clip.fileName||'Uploaded video')}</strong>${mediaCachedUrl(clip.filePath)?`<video controls playsinline preload="metadata" src="${e(mediaCachedUrl(clip.filePath))}"></video>`:`<p class="muted">Loading private clip…</p>`}</div>`).join('')}</section>`:'';
  const url=d.filePath&&(r.kind!=='Video'||d.manualVideoHub===true)?mediaCachedUrl(d.filePath):'';
- return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${d.description?`<p class="detail-desc">${e(d.description)}</p>`:''}${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
+ return `<div class="page-head"><div><button class="btn btn-small" data-back>← ${e(label(r.kind))}</button></div><div class="actions"><button class="btn" data-edit="${r.id}">${pinkIcon('wand')} Edit</button><button class="btn btn-small btn-soft" data-manage-fields="${r.kind}">${pinkIcon('fields')} Fields</button>${SHOP_KINDS.includes(r.kind)?`<button class="btn btn-small btn-soft" data-move-library="${e(r.id)}">${pinkIcon('wand')} Move Library</button>`:''}${!['Photo','Video'].includes(r.kind)?`<button class="btn btn-small" data-duplicate="${r.id}">Duplicate</button>`:''}${r.kind==='Build'||r.kind==='CraftableItem'?`<button class="btn btn-soft" data-location="${r.id}">${pinkIcon('pin')} Add to Map</button>`:''}${r.kind==='BuildIdea'?`<button class="btn btn-primary" data-convert="${r.id}">Turn into Build →</button>`:''}${r.kind==='WorldTemplate'?`<button class="btn btn-primary" data-start-template="${r.id}">${pinkIcon('World')} Create World from Template</button>`:''}${['Build','Lore','World','Subproject','BuildIdea','Journal'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-photo="${r.id}">＋ Photo</button>`:''}${['Build','World'].includes(r.kind)?`<button class="btn btn-soft btn-small" data-add-tiktok="${r.id}">＋ TikTok</button>`:''}${r.kind==='Subproject'?`<button class="btn btn-soft btn-small" data-add-task="${r.id}">＋ Task</button>`:''}<button class="btn btn-soft btn-small" data-archive="${r.id}">Archive</button><button class="btn btn-danger-soft btn-small" data-delete="${r.id}">Delete</button></div></div><section class="panel"><div class="detail-header"><div class="detail-title"><div class="detail-symbol">${emoji(r.kind)}</div><div><div class="eyebrow">${e(cfg.singular)}</div><h1>${e(title(r))}</h1><small>Last edited ${e(dateStr(r.updated_at))}</small></div></div></div>${SHOP_KINDS.includes(r.kind)?`<div class="creator-detail-credit"><strong>Creator</strong><span>${e(creatorDetails(r).name)}${creatorDetails(r).source==='catalog'?' · unverified suggestion':''}</span><button class="btn btn-small btn-soft" data-edit="${e(r.id)}">Change</button></div>`:''}
  ${url&&r.kind==='Photo'?`<p><img class="media-image" alt="${e(title(r))}" src="${e(url)}" /></p><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original photo if this format cannot display</a></p>`:''}${url&&r.kind==='Video'?`<video class="media-image" controls preload="metadata" playsinline src="${e(url)}"></video><p class="hint"><a href="${e(url)}" target="_blank" rel="noopener">Open original video if your browser cannot play it</a></p>`:''}${d.filePath&&!url?'<div class="notice">Preparing private media preview…</div>':''}
- ${fields.length?`<div class="info-grid">${fields.map(([k,lab])=>`<div class="info-cell"><div class="key">${e(lab)}</div><div class="value">${typeof d[k]==='boolean'?(d[k]?'Yes':'No'):e(d[k])}</div></div>`).join('')}</div>`:''}</section>
+ ${detailEditableTable(r)}</section>
  ${r.kind==='World'?worldDetailPhotoSection(r)+worldScopedLinks(r)+worldOverviewStrip(r)+packHistorySection(r)+worldOptionalMenu(r)+worldOptionalOverview(r)+worldConnectionsPanel(r):''}
 
  ${kitGallery}
@@ -6746,7 +6854,7 @@ function wireCreativeSuite(){
  app.querySelector('[data-cs-status]')?.addEventListener('change',ev=>{S.csStatus=ev.target.value;render()});
 }
 
-function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='Packs')body=packsPage();else if(S.page==='PackRecommendations')body=packRecommendationsPage()+comboSuggestedPanel();else if(S.page==='NotesTasks')body=notesTasksPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=tkOneListPage();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;shell(body)}
+function render(){if(S.page==='TikTok')S.page='Video';if(!sessionValid()){guestShell();return}if(S.loading&&!S.lastLoad){shell('<section class="panel" style="padding:55px;text-align:center"><span class="spinner"></span><h2 style="margin-top:15px">Loading your saved HQ…</h2><p class="muted" id="load-progress">Your records will appear once the private database responds.</p></section>');return}if(S.detail){shell(detailPage());return}let body='';if(S.page==='home')body=homePage();else if(S.page==='today')body=todayPage();else if(S.page==='Packs')body=packsPage();else if(S.page==='PackRecommendations')body=packRecommendationsPage()+comboSuggestedPanel();else if(S.page==='NotesTasks')body=notesTasksPage();else if(S.page==='generator')body=generatorPage();else if(S.page==='settings')body=settingsPage();else if(S.page==='reconcile')body=reconPanel();else if(S.page==='shop')body=shopPage();else if(S.page==='fields')body=fieldEditorPage();else if(S.page==='trash')body=trashPage();else if(S.page==='Video'||S.page==='TikTok')body=tkOneListPage();else if(S.page==='ContentPlanner')body=contentPlannerPage();else if(S.page==='search')body=globalSearchPage();else if(S.page==='Event')body=calendarPage();else if(KINDS[S.page])body=listPage(S.page);else body=homePage();if(WORLD_SCOPED_PAGES[S.page])body=worldScopedPageBanner(S.page)+body;body+=relevantPageTable(S.page);shell(body)}
 // Same-page selections should not throw the user back to the top of a long
 // mobile form or collapse the history cards they were reviewing.
 function renderKeepingPlace(){
@@ -7716,6 +7824,11 @@ async function preview2000BuildIdeas(){
  }catch(err){showToast('Could not preview ideas: '+err.message);if(opener){opener.disabled=false;opener.innerHTML='Preview 2,000 Idea Pack'}}
 }
 function wireApp(){
+ app.querySelectorAll('[data-table-mode]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.tableMode;if(!KINDS[kind])return;S.tableModes={...(S.tableModes||{}),[kind]:button.dataset.tableView==='list'?'list':'table'};S.inlineEdit=null;render()}));
+ app.querySelectorAll('[data-table-page]').forEach(button=>button.addEventListener('click',()=>{const kind=button.dataset.tablePage,delta=Number(button.dataset.tableDelta)||0;if(!KINDS[kind])return;S.tablePages={...(S.tablePages||{}),[kind]:Math.max(0,(S.tablePages?.[kind]||0)+delta)};S.inlineEdit=null;render();app.querySelector('.readable-table-panel')?.scrollIntoView({block:'start',behavior:'smooth'})}));
+ app.querySelectorAll('[data-inline-open]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.inlineOpen,key=button.dataset.inlineKey,r=get(id);if(!r||r.archived_at||!fieldDefs(r.kind).some(f=>f.key===key)){showToast('Open the active record to edit this field.');return}S.inlineEdit={id,key};render();const form=[...app.querySelectorAll('[data-inline-form]')].find(f=>f.dataset.inlineId===id&&f.dataset.inlineKey===key);form?.querySelector('input,textarea,select')?.focus({preventScroll:true});form?.scrollIntoView({block:'nearest',behavior:'smooth'})}));
+ app.querySelectorAll('[data-inline-cancel]').forEach(button=>button.addEventListener('click',()=>{S.inlineEdit=null;render()}));
+ app.querySelectorAll('[data-inline-form]').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault();saveInlineField(form)}));
  app.querySelector('[data-hub-open]')?.addEventListener('click',()=>{
   S.hubMenuOpen=!S.hubMenuOpen;render();
   if(S.hubMenuOpen)app.querySelector('[data-hub-choice]')?.focus();
