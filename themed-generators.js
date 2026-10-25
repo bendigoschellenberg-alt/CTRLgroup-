@@ -141,10 +141,10 @@
   if(window.__ctrlMinecraftEnhancementRequested)return;
   window.__ctrlMinecraftEnhancementRequested=true;
   const tips=document.createElement('script');
-  tips.src='./minecraft-tips-data.js?v=20261024-1';
+  tips.src='./minecraft-tips-data.js?v=20261024-2';
   tips.onload=function(){
     const ui=document.createElement('script');
-    ui.src='./minecraft-experience.js?v=20261024-1';
+    ui.src='./minecraft-experience.js?v=20261024-2';
     ui.onerror=function(){console.warn('CTRL tips UI did not load; other HQ features are unaffected');};
     document.head.appendChild(ui);
   };
