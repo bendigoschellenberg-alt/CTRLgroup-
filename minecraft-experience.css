@@ -64,3 +64,76 @@
  #app .mc-title strong{font-size:14px}
  #app .mc-home-link{flex-direction:column;align-items:stretch}
 }
+
+/* October 24 · finished cross-page navigation + app-wide readability layer. */
+#app .ux-nav{margin:0 auto 21px;max-width:1180px;background:#fff;border:1px solid #f0c9db;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(107,67,81,.04)}
+#app .ux-nav-hubs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border-bottom:1px solid #f2d5df}
+#app .ux-hub-button{background:#fff!important;color:#814b63!important;border:0!important;border-right:1px solid #f4e0e6!important;border-radius:0!important;padding:13px 5px!important;font-weight:800!important;font-size:13px!important;letter-spacing:0!important;line-height:1.25!important;cursor:pointer;min-height:47px}
+#app .ux-hub-button:last-child{border-right:0!important}
+#app .ux-hub-button.current{background:#ffe7a3!important;box-shadow:inset 0 -3px 0 #ecad58!important;color:#553944!important}
+#app .ux-hub-button:hover:not(.current){background:#ffe4ed!important;color:#a7356a!important}
+#app .ux-nav-related{background:#fff}
+#app .ux-nav-related>summary{display:flex;align-items:center;gap:4px;min-height:45px;list-style:none;padding:10px 15px;cursor:pointer;font-size:13px;color:#7b596a}
+#app .ux-nav-related>summary::-webkit-details-marker{display:none}
+#app .ux-nav-related>summary strong{color:#a13765}
+#app .ux-nav-expand{margin-left:auto!important;white-space:nowrap!important;font-size:12px!important;color:#9f4173!important;font-weight:800!important}
+#app .ux-related-buttons{padding:0 13px 12px;display:flex;gap:7px;flex-wrap:wrap}
+#app .ux-related-buttons button{border:1px solid #eecddc!important;background:#fff!important;color:#754859!important;border-radius:9px!important;padding:8px 11px!important;min-height:39px;cursor:pointer;font-size:13px;font-weight:750}
+#app .ux-related-buttons button:hover,#app .ux-related-buttons button.is-selected{border-color:#e7b84d!important;background:#ffe7a3!important;color:#654153!important}
+#app .ux-directory-launch{background:linear-gradient(120deg,#fff,#ffe4ed)!important;border:1px solid #efc6d8!important;padding:20px!important;border-radius:15px!important;margin:8px 0 20px!important}
+#app .ux-directory-launch h2{margin:0 0 5px!important;color:#783d59!important;font-size:23px!important}
+#app .ux-directory-launch p{color:#755d6c!important;margin:0 0 15px!important}
+#app .ux-directory-launch>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#app .ux-directory-launch button{display:grid;gap:5px;text-align:left;background:#fff!important;color:#653b4e!important;border:1px solid #e9ccdb!important;border-radius:12px!important;padding:13px!important;cursor:pointer;min-height:65px}
+#app .ux-directory-launch button strong{font-size:15px!important}
+#app .ux-directory-launch button small{font-size:12px!important;color:#8e6c7b!important}
+#app .ux-directory-launch button:hover{border-color:#df9dbf!important;background:#fff5f9!important}
+#app .ux-home-hubs{background:white!important;border:1px solid #efd0df!important;border-radius:16px!important;padding:17px!important;display:grid;gap:13px}
+#app .ux-home-hubs-header{display:flex;justify-content:space-between;gap:10px;align-items:center}
+#app .ux-home-hubs-header strong{font-size:22px!important;color:#9c3365!important;font-family:var(--scrap-hand,'Caveat',cursive)!important}
+#app .ux-home-hubs-header button{border:0!important;background:#ffe7a3!important;color:#573c48!important;border-radius:9px!important;min-height:38px;padding:8px 12px!important;font-weight:800!important;cursor:pointer}
+#app .ux-home-hubs>div:last-child{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+#app .ux-home-hubs>div:last-child button{background:#fff!important;min-height:68px;border:1px solid #eed5e0!important;border-radius:12px!important;color:#653f56!important;display:grid;text-align:left;align-content:center;gap:4px;padding:10px!important;cursor:pointer}
+#app .ux-home-hubs>div:last-child button:hover{background:#ffe7a3!important;border-color:#f0b94c!important}
+#app .ux-home-hubs>div:last-child button strong{font-size:15px!important;line-height:1.2!important}
+#app .ux-home-hubs>div:last-child button small{font-size:11px!important;color:#86727b!important}
+#app .ux-catalogue-provenance{background:#fff!important;border-left:4px solid #ffbdd5!important;padding:11px 13px!important;font-size:13px!important;line-height:1.5!important;color:#756170!important}
+#app .sidebar.sidebar-v4{background:#fff!important;box-shadow:none!important}
+#app .sidebar.sidebar-v4 .nav-item{min-height:41px}
+#app .sidebar.sidebar-v4 .sidebar-v4-library{background:#fff!important}
+#app .sidebar.sidebar-v4 .group-heading{color:#793d59!important}
+#app .page-head{border-bottom-color:#ffe7a3!important}
+#app .compact-library-panel .record-toolbar,#app .compact-library-panel>.compact-library-bar{background:#fff!important}
+#app .compact-library-panel .compact-row{background:#fff!important;border-bottom-color:#f0dce7!important}
+#app .compact-library-panel .compact-row:hover{background:#fff8fb!important}
+#app .compact-library-panel .compact-open{min-height:46px}
+#app .compact-copy strong{color:#48333e!important}
+#app .compact-copy small{color:#776874!important}
+#app .page-directory-item{border-radius:9px!important}
+#app .page-directory-item:hover{background:#ffe4ed!important}
+#app .compact-toolbar .search-input,#app input[type=search],#app .record-toolbar select{background:#fff!important;color:#43383e!important;border-color:#e8c9d8!important}
+#app input[type=search]:focus-visible,#app .record-toolbar select:focus-visible{outline:3px solid #ffe7a3!important;outline-offset:2px!important}
+#app .readable-table-panel .compact-list{background:#fff!important}
+#app .quick-data-drawer{margin-top:10px!important}
+#app .mc-hq{padding-bottom:30px!important}
+@media(max-width:950px){
+#app .ux-nav-hubs{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin}
+#app .ux-hub-button{flex:0 0 auto;min-width:93px;padding:12px 10px!important;scroll-snap-align:start}
+#app .ux-home-hubs>div:last-child{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+#app .ux-nav{margin:0 0 14px;border-radius:12px!important}
+#app .ux-hub-button{font-size:12px!important;min-height:47px}
+#app .ux-nav-related>summary{padding:10px 11px!important;font-size:12px!important;gap:4px}
+#app .ux-nav-related>summary>span:first-of-type{display:none}
+#app .ux-nav-expand{font-size:11px!important}
+#app .ux-related-buttons{gap:7px;padding:1px 10px 12px}
+#app .ux-related-buttons button{min-height:43px!important}
+#app .ux-directory-launch{padding:14px!important}
+#app .ux-directory-launch>div{grid-template-columns:repeat(2,minmax(0,1fr))}
+#app .ux-home-hubs{padding:12px!important}
+#app .ux-home-hubs>div:last-child{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#app .ux-home-hubs-header strong{font-size:19px!important}
+#app .ux-home-hubs-header button{font-size:11px!important;min-height:40px}
+}
+@media(prefers-reduced-motion:reduce){#app .ux-hub-button,#app .ux-related-buttons button{transition:none!important}}
