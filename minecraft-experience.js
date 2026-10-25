@@ -1,3 +1,4 @@
+/* Production redeploy marker — 2026-10-24. UI assets only; no data changes. */
 /* CTRL n crft — searchable Minecraft reference and navigation upgrade.
    Read-only UI: existing Supabase collections and records are never changed. */
 (function(){
