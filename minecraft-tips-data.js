@@ -4,7 +4,7 @@
 (function(root){
 'use strict';
 const sections = [
-['Essential commands',\`
+['Essential commands',`
 Fill large areas|Use /fill to place a rectangular section of the same block; check both corners before running it.
 Hollow walls quickly|Use the hollow option of /fill for big empty rooms and structures.
 Replace one material|Use the replace mode of /fill to swap matching blocks in a bounded area without rebuilding.
@@ -15,8 +15,8 @@ Teleport to landmarks|Use /tp with saved coordinates instead of travelling acros
 Switch weather temporarily|Use /weather clear when you need clean screenshots or uninterrupted building.
 Set a useful time|Use /time set day to inspect difficult building details and light placement.
 Protect important work|Make a backup before running wide-range commands or experimenting with add-ons.
-\`],
-['Structure block shortcuts',\`
+`],
+['Structure block shortcuts',`
 Save a complete room|Capture a room as a structure so furniture and details can be reused.
 Use clear structure names|Include the world, building and version in each structure save name.
 Save modular pieces|Store walls, corners, stairs, windows and roof parts as separate modules.
@@ -32,8 +32,8 @@ Label structure versions|Keep v1, v2 and final variants when iterating on a larg
 Split enormous captures|Store oversized builds in smaller chunks that are easier to place and repair.
 Keep a structure index|Record name, size, purpose and original coordinates for saved structures.
 Recheck replaced blocks|After a structure load, inspect doorways, liquids, stairs and block orientation.
-\`],
-['City-building shortcuts',\`
+`],
+['City-building shortcuts',`
 Reserve roads first|Lay out your full roads and sidewalks before placing buildings.
 Keep one road standard|Use your 32-block road allocation throughout CTRL Group to avoid mismatched intersections.
 Build one intersection template|Perfect a crossing once, then clone or place it where needed.
@@ -49,8 +49,8 @@ Reserve underground clearance|Leave room for tunnels, utilities and stations ben
 Separate districts with landmarks|Give each city area a distinct plaza, park or building silhouette.
 Use elevation sparingly|Plan ramps and bridges before adding height changes to road networks.
 Make a city template world|Keep a safe copy of your road grid and core modules for future expansion.
-\`],
-['Better-looking builds',\`
+`],
+['Better-looking builds',`
 Layer wall depth|Mix inset panels and raised trims so big walls do not look flat.
 Limit your main materials|Pick a focused palette and use accent blocks for contrast.
 Break up long roofs|Add dormers, eaves, chimneys or setbacks to avoid one flat shape.
@@ -61,8 +61,8 @@ Hide structural scaffolding|Remove temporary guide blocks only after checking al
 Vary repeating facades|Keep dimensions consistent while altering signs, doors or balcony details.
 Add landscaping last|Finish main entrances and paths before detailed planting.
 Check the silhouette|Walk far away and see whether the shape reads clearly at a distance.
-\`],
-['Underwater construction',\`
+`],
+['Underwater construction',`
 Set a shared water level|Choose a reference Y-level such as 63 for your planned underwater city.
 Plan dry chambers first|Design how to remove water before closing complicated rooms.
 Build from anchors|Place visible reference pillars at the centre and outer edges of domes.
@@ -73,8 +73,8 @@ Space domes generously|Leave open water between buildings so the overall city re
 Make pressure-proof-looking supports|Connect domes with arches, pylons and rings for convincing architecture.
 Build on planned terraces|Use multiple platforms at known Y-levels rather than random heights.
 Keep access obvious|Connect major domes with tunnels, bridges, elevators or swim routes.
-\`],
-['Xbox and add-on organization',\`
+`],
+['Xbox and add-on organization',`
 Record every add-on precisely|Keep exact creator names, size in MB and version details in your collection.
 Test add-ons in a spare world|Check compatibility before moving a new combination into a valuable build.
 Add one change at a time|When troubleshooting a crash, introduce add-ons individually.
@@ -85,8 +85,8 @@ Keep older configurations|Do not overwrite a previously working loadout when tes
 Label crash evidence|Record which add-ons were loaded and what occurred before the failure.
 Export worlds regularly|Keep recoverable world copies before major marketplace or settings changes.
 Use Xbox-friendly workflows|Favor short repeatable commands, clear menus and structure modules over long typing sessions.
-\`],
-['Advanced blocks and commands',\`
+`],
+['Advanced blocks and commands',`
 Use invisible light|Light blocks can illuminate finished interiors without a visible fixture.
 Understand barriers|Use barrier blocks for temporary invisible containment or guide areas.
 Try structure void|Use structure void where supported to protect areas from unwanted placement.
@@ -97,8 +97,8 @@ Use repeating command blocks cautiously|Check redstone requirement and delay to 
 Use conditional chains|Run a follow-up command only after its predecessor succeeds.
 Keep a command notebook|Save tested Bedrock syntax and coordinate patterns in your HQ.
 Prefer reversibility|Choose methods you can undo, clone back or restore from backup.
-\`],
-['Coordinates and building maths',\`
+`],
+['Coordinates and building maths',`
 Write X Y Z in one format|Keep coordinates consistently ordered to prevent misplaced builds.
 Mark the exact centre|Use a unique block at the centre of a symmetrical project.
 Measure inclusive widths|From X=0 through X=24 is 25 block positions, not 24.
@@ -109,8 +109,8 @@ Record facing direction|Note north, south, east or west along with module positi
 Use a coordinate legend|Track reference origin, water height, road centre and structure anchors.
 Sketch on a grid|Mark every planned section in blocks instead of estimating by sight.
 Double-check negatives|Moving from X=-100 to X=-110 changes X by -10, not +10.
-\`],
-['More structure block tricks',\`
+`],
+['More structure block tricks',`
 Capture a quarter build|Save one symmetrical quadrant and reuse it around a centre.
 Load at fixed Y-levels|Place modules at a recorded floor height to avoid stepped mismatches.
 Store roof variants|Use one shell with several roof modules for design experiments.
@@ -121,22 +121,22 @@ Clone interiors by layer|Make standard floor layouts separately from special gro
 Add labels outside capture boxes|Keep signposts or temporary guides out of final structure saves.
 Build with placeholders|Use easy-to-replace marker blocks for windows and decorative slots.
 Keep your originals intact|Save a version before rotating, mirroring or redesigning a complex module.
-\`],
-['Landscaping and decoration',\`
+`],
+['Landscaping and decoration',`
 Plant in clusters|Repeat a few types of trees and plants in uneven, natural-looking groups.
 Blend terrain transitions|Layer grass, stone and soil along slopes instead of sharp rectangular edges.
 Plan a path network|Join entrances and activity areas before placing plants.
 Add focal points|Use a bench, fountain, statue or specimen tree to anchor each garden section.
 Leave breathing space|Reserve open areas so small decorations do not overwhelm the larger composition.
-\`],
-['Add-on compatibility and performance',\`
+`],
+['Add-on compatibility and performance',`
 Track test results|Mark every combination as Works, Issues, Crashes or Untested.
 Keep test notes searchable|Record symptoms, changes and exact add-on sizes with each trial.
 Watch for duplicate functions|Be cautious when two add-ons modify the same systems or interface.
 Test after an update|An add-on version change can alter a formerly working combination.
 Separate content from diagnosis|Do not delete valuable world content while troubleshooting a compatibility problem.
-\`],
-['Command-block automation',\`
+`],
+['Command-block automation',`
 Label command systems|Place a readable label by every group of command blocks.
 Test with impulse first|Use a one-shot command block before making a command repeat.
 Choose activation deliberately|Select Always Active or Needs Redstone to match the intended trigger.
@@ -152,8 +152,8 @@ Record working syntax|Save exact Bedrock command examples outside the command bl
 Use tags intentionally|Give target entities explicit tags before applying repeated effects.
 Add visual status lights|Show whether a control circuit is enabled or paused.
 Isolate experimental circuits|Prototype automation far from valuable storage and structures.
-\`],
-['Advanced construction systems',\`
+`],
+['Advanced construction systems',`
 Build a reusable wall kit|Prepare straight, corner and window modules at matching heights.
 Repeat floor plates|Place one tested floor layout at each planned Y-level.
 Separate shell and decor|Finish the main structure before adding room-specific furnishings.
@@ -169,8 +169,8 @@ Plan material replacements|Use temporary blocks that are easily replaced in bulk
 Use terrain-relative foundations|Account for changes in ground height before placing copied structures.
 Build a sample facade|Try different material and window spacing before committing to a tower.
 Save module coordinates|Record origin and width for consistent placement across builds.
-\`],
-['Scoreboards and world controls',\`
+`],
+['Scoreboards and world controls',`
 Use scoreboards for counters|Track points or rounds in command-based minigames where supported.
 Name objectives clearly|Use readable objective names so game control commands are easier to maintain.
 Reset match scores|Include a reset step between rounds.
@@ -181,8 +181,8 @@ Set a world spawn deliberately|Choose a safe accessible spawn location for visit
 Use tags for teams|Mark participants so commands affect the intended group.
 Create a game start switch|Start timers, counters and effects from one visible control.
 Keep a rules sign|Explain how to play and reset each interactive activity.
-\`],
-['Hidden decorative features',\`
+`],
+['Hidden decorative features',`
 Conceal lighting behind panels|Use safe hidden lighting locations that still illuminate the room.
 Mix trapdoors and slabs|Create thinner-looking furnishings and textured surfaces.
 Decorate with banners|Use banners and patterns as curtains, signs or wall art.
@@ -193,8 +193,8 @@ Add small floor patterns|Use carpets and contrasting blocks to define room zones
 Make textured columns|Alternate full blocks, walls and stairs for deeper pillars.
 Frame large windows|Use solid ribs and trims to support tall glass panels visually.
 Use concealed access doors|Add an obvious maintenance route even when the decorative entry is hidden.
-\`],
-['Water and transportation',\`
+`],
+['Water and transportation',`
 Mark boat routes|Define entrances and turn zones before building a canal.
 Check water currents|Test whether flows move entities the intended direction.
 Build underwater checkpoints|Use lighted landmarks at predictable distances.
@@ -210,8 +210,8 @@ Place docks before buildings|Ensure room for boarding, turning and access paths.
 Allow for terrain variation|Expect seabed and shoreline height changes when planning routes.
 Test every route end-to-end|Travel along the full route before decorating it completely.
 Keep scenic routes open|Preserve views and space around important underwater structures.
-\`],
-['Redstone shortcuts',\`
+`],
+['Redstone shortcuts',`
 Build circuits on a test pad|Use a clearly labelled flat area to prototype mechanisms.
 Learn signal direction|Check which way components face and which blocks they power.
 Use levers for manual testing|Replace complicated automatic triggers with a switch while debugging.
@@ -227,8 +227,8 @@ Test after decoration|Nearby blocks may interfere with moving mechanisms or sign
 Avoid unnecessary always-on clocks|Use triggers only when needed to reduce activity and lag.
 Use indicator lamps|Show power status while testing buried components.
 Document the working build|Take a snapshot of the circuit and its component order.
-\`],
-['Storage, navigation and workflow',\`
+`],
+['Storage, navigation and workflow',`
 Sort storage by purpose|Group materials, tools, decoration and rare items in distinct areas.
 Label every chest row|Use large readable signs rather than remembering box positions.
 Keep a project shulker set|Prepare material kits for individual building sessions.
@@ -249,8 +249,8 @@ Back up before big changes|Export or duplicate your world ahead of mass cloning 
 Keep the next task visible|Make one actionable build task easy to return to after a break.
 Group related app pages|Use links between worlds, builds, materials and photos instead of duplicate records.
 End with a quick review|Save coordinates, working status and the next step before leaving a session.
-\`],
-['Circles, symmetry, and precise geometry',\`
+`],
+['Circles, symmetry, and precise geometry',`
 Choose a centre coordinate|Record the X/Y/Z centre of every major circular or symmetrical structure.
 Mark your axes|Create temporary X- and Z-axis lines through the centre.
 Use odd-numbered circle widths|A 25-block-wide circle has a single centre block.
@@ -271,8 +271,8 @@ Make 45° diagonals|Move one block in X for every one block in Z.
 Make gentle diagonals|Repeat two blocks horizontally for every one block sideways.
 Make medium diagonals|Use repeating 3:2 movement patterns to create other slopes.
 Plan curved roads with waypoints|Plot several points along the desired curve before joining them with your line or curve tool.
-\`],
-['Domes, arches, and bridges',\`
+`],
+['Domes, arches, and bridges',`
 Construct arches from calculated points|A semicircular arch can follow y = √(r² - x²) above its baseline.
 Measure arch clearance first|Choose the required opening width and height before calculating the curve.
 Build sagging suspension cables|Use a shallow parabolic curve, with the lowest point near the middle of the span.
@@ -288,8 +288,8 @@ Taper towers|Reduce the horizontal footprint at planned height intervals.
 Create cones|Gradually reduce ring radii from bottom to top.
 Create pyramids|Shrink each square layer by a fixed number of blocks.
 Build spiral staircases|Repeat an angular pattern around a central pillar while increasing Y at each step.
-\`],
-['Megabuild planning shortcuts',\`
+`],
+['Megabuild planning shortcuts',`
 Create spiral ramps|Combine gradual height changes with circular or polygonal movement around a centre.
 Place columns at equal angles|Calculate several positions at the same radius around a circular building.
 Build radial roads|Extend straight lines outward from a central plaza at planned angles.
@@ -305,7 +305,7 @@ Build large pixel art row by row|Record the number of blocks in each horizontal 
 Design complex rooflines as side profiles first|Once the cross-section looks right, extend or repeat it along the building.
 Use consistent reference levels underwater|For your underwater city, plan around Y=63 for the surface and example platforms Y=49, 35 and 21, adjusting for the actual seabed.
 Preserve negative space|Do not fill every available area. Open water, courtyards, clear views and wide gaps make enormous structures more impressive.
-\`]
+`]
 ];
 const data = [];
 sections.forEach(([section,raw],sectionIndex)=>{
