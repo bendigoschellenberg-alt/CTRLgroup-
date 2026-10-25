@@ -143,7 +143,7 @@ page=function(){
   return out.replace('<p class="mc-help">',note+'<p class="mc-help">');
 };
 
-const css=document.createElement('link');css.rel='stylesheet';css.href='./minecraft-experience.css?v=20261024';document.head.appendChild(css);
+const css=document.createElement('link');css.rel='stylesheet';css.href='./minecraft-experience.css?v=20261024-2';document.head.appendChild(css);
 if(location.hash==='#MinecraftTips'&&S.page!=='MinecraftTips')S.page='MinecraftTips';
 if(sessionValid())render();
 window.CTRL_TIPS_UI={installed:true,tips:DATA.items.length,sections:DATA.sections.length};
