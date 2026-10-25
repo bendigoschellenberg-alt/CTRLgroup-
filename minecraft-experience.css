@@ -1,0 +1,66 @@
+/* CTRL n crft October 24: airy mobile-first scrapbook polish, white/pink/yellow only. */
+:root{--bg:#fff!important;--paper:#fff!important;--gold-soft:#ffe7a3!important}
+#app .mc-hq{max-width:1150px;margin:0 auto;display:grid;gap:18px;padding-bottom:28px;color:#333}
+#app .mc-hq .page-head{margin-bottom:0}
+#app .mc-hero{background:linear-gradient(120deg,#ffe4ed,#fff 60%,#ffe7a3);border:1px solid #f2c8d6;border-radius:21px;padding:clamp(20px,4vw,35px);display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 8px 20px #d2628a15}
+#app .mc-eyebrow{display:block;font-size:11px;font-weight:900;color:#ae426a;letter-spacing:1.5px;margin-bottom:6px;text-transform:uppercase}
+#app .mc-hero h2{font-size:clamp(25px,4vw,40px);line-height:1.1;font-weight:900;color:#982d5d;margin:0 0 10px}
+#app .mc-hero p{line-height:1.6;color:#61585e;max-width:620px;margin:0}
+#app .mc-summary{flex:0 0 115px;background:#fff;border:1px solid #f4c4d6;padding:16px 20px;border-radius:20px;display:grid;gap:2px;align-content:center;text-align:center}
+#app .mc-summary strong{font-size:27px;line-height:1;color:#de4282}#app .mc-summary span{font-size:11px;color:#81767b;margin-bottom:8px}
+#app .mc-controls,#app .mc-topics,#app .mc-list{background:#fff;border:1px solid #f0d1dc;border-radius:18px;padding:18px}
+#app .mc-controls>label{display:block;font-weight:900;color:#9d3d68;margin-bottom:8px}
+#app .mc-search{display:flex;gap:8px}#app .mc-search input{width:100%;flex:1;min-width:0;border:1px solid #e7bbcc;border-radius:12px;padding:13px 14px;background:#fff;color:#333;font-size:16px}
+#app .mc-search>button{border:1px solid #e7bbcc;border-radius:12px;background:#ffe7a3;color:#643e53;padding:10px 14px;cursor:pointer;font-weight:900}
+#app .mc-search input:focus-visible,#app .mc-hq button:focus-visible{outline:3px solid #ea62a1;outline-offset:2px}
+#app .mc-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#app .mc-pills button,#app .mc-topic-grid button{min-height:39px;border:1px solid #e9cad7;background:#fff;color:#75425d;border-radius:12px;padding:8px 12px;font-weight:800;cursor:pointer;text-align:left}
+#app .mc-pills button[aria-pressed=true],#app .mc-topic-grid button[aria-pressed=true]{background:#ffe7a3;border-color:#e6b648;color:#573940}
+#app .mc-topics>summary{cursor:pointer;font-weight:900;color:#9d3d68;min-height:42px;display:flex;align-items:center;justify-content:space-between}
+#app .mc-topics>summary::-webkit-details-marker{display:none}
+#app .mc-topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px}
+#app .mc-list-heading{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:10px}
+#app .mc-list-heading h2{margin:0;color:#963d64;font-size:25px}
+#app #mc-tip-count{font-size:12px;color:#7d6876;text-align:right}
+#app #mc-tip-results{display:grid;gap:8px}
+#app .mc-tile{border:1px solid #f0d8e3;background:#fff;border-radius:13px;overflow:hidden}
+#app .mc-tile[open]{border-color:#e9a9c9;box-shadow:0 4px 12px #df7eab16}
+#app .mc-tile summary{display:flex;align-items:center;gap:13px;padding:12px 14px;cursor:pointer;min-height:64px;list-style:none}
+#app .mc-tile summary::-webkit-details-marker{display:none}
+#app .mc-number{border-radius:11px;background:#ffe4ed;border:1px solid #f3c0d5;color:#af3d71;min-width:43px;text-align:center;padding:9px 3px;font-weight:900;font-size:13px}
+#app .mc-title{display:grid;gap:3px;flex:1;min-width:0}
+#app .mc-title strong{font-size:15px;line-height:1.4;color:#393139}
+#app .mc-title small{font-size:11px;color:#9b7083}
+#app .mc-plus{font-size:24px;color:#d85c97;line-height:1}#app .mc-tile[open] .mc-plus{transform:rotate(45deg)}
+#app .mc-detail{padding:4px 16px 16px 68px}
+#app .mc-detail p{font-size:15px;line-height:1.65;color:#574a53;white-space:pre-line;margin-bottom:13px}
+#app .mc-actions{display:flex;gap:8px;flex-wrap:wrap}
+#app .mc-actions button,#app #mc-tip-more{border-radius:9px;background:#fff;border:1px solid #eebdd4;padding:10px 12px;color:#953760;font-weight:900;cursor:pointer}
+#app .mc-actions button[aria-pressed=true]{background:#ffe7a3;border-color:#e3bb5b;color:#6d4151}
+#app #mc-tip-more{width:100%;margin-top:13px;background:#ffe7a3;color:#554046}
+#app #mc-tip-more[hidden]{display:none}
+#app .mc-empty{padding:25px;background:#fff7fb;border-radius:13px;color:#79576c}
+#app .mc-help{border-left:5px solid #f4bd5c;background:#fff;padding:13px 16px;font-size:13px;line-height:1.6;color:#79636e}
+#app .mc-related{display:flex;gap:9px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #f1d1db;border-radius:13px;padding:12px 15px;margin:8px 0 18px;color:#745967;font-size:14px}
+#app .mc-related button{background:#ffe7a3;color:#663e52;border:0;border-radius:9px;padding:8px 12px;font-weight:900;cursor:pointer}
+#app .mc-home-link{background:linear-gradient(100deg,#fff,#ffe4ed);border:1px solid #edbad0;border-left:6px solid #ff5b9a;border-radius:17px;padding:17px;display:flex;gap:16px;justify-content:space-between;align-items:center}
+#app .mc-home-link>div{display:grid;gap:4px}
+#app .mc-home-link span{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#a64b71}
+#app .mc-home-link strong{font-size:18px;color:#73344e}
+#app .mc-home-link small{font-size:12px;color:#796774}
+#app .mc-home-link button{min-height:44px;background:#ffe7a3;border:1px solid #e5b85b;color:#653c50;padding:11px 14px;border-radius:11px;cursor:pointer;font-weight:900}
+#app .sidebar-v4 .sidebar-v4-group:has([data-nav=MinecraftTips]){border-bottom:2px solid #ffe7a3}
+#app .sidebar-v4 .nav-item:focus-visible{outline:3px solid #ff5b9a;outline-offset:2px}
+@media(max-width:760px){
+ #app .mc-hq{gap:12px}
+ #app .mc-hero{flex-direction:column;align-items:stretch}
+ #app .mc-summary{display:flex;flex:none;justify-content:center;align-items:center;gap:8px;padding:12px}
+ #app .mc-summary strong{font-size:23px}#app .mc-summary span{margin:0 8px 0 0}
+ #app .mc-controls,#app .mc-topics,#app .mc-list{padding:13px}
+ #app .mc-list-heading{align-items:flex-start;flex-direction:column;gap:5px}
+ #app #mc-tip-count{text-align:left}
+ #app .mc-tile summary{gap:9px;padding:10px;min-height:60px}
+ #app .mc-detail{padding:0 11px 14px}
+ #app .mc-title strong{font-size:14px}
+ #app .mc-home-link{flex-direction:column;align-items:stretch}
+}
