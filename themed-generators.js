@@ -134,3 +134,20 @@
   }
   root.CTRL_THEMES={resolve,pool,options:Object.entries(LABELS).map(([value,label])=>({value,label})),topicCount:25,directionCount:10};
 })(window);
+
+
+/* CTRL n crft: load read-only Minecraft handbook / UI enhancement */
+(function(){
+  if(window.__ctrlMinecraftEnhancementRequested)return;
+  window.__ctrlMinecraftEnhancementRequested=true;
+  const tips=document.createElement('script');
+  tips.src='./minecraft-tips-data.js?v=20261024-1';
+  tips.onload=function(){
+    const ui=document.createElement('script');
+    ui.src='./minecraft-experience.js?v=20261024-1';
+    ui.onerror=function(){console.warn('CTRL tips UI did not load; other HQ features are unaffected');};
+    document.head.appendChild(ui);
+  };
+  tips.onerror=function(){console.warn('CTRL tips library did not load; other HQ features are unaffected');};
+  document.head.appendChild(tips);
+})();
