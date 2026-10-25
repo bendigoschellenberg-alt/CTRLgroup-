@@ -82,6 +82,67 @@ if(['World','Build','StructureBlock','Avenue','Street','Location'].includes(kind
 return out;
 };
 }
+
+/* Unified wayfinding: make related pages reachable without scattering the original 44. */
+const UX_HUBS=[
+ {name:'My HQ',key:'home',note:'Daily work & plans',pages:['home','today','NotesTasks','Task','Event','Journal','ContentPlanner']},
+ {name:'Worlds',key:'World',note:'Worlds, builds & places',pages:['World','WorldGroup','Build','Location','CityBlock','Avenue','Street','GardenTheme','GardenFeature']},
+ {name:'Collections',key:'Packs',note:'Your inventory & add-ons',pages:['Packs','AddOn','Craftable','WorldTemplate','Texture','PackRecommendations','CraftableItem','Creator','Material','Block','Palette','Skin','shop','WishlistItem']},
+ {name:'Create',key:'generator',note:'Ideas, guides & structures',pages:['generator','GeneratorPrompt','MinecraftTips','StructureBlock','CraftablePlacement','CoordinatePin']},
+ {name:'Media',key:'Photo',note:'Photos, videos & stories',pages:['Photo','Video','Lore']},
+ {name:'More',key:'allpages',note:'Every original page',pages:['Tag','fields','RecoveryReview','trash','reconcile','settings']}
+];
+function uxPageTitle(key){
+  for(const [,pages] of GROUPS){const r=pages.find(item=>item[0]===key);if(r)return r[1];}
+  return key==='allpages'?'All Pages':key==='MinecraftTips'?'Minecraft Tips & Tricks':key;
+}
+function uxNavigate(){
+ const active=UX_HUBS.find(h=>h.pages.includes(S.page))||UX_HUBS[5];
+ if(S.page==='home'&& !S.detail)return '';
+ const navButtons=UX_HUBS.map(h=>
+  '<button type="button" class="ux-hub-button '+(h===active?'current':'')+'" data-nav="'+h.key+'" '+(h===active?'aria-current="page"':'')+'><span>'+esc(h.name)+'</span></button>'
+ ).join('');
+ const links=active.pages.filter(k=>k!=='home' &&k!=='allpages').map(k=>
+ '<button type="button" data-nav="'+esc(k)+'" class="'+(S.page===k?'is-selected':'')+'">'+esc(uxPageTitle(k))+'</button>').join('');
+ return '<nav class="ux-nav" aria-label="Find connected app pages"><div class="ux-nav-hubs">'+navButtons+'</div>'+
+ '<details class="ux-nav-related"><summary><strong>'+esc(active.name)+'</strong><span> · '+esc(active.note)+'</span><span class="ux-nav-expand">See related pages ⌄</span></summary><div class="ux-related-buttons">'+links+
+ '<button type="button" data-nav="allpages" class="ux-related-directory">Find any page ↗</button></div></details></nav>';
+}
+const oldShell=shell;
+shell=function(contents){
+  const show=uxNavigate();
+  oldShell(show+contents);
+};
+const oldAllPages=allPagesPage;
+allPagesPage=function(){
+ const old=oldAllPages();
+ const shortcuts='<section class="ux-directory-launch" aria-label="Go directly to a section"><h2>Go straight to what you need</h2><p>Everything is still here, but grouped so you can find it faster.</p><div>'+
+ UX_HUBS.map(h=>'<button type="button" data-nav="'+h.key+'"><strong>'+esc(h.name)+'</strong><small>'+esc(h.note)+'</small></button>').join('')+'</div></section>';
+ return old.replace('<section class="page-directory"',shortcuts+'<section class="page-directory"');
+};
+const oldHomeQuick=homePage;
+homePage=function(){
+ const out=oldHomeQuick();
+ const panel='<section class="ux-home-hubs"><div class="ux-home-hubs-header"><strong>Find your next thing ♡</strong><button type="button" data-nav="allpages">All '+GROUPS.reduce((n,g)=>n+g[1].length,0)+' pages ↗</button></div><div>'+
+ UX_HUBS.filter(h=>h.key!=='allpages').map(h=>'<button type="button" data-nav="'+h.key+'"><strong>'+esc(h.name)+'</strong><small>'+esc(h.note)+'</small></button>').join('')+
+ '</div></section>';
+ return out.replace('</header>','</header>'+panel);
+};
+// Keep the user's preferred readable list as the default, without removing
+// the optional table view or editing controls on any original library page.
+if(!S.tableModes)S.tableModes={};
+for(const kind of Object.keys(KINDS))if(!Object.prototype.hasOwnProperty.call(S.tableModes,kind))S.tableModes[kind]='list';
+// Reduce visual noise from optional table drawers while keeping all original data.
+if(!S.quickDataOpen)S.quickDataOpen={};
+// Make the reconstructed material unmistakably labeled; only 211–260
+// came from the user's full text in the current available source.
+const oldHandbookPage=page;
+page=function(){
+  const out=oldHandbookPage();
+  const note='<p class="ux-catalogue-provenance"><strong>Reference note:</strong> Tips 1–210 were curated by topic. Tips 211–260 follow your original supplied guide. No saved world or collection records are involved.</p>';
+  return out.replace('<p class="mc-help">',note+'<p class="mc-help">');
+};
+
 const css=document.createElement('link');css.rel='stylesheet';css.href='./minecraft-experience.css?v=20261024';document.head.appendChild(css);
 if(location.hash==='#MinecraftTips'&&S.page!=='MinecraftTips')S.page='MinecraftTips';
 if(sessionValid())render();
